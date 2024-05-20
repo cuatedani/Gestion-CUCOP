@@ -1,0 +1,17 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/common/footer.pug
+doctype html
+html(lang="es")
+  head
+    +header("Recurso no encontrado")
+    link(rel="stylesheet", href="/time/public/css/common/404.css")
+  body
+    .notfound-container 
+      h1.notfount-title 404
+      p.notfount-p Recurso no encontrado 
+      a(href="/time").notfount-link Ir al inicio
+    +footer()
+    +scripts()

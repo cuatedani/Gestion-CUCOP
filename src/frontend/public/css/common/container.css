@@ -1,0 +1,24 @@
+.white-container{
+  background-color: white;
+  box-shadow: 0 0 3px rgb(0 0 0 / 20%);
+  border-radius: 10px;
+}
+
+.white-hr{
+  margin:0;
+}
+
+.white-header-container{
+  padding: 1% 2%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.white-title{
+  margin:0;
+}
+
+.white-body-container{
+  padding: 2%;
+}

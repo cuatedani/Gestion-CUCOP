@@ -1,0 +1,22 @@
+.container {
+  width: 100%;
+  display: flex;
+}
+.widget {
+  width: 100%;
+}
+.widget li {
+  display: inline;
+  font-size: 20px;
+}
+.date {
+  width: 50%;
+  float: left;
+}
+.date li {
+  margin-left: 5px;
+}
+.clock {
+  width: 50%;
+  float: right;
+}

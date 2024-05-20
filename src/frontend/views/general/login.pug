@@ -1,0 +1,25 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/common/modal.pug
+include ../../templates/general/login/operation.pug
+include ../../templates/general/login/nav-bar.pug
+include ../../templates/general/login/footer.pug
+
+doctype html
+html(lang="es")
+  head
+    +header("Iniciar sesión")
+    link(rel="stylesheet" href="https://ut3.cicese.mx/public/css/common/styles.css")
+    link(rel="stylesheet" href="https://ut3.cicese.mx/public/css/common/nav-bar.css")
+    link(rel="stylesheet" href="https://ut3.cicese.mx/public/css/common/footer.css")
+    link(rel="stylesheet" href="https://ut3.cicese.mx/public/css/common/panel.css")
+    link(rel="stylesheet" href="/time/public/css/general/login.css")
+  body
+    +nav-bar()
+    +form()
+    +footer()
+    +scripts()
+    script(src="/time/public/js/general/login/login.js")
+     

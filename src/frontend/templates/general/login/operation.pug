@@ -1,0 +1,13 @@
+mixin form()
+  #login-form.panel-container
+    h1.mb-3 Iniciar sesión
+    .mb-3
+      label(for="email").form-label Correo electrónico
+      input(type="email" id="email" v-model="email").form-control
+    .mb-3
+      label(for="password").form-label Contraseña
+      input(type="password" id="password" v-model="password").form-control
+    .text-end
+      button(@click="sendForm").btn.btn-panel-primary Ingresar
+    div(role="alert" v-if="code==200").alert.alert-success.mt-3 Inicio de sesión exitoso
+    div(role="alert" v-if="code==401").alert.alert-danger.mt-3 Revisa los campos

@@ -1,0 +1,39 @@
+include ../../common/table
+mixin table()
+  .white-container.mb-4
+    .white-body-container
+      .toast-container.position-fixed.top-0.end-0.p-3
+        div(role="alert" aria-live="assertive" aria-atomic="true")#liveToast.toast.align-items-center.text-bg-success.border-0
+          .d-flex
+            .toast-body
+              div(v-if="code == 1") Entrada registrada
+              div(v-if="code == 2") Salida registrada
+              div(v-if="code == 3") Justificación registrada
+            button(type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close")
+
+      table.table.table-hover
+        thead
+          tr
+            th Id
+            th Rol
+            th Institución
+            th Nombre completo
+            th Hora de entrada hoy
+            th Hora de entrada salida hoy
+            th.center(colspan="3") Acciones
+        tbody 
+          tr(v-for="customer in customers") 
+            td {{customer.customerId}}
+            td {{customer.rol}}
+            td {{customer.institution}}
+            td
+              strong {{customer.contact.name}}
+            td {{customer?.checkIn?.createdAt && new Date(customer?.checkIn?.createdAt).parseDate() || "NA"}}
+            td {{customer?.checkOut?.createdAt && new Date(customer?.checkOut?.createdAt).parseDate() || "NA"}}
+            td.center
+              button(@click=`checkIn(customer.customerId)`).btn.btn-primary.me-2 Entrada
+            td.center
+              button(@click=`checkOut(customer.customerId)`).btn.btn-danger Salida
+            - if (user?.rol === "admin")
+              td.center
+                button(@click=`justify(customer.customerId)`).btn.btn-primary.me-2 Justificado

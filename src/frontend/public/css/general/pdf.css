@@ -1,0 +1,71 @@
+body {
+  overflow: auto;
+  background-color: white;
+}
+
+p {
+  margin: 0;
+}
+
+h5 {
+  font-weight: bold;
+  font-size: 1.3rem;
+  font-style: italic;
+}
+
+.logo {
+  width: 100%;
+  height: auto;
+}
+
+.banner-container {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  width: 80%;
+  margin: 1% auto;
+}
+
+.info-container {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  width: 80%;
+  margin: 1.5% auto;
+}
+
+.table-container {
+  text-align: center;
+  margin: 1.5% auto;
+}
+
+.signing-container {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  width: 90%;
+  margin: auto;
+  margin-top: 8%;
+}
+
+.signing-customer {
+  width: 18%;
+}
+
+.signing-return-container {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  width: 70%;
+  margin: auto;
+  margin-top: 8%;
+}
+
+.signing-return-customer {
+  width: 30%;
+}
+
+.footer-container {
+  width: 95%;
+  margin:auto;
+}

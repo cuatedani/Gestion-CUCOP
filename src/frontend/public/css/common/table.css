@@ -1,0 +1,20 @@
+.table-small {
+  font-size: 11px !important;
+}
+
+.th-sortable{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon-sortable {
+  width: 25px;
+  height: auto;
+  cursor: pointer;
+}
+
+.icon-sortable > img {
+  width: 100%;
+  height: auto;
+}

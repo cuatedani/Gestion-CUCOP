@@ -1,0 +1,40 @@
+-
+  const menu = [
+    {
+      "title":"Directorio",
+      "url":"https://requiem.cicese.mx/",
+      "options":[]
+    },
+    {
+      "title":"CICESE",
+      "url":"https://cicese.edu.mx/",
+      "options":[]
+    },
+    {
+      "title":"CICESE-UT3",
+      "url":"https://ut3.cicese.mx/",
+      "options":[]
+    },
+  ]
+
+mixin nav-bar(view = -1)
+  nav.navbar.navbar-expand-lg.fixed-top.nav-bar
+    .container-fluid
+      a(href="/time").navbar-brand
+        img(src="https://ut3.cicese.mx/public/images/logo_blanco.png" alt="Logo de cicese").nav-bar-logo
+      button(type="button" data-bs-toggle="collapse" data-bs-target="#nav-bar").navbar-toggler
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-list" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+      .collapse.navbar-collapse.nav-bar-items#nav-bar
+        ul.navbar-nav.nav-bar-ul
+          each item,index in menu
+            li.nav-item.dropdown
+              if item.options.length==0
+                a(href=item.url role="button" target=item.target,class=view==index?"nav-bar-a-selected":"").nav-link.nav-bar-a #{item.title}
+              else
+                a(href=item.url role="button" data-bs-toggle="dropdown" target=item.target,class=view==index?"nav-bar-a-selected":"").nav-link.dropdown-toggle.nav-bar-a #{item.title}
+                ul.dropdown-menu
+                  each subItem in item.options
+                    li
+                      a(href=subItem.url target=subItem.target).dropdown-item #{subItem.title}

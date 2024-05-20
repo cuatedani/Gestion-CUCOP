@@ -1,0 +1,29 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th
+              .th-sortable
+                span Id
+                +sort("id", "sortByIdDes")
+            th Nombres y apellidos
+            th Rol
+            th Correo electrónico
+            th Activo
+            th Fecha de creación
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="user in filteredUsers") 
+            td {{user.userId}}
+            td {{user.firstNames}} {{user.lastNames}}
+            td {{user.rol == "admin" ? "Administrador" : "Normal"}}
+            td {{user.email}}
+            td {{user.active ? "Sí" : "No"}}
+            td {{new Date(user.createdAt).parseDate()}}
+            td.center
+              a(:href=`"/time/users/"+user.userId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(user.userId)").btn.btn-danger Eliminar 

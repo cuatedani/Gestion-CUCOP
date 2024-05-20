@@ -1,0 +1,35 @@
+include ../../common/table
+mixin table()
+  .white-container.mb-4
+    .white-body-container
+      table.table.table-hover
+        thead
+          tr
+            th
+              .th-sortable
+                span Id
+                +sort("id", "sortDesById")
+            th Rol
+            th Institución
+            th Nombre completo
+            th Correos electrónicos
+            th Horas objetivo
+            th Horas realizadas
+            th Horas faltantes
+            th Activo
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="customer in filteredCustomers") 
+            td {{customer.customerId}}
+            td {{customer.rol}}
+            td {{customer.institution}}
+            td {{customer.contact.name}}
+            td {{customer.contact.email1}}, {{customer.contact.email2 || ""}}
+            td {{customer.targetHours}}
+            td {{customer.hoursElapsed}}
+            td {{customer.targetHours - customer.hoursElapsed}}
+            td {{customer.active ? "Sí" : "No"}}
+            td.center
+              a(:href=`"/time/customers/"+customer.customerId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click=`showDialog(customer.customerId)`).btn.btn-danger Eliminar
