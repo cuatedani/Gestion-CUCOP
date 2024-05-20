@@ -1,0 +1,25 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/general/users/operation.pug
+
+doctype html
+html(lang="es")
+  head
+    if operation == 'create'
+      +header("Agregar usuario")
+    else
+      +header("Editar usuario")
+  body
+    .main-container
+      +nav-bar(3)
+      .right-container
+        if operation == 'create'
+          +nav-top("Agregar usuario")
+        else
+          +nav-top("Editar usuario")
+        .content-container#app
+          +operation()
+    +scripts()
+    script(src="/time/public/js/general/users/users_operation.js")

@@ -1,0 +1,3 @@
+mixin sort(type, variable)
+  span(@click=`sort('${type}')`).icon-sortable
+    img(:src=`'/time/public/images/table/'+(${variable}?'abajo':'arriba')+'.png'`)

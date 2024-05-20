@@ -1,0 +1,27 @@
+{
+  "development": {
+    "database": {
+      "host": "localhost",
+      "user": "root",
+      "password": "password",
+      "database": "ut3-sistema-control-horas"
+    }
+  },
+  "test": {
+    "database": {
+      "host": "localhost",
+      "user": "root",
+      "password": "password",
+      "database": "ut3-sistema-control-horas-test"
+    }
+  },
+  "production": {
+    "database": {
+      "host": "localhost",
+      "user": "root",
+      "password": "password",
+      "database": "ut3-sistema-control-horas"
+    }
+  },
+  "token": "TOKEN"
+}

@@ -1,0 +1,8 @@
+mixin search_field(model, array, property, placeholder = "", empty = "")
+  input(type="text" placeholder=placeholder v-model=model id=model @focus="searchFieldFocus($event, '"+model+"')" @blur="searchFieldBlur($event, '"+model+"')" @keyup="searchFieldKeyUp($event, '"+model+"')").form-control
+  .dropdown
+    ul(v-if="searchFieldIsShowed('"+model+"')").dropdown-content
+      if(empty != "")
+        li(@mousedown="searchFieldSelectItem(null, '"+model+"')") #{empty}
+      li(v-for="item in "+array, @mousedown="searchFieldSelectItem(item, '"+model+"')") {{#{property}}}
+      li(v-if=array+".length == 0") Sin datos

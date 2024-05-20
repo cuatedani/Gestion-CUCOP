@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "noEmit": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@views":[
+        "./src/frontend/views"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "index.ts"
+  ],
+  "exclude": [
+    "./src/frontend/public/js"
+  ]
+}

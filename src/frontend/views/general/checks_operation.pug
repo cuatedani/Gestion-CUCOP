@@ -1,0 +1,24 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/footer.pug
+include ../../templates/common/layout.pug
+include ../../templates/common/modal.pug
+include ../../templates/common/search_field.pug
+include ../../templates/general/checks/operation.pug
+
+doctype html
+html(lang="es")
+  head
+    if operation == 'create'
+      +header("Agregar nuevo registro")
+  body
+    .main-container
+      +nav-bar(0)
+      .right-container
+        if operation == 'create'
+          +nav-top("Agregar nuevo registro")
+        .content-container#app
+          +table()
+    +scripts()
+    script(type="module" src="/time/public/js/general/checks/checks_operation.js")

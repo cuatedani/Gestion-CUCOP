@@ -1,0 +1,22 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/footer.pug
+include ../../templates/common/layout.pug
+include ../../templates/common/modal.pug
+include ../../templates/common/search_field.pug
+include ../../templates/general/reports/reports.pug
+
+doctype html
+html(lang="es")
+  head
+    +header("Reportes")
+  body
+    .main-container
+      +nav-bar(4)
+      .right-container
+        +nav-top("Reportes")
+        .content-container#app
+          +reports()
+    +scripts()
+    script(type="module" src="/time/public/js/general/reports/reports.js")

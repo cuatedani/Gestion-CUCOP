@@ -1,0 +1,47 @@
+mixin filters
+  .white-container.mb-4
+    .white-header-container
+      h5.white-title Filtros
+      a(href="/time/customers/create").btn.btn-link.p-0 Agregar cliente interno
+    hr.white-hr
+    .white-body-container
+      .row
+        .col-10 
+          label.form-label Todos los campos
+          input.form-control(type="text", placeholder="Ej. Juan Carlos", v-model.trim="wherever")
+        .col-2.btn-toggle-more-filters
+          button.btn.btn-primary(data-bs-toggle="collapse", data-bs-target="#extraFilters") Mostrar más filtros
+      #extraFilters.row.collapse
+        .row.mt-3
+          .col-2
+            label.form-label Rol
+            select(v-model="rol").form-select
+              option(value="") Todos
+              option(value="Estudiante") Estudiante
+              option(value="Personal") Personal
+              option(value="Investigador") Investigador
+              option(value="Posdoctorante") Posdoctorante
+              option(value="Otro") Otro
+          .col
+            label.form-label Nombre
+            input.form-control(type="text", placeholder="Ej. Luis Gonzalez Ulloa", v-model.trim="name")
+          .col
+            label.form-label Institución
+            input.form-control(type="text", placeholder="Ej. CICESE-UT3", v-model.trim="institution")
+          .col
+            label.form-label Dirección
+            input.form-control(type="text", placeholder="Ej. Zaragoza 212", v-model.trim="address")
+        .row.mt-3
+          .col
+            label.form-label Télefono
+            input(type="text" placeholder="Ej. 319-101-0836" v-model='phone').form-control
+          .col
+            label.form-label Correo electrónico
+            input(type="text" placeholder="Ej. luis34gonza@hotmail.com" v-model='email').form-control
+          .col
+            label.form-label Activo
+            select(v-model="active").form-select
+              option(value="") Todos 
+              option(value="1") Activo
+              option(value="0") Inactivo
+    
