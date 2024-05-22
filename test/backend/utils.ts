@@ -1,9 +1,11 @@
 import db from "../../src/backend/database";
 import { faker } from "@faker-js/faker";
 import User from "../../src/backend/models/user";
+import Contact from "../../src/backend/models/contact";
+import Customer from "../../src/backend/models/customer";
+
 import Supplier from "../../src/backend/models/supplier";
 import Location from "../../src/backend/models/location";
-import Customer from "../../src/backend/models/customer";
 import Category from "../../src/backend/models/category";
 import Area from "../../src/backend/models/area";
 import Account from "../../src/backend/models/account";
@@ -13,7 +15,6 @@ import Assignment, {
   AssignmentStatus,
 } from "../../src/backend/models/assignment";
 import Product from "../../src/backend/models/product";
-import Contact from "../../src/backend/models/contact";
 
 const cleanDataBase = async () => {
   await db.query(`delete from contacts`);
@@ -46,7 +47,7 @@ const createContact = async (active = false) => {
     street: faker.address.street(),
     cardinalPoint: faker.address.cardinalDirection(),
     number: faker.datatype.string(),
-    cp: faker.datatype.number({ min: 10000, max: 99999 }),
+    cp: "" + faker.datatype.number({ min: 10000, max: 99999 }),
     phone1: faker.phone.phoneNumber("### ### ####"),
     phone2: faker.phone.phoneNumber("### ### ####"),
     email1: faker.internet.email(),
@@ -61,7 +62,9 @@ const createUser = async (active = false, email = "", password = "") => {
   const email_ = email ? email : faker.internet.email();
   const password_ = password ? password : faker.internet.password();
   return User.create({
-    userName: faker.name.firstName(),
+    firstNames: faker.name.firstName(),
+    lastNames: faker.name.lastName(),
+    rol: "",
     email: email_,
     password: password_,
     active,
@@ -91,8 +94,13 @@ const createLocation = async (active = false) => {
 const createCustomer = async (active = false) => {
   const contactId = await createContact(true);
   return Customer.create({
-    contactId,
-    active,
+    contactId: contactId,
+    rol: "",
+    institution: "",
+    targetHours: 100,
+    adjustHours: 1,
+    hoursElapsed: 3,
+    active: active,
   });
 };
 
@@ -140,7 +148,7 @@ const createIncome = async (
   projectId = -1,
   accountId = -1,
   supplierId = -1,
-  customerId = -1
+  customerId = -1,
 ) => {
   return Income.create({
     projectId: projectId == -1 ? await createProject(true) : projectId,
@@ -170,7 +178,7 @@ const createProduct = async (
   active = false,
   areaId = -1,
   categoryId = -1,
-  locationId = -1
+  locationId = -1,
 ) => {
   return Product.create({
     areaId: areaId == -1 ? await createArea() : areaId,

@@ -3,7 +3,7 @@
     "database": {
       "host": "localhost",
       "user": "root",
-      "password": "password",
+      "password": "12345",
       "database": "ut3-sistema-control-horas"
     }
   },
@@ -11,7 +11,7 @@
     "database": {
       "host": "localhost",
       "user": "root",
-      "password": "password",
+      "password": "12345",
       "database": "ut3-sistema-control-horas-test"
     }
   },
@@ -19,7 +19,7 @@
     "database": {
       "host": "localhost",
       "user": "root",
-      "password": "password",
+      "password": "12345",
       "database": "ut3-sistema-control-horas"
     }
   },

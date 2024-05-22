@@ -82,7 +82,7 @@ describe("Customer model", () => {
     const customerId = await Utils.createCustomer();
     const contactId = await Utils.createContact();
     const update = await Customer.update(customerId, {
-      contactId,
+      contactId: contactId,
       active: true,
     });
     expect(update).toBe(true);
