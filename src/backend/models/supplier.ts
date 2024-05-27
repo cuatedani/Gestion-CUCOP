@@ -11,7 +11,6 @@ export interface ISupplier {
   supplierId: number;
   name: string;
   description: string;
-  RFC: string;
   tin: string;
   phone: string;
   address: string;
@@ -108,7 +107,6 @@ const getById = async (
 const create = async ({
   name,
   description,
-  RFC,
   tin,
   phone,
   address,
@@ -120,14 +118,13 @@ const create = async ({
       insert into users (
         name,
         description,
-        RFC,
         tin,
         phone,
         address,
         active,
       ) values(?, ?, ?, ?, ?, ?, ?)
     `,
-      [name, description, RFC, tin, phone, address, active],
+      [name, description, tin, phone, address, active],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -140,7 +137,7 @@ const create = async ({
 
 const update = async (
   supplierId: number | string,
-  { name, description, RFC, tin, phone, address, active }: IUpdateSupplier,
+  { name, description, tin, phone, address, active }: IUpdateSupplier,
 ): Promise<boolean> => {
   try {
     const [rows] = await db.query(
@@ -150,14 +147,13 @@ const update = async (
       SET 
         name=?,
         description=?,
-        RFC=?,
         tin=?,
         phone=?,
         address=?,
         active=?
       WHERE supplierId=?
     `,
-      [name, description, RFC, tin, phone, address, active, supplierId],
+      [name, description, tin, phone, address, active, supplierId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;

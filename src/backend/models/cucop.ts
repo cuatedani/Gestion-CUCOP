@@ -47,7 +47,7 @@ const exists = async (cucopId: number | boolean): Promise<boolean> => {
       `
       select 
         cucopId
-      from users
+      from cucop
       where cucopId=?
     `,
       [cucopId],
@@ -125,7 +125,8 @@ const create = async ({
   desccapitulo,
   fechaalta,
   fechamodificacion,
-  active,
+  // eslint-disable-next-line prettier/prettier
+  active
 }: ICreateCucop): Promise<number> => {
   try {
     const [rows] = await db.query(

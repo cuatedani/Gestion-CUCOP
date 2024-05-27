@@ -2,15 +2,15 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 import db from "../database";
 import OperationError from "../utils/error";
+import { IList } from "./list";
+import { IProduct } from "./product";
 
 /**
  * Interfaces
  */
 
-// AQUI CONTINUA EL DESARROLLO
-
-export interface IList_Product {
-  list_productId: number;
+export interface IListProduct {
+  listProductId: number;
   listId: number;
   productId: number;
   quantity: string;
@@ -18,14 +18,16 @@ export interface IList_Product {
   active: boolean;
   updatedAt: string;
   createdAt: string;
+  list: IList;
+  product: IProduct;
 }
 
-export type ICreateList_Product = Omit<
-  IList_Product,
-  "list_productId" | "createdAt" | "updatedAt"
+export type ICreateListProduct = Omit<
+  IListProduct,
+  "listProductId" | "createdAt" | "updatedAt"
 >;
 
-export type IUpdateList_Product = ICreateList_Product;
+export type IUpdateListProduct = ICreateListProduct;
 
 interface IGetAllFilters {
   limit?: number;
@@ -37,16 +39,16 @@ interface IGetAllFilters {
  * Methods
  */
 
-const exists = async (list_productId: number | boolean): Promise<boolean> => {
+const exists = async (listProductId: number | boolean): Promise<boolean> => {
   try {
     const [rows] = await db.query(
       `
       select 
-        list_productId
+        listProductId
       from list_products
-      where list_productId=?
+      where listProductId=?
     `,
-      [list_productId],
+      [listProductId],
     );
 
     const data = rows as RowDataPacket[];
@@ -62,7 +64,7 @@ const getAll = async ({
   limit,
   sort = "desc",
   status = "all",
-}: IGetAllFilters): Promise<IList_Product[]> => {
+}: IGetAllFilters): Promise<IListProduct[]> => {
   try {
     const amount = limit ? `limit ${limit}` : "";
     const active = status != "all" ? `where active=${status == "active"}` : "";
@@ -74,7 +76,7 @@ const getAll = async ({
       order by createdAt ${sort} ${amount}
     `);
 
-    const data = rows as IList_Product[];
+    const data = rows as IListProduct[];
     return data;
   } catch (ex) {
     console.log(ex);
@@ -83,22 +85,22 @@ const getAll = async ({
 };
 
 const getById = async (
-  list_productId: number | string,
-): Promise<IList_Product | undefined> => {
+  listProductId: number | string,
+): Promise<IListProduct | undefined> => {
   try {
     const [rows] = await db.query(
       `
       select 
         *
       from list_products
-      where list_productId=?
+      where listProductId=?
     `,
-      [list_productId],
+      [listProductId],
     );
 
     const data = rows as RowDataPacket[];
     if (data.length == 0) throw new OperationError(400, "Not found");
-    return data[0] as IList_Product;
+    return data[0] as IListProduct;
   } catch (ex) {
     console.log(ex);
     return undefined;
@@ -111,7 +113,7 @@ const create = async ({
   quantity,
   price,
   active,
-}: ICreateList_Product): Promise<number> => {
+}: ICreateListProduct): Promise<number> => {
   try {
     const [rows] = await db.query(
       `
@@ -135,8 +137,8 @@ const create = async ({
 };
 
 const update = async (
-  list_productId: number | string,
-  { listId, productId, quantity, price, active }: IUpdateList_Product,
+  listProductId: number | string,
+  { listId, productId, quantity, price, active }: IUpdateListProduct,
 ): Promise<boolean> => {
   try {
     const [rows] = await db.query(
@@ -149,9 +151,9 @@ const update = async (
         quantity=?,
         price=?,
         active=?,
-      WHERE list_productId=?
+      WHERE listProductId=?
     `,
-      [listId, productId, quantity, price, active, list_productId],
+      [listId, productId, quantity, price, active, listProductId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;
@@ -162,7 +164,7 @@ const update = async (
   }
 };
 
-const remove = async (list_productId: number | string): Promise<boolean> => {
+const remove = async (listProductId: number | string): Promise<boolean> => {
   try {
     const [rows] = await db.query(
       `
@@ -171,9 +173,9 @@ const remove = async (list_productId: number | string): Promise<boolean> => {
       set
         active=? 
       where
-        list_productId=?
+        listProductId=?
     `,
-      [false, list_productId],
+      [false, listProductId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;

@@ -2,6 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 import db from "../database";
 import OperationError from "../utils/error";
+import { IUser } from "./user";
 
 /**
  * Interfaces
@@ -14,6 +15,7 @@ export interface IList {
   active: boolean;
   updatedAt: string;
   createdAt: string;
+  user: IUser;
 }
 
 export type ICreateList = Omit<IList, "listId" | "createdAt" | "updatedAt">;
@@ -36,7 +38,7 @@ const exists = async (listId: number | boolean): Promise<boolean> => {
       `
       select 
         listId
-      from users
+      from lists
       where listId=?
     `,
       [listId],

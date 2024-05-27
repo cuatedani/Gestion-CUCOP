@@ -2,6 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 import db from "../database";
 import OperationError from "../utils/error";
+import { ISupplier } from "./supplier";
 
 /**
  * Interfaces
@@ -9,14 +10,13 @@ import OperationError from "../utils/error";
 
 export interface IQuotation {
   quotationId: number;
-  productId: number;
   supplierId: number;
   price: number;
-  quotationDate: string;
   description: string;
   active: boolean;
   updatedAt: string;
   createdAt: string;
+  supplier: ISupplier;
 }
 
 export type ICreateQuotation = Omit<
@@ -105,10 +105,8 @@ const getById = async (
 };
 
 const create = async ({
-  productId,
   supplierId,
   price,
-  quotationDate,
   description,
   active,
 }: ICreateQuotation): Promise<number> => {
@@ -116,15 +114,13 @@ const create = async ({
     const [rows] = await db.query(
       `
       insert into quotations (
-        productId,
         supplierId,
         price,
-        quotationDate,
         description,
         active
       ) values(?, ?, ?, ?, ?, ?)
     `,
-      [productId, supplierId, price, quotationDate, description, active],
+      [supplierId, price, description, active],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -137,14 +133,7 @@ const create = async ({
 
 const update = async (
   quotationId: number | string,
-  {
-    productId,
-    supplierId,
-    price,
-    quotationDate,
-    description,
-    active,
-  }: IUpdateQuotation,
+  { supplierId, price, description, active }: IUpdateQuotation,
 ): Promise<boolean> => {
   try {
     const [rows] = await db.query(
@@ -152,23 +141,13 @@ const update = async (
       UPDATE  
         quotations 
       SET 
-        productId=?,
         supplierId=?,
         price=?,
-        quotationDate=?,
         description=?,
         active=?
-      WHERE userId=?
+      WHERE quotationId=?
     `,
-      [
-        productId,
-        supplierId,
-        price,
-        quotationDate,
-        description,
-        active,
-        quotationId,
-      ],
+      [supplierId, price, description, active, quotationId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;

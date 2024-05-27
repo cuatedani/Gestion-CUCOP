@@ -17,9 +17,9 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `userId` int NOT NULL AUTO_INCREMENT,
+  `userId` INT AUTO_INCREMENT,
   `firstNames` varchar(120) NOT NULL,
-  `lastNames` varchar(120) NOT NULL,
+  `lastNames` varchar(120),
   `email` varchar(200) NOT NULL,
   `password` text NOT NULL,
   `rol` enum('admin','normal') NOT NULL DEFAULT 'normal',
@@ -32,7 +32,7 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 CREATE TABLE `lists` (
-  `listId` int NOT NULL AUTO_INCREMENT,
+  `listId` INT AUTO_INCREMENT,
   `userId` int NOT NULL,
   `status` varchar(20),
   `active` tinyint(1) NOT NULL DEFAULT 1,
@@ -45,7 +45,7 @@ CREATE TABLE `lists` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 CREATE TABLE `cucop` (
-  `cucopId` INT NOT NULL AUTO_INCREMENT,
+  `cucopId` INT AUTO_INCREMENT,
   `clavecucopid` text NOT NULL,
   `clavecucop` INT NOT NULL,
   `descripcion` text,
@@ -68,10 +68,10 @@ CREATE TABLE `cucop` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 CREATE TABLE `products` (
-  `productId` INT NOT NULL AUTO_INCREMENT,
+  `productId` INT AUTO_INCREMENT,
   `cucopId` INT NOT NULL,
   `name` varchar(120) NOT NULL,
-  `description`  varchar(350),
+  `description`  TEXT,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -82,29 +82,28 @@ CREATE TABLE `products` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 CREATE TABLE `list_products` (
-  `list_productId` INT NOT NULL AUTO_INCREMENT,
+  `listProductId` INT AUTO_INCREMENT,
   `listId` INT NOT NULL,
   `productId` INT NOT NULL,
   `quantity` INT NOT NULL,
-  `price` NUMERIC NOT NULL,
+  `price` FLOAT NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`list_productId`),
-  KEY `idx_list_productId` (`list_productId`),
+  PRIMARY KEY (`listProductId`),
+  KEY `idx_listProductId` (`listProductId`),
   CONSTRAINT `list_products_ibfk_1` FOREIGN KEY (`listId`) REFERENCES `lists` (`listId`) ON DELETE CASCADE,
   CONSTRAINT `list_products_ibfk_2` FOREIGN KEY (`productId`) REFERENCES `products` (`productId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 CREATE TABLE `suppliers` (
-  `supplierId`  INT NOT NULL AUTO_INCREMENT,
+  `supplierId`  INT AUTO_INCREMENT,
   `name` varchar(120) NOT NULL,
   `description` text,
-  `RFC` text NOT NULL,
   `tin` text NOT NULL,
-  `phone` varchar(15) NOT NULL,
-  `address` text NOT NULL,
+  `phone` varchar(15),
+  `address` text,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -114,18 +113,15 @@ CREATE TABLE `suppliers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 CREATE TABLE `quotations` (
-  `quotationId`  INT NOT NULL AUTO_INCREMENT,
-  `productId` INT NOT NULL,
+  `quotationId` INT AUTO_INCREMENT,
   `supplierId` INT NOT NULL,
   `price` FLOAT NOT NULL,
-  `quotationDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `description` TEXT,
   `active` TINYINT(1) NOT NULL DEFAULT 1,
   `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`quotationId`),
   KEY `idx_quotationId` (`quotationId`),
-  CONSTRAINT `quotations_ibfk_1` FOREIGN KEY (`productId`) REFERENCES `products` (`productId`) ON DELETE CASCADE,
-  CONSTRAINT `quotations_ibfk_2` FOREIGN KEY (`supplierId`) REFERENCES `suppliers` (`supplierId`) ON DELETE CASCADE
+  CONSTRAINT `quotations_ibfk_1` FOREIGN KEY (`supplierId`) REFERENCES `suppliers` (`supplierId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

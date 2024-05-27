@@ -2,6 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 import db from "../database";
 import OperationError from "../utils/error";
+import { ICucop } from "./cucop";
 
 /**
  * Interfaces
@@ -15,6 +16,7 @@ export interface IProduct {
   active: boolean;
   updatedAt: string;
   createdAt: string;
+  cucop: ICucop;
 }
 
 export type ICreateProduct = Omit<
