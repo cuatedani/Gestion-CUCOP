@@ -4,7 +4,7 @@
       "host": "localhost",
       "user": "root",
       "password": "12345",
-      "database": "ut3-sistema-control-horas"
+      "database": "ut3-sistema-gestion-cucop"
     }
   },
   "test": {
@@ -12,7 +12,7 @@
       "host": "localhost",
       "user": "root",
       "password": "12345",
-      "database": "ut3-sistema-control-horas-test"
+      "database": "ut3-sistema-gestion-cucop-test"
     }
   },
   "production": {
@@ -20,7 +20,7 @@
       "host": "localhost",
       "user": "root",
       "password": "12345",
-      "database": "ut3-sistema-control-horas"
+      "database": "ut3-sistema-gestion-cucop"
     }
   },
   "token": "TOKEN"

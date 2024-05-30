@@ -115,14 +115,14 @@ const create = async ({
   try {
     const [rows] = await db.query(
       `
-      insert into users (
+      insert into suppliers (
         name,
         description,
         tin,
         phone,
         address,
-        active,
-      ) values(?, ?, ?, ?, ?, ?, ?)
+        active
+      ) values(?, ?, ?, ?, ?, ?)
     `,
       [name, description, tin, phone, address, active],
     );

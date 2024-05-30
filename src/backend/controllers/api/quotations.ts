@@ -14,7 +14,7 @@ app.get("/cucop/api/quotations", auth, async (req, res) => {
   res.status(200).send({ code: 200, quotation });
 });
 
-app.get("/cucop/api/quotations", auth, async (req, res) => {
+app.get("/cucop/api/quotations/:id", auth, async (req, res) => {
   const quotation = await Quotation.getById(req.params.id);
   res.status(200).send({ code: 200, quotation });
 });

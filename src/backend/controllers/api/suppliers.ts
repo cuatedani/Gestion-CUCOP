@@ -4,9 +4,12 @@ import auth from "../../middlewares/auth";
 
 const app = express();
 
+app.get("/holass", async (req, res) => {
+  return res.status(200).send("hola mundo");
+});
+
 app.get("/cucop/api/suppliers", auth, async (req, res) => {
   const { sort = "desc", status } = req.query;
-
   const supplier = await Supplier.getAll({
     sort: sort as "desc" | "asc",
     status: status as "all" | "active" | "inactive",

@@ -21,7 +21,7 @@ export interface IProduct {
 
 export type ICreateProduct = Omit<
   IProduct,
-  "productId" | "createdAt" | "updatedAt"
+  "productId" | "createdAt" | "updatedAt" | "cucop"
 >;
 
 export type IUpdateProduct = ICreateProduct;

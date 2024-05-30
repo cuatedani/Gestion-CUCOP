@@ -21,7 +21,7 @@ export interface IQuotation {
 
 export type ICreateQuotation = Omit<
   IQuotation,
-  "quotationId" | "createdAt" | "updatedAt"
+  "quotationId" | "createdAt" | "updatedAt" | "supplier"
 >;
 
 export type IUpdateQuotation = ICreateQuotation;
@@ -89,7 +89,7 @@ const getById = async (
       `
       select 
         *
-      from quotation
+      from quotations
       where quotationId=?
     `,
       [quotationId],
@@ -118,7 +118,7 @@ const create = async ({
         price,
         description,
         active
-      ) values(?, ?, ?, ?, ?, ?)
+      ) values(?, ?, ?, ?)
     `,
       [supplierId, price, description, active],
     );

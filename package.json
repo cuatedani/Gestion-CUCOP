@@ -7,7 +7,7 @@
     "test": "jest --runInBand",
     "test-single": "jest ./test/backend/controllers/general/general.spec.ts --runInBand",
     "test-folder": "jest ./test/backend/models --runInBand",
-    "start-dev": "nodemon --exec ts-node index.ts",
+    "start-dev": "npx nodemon --exec npx ts-node index.ts",
     "start": "ts-node index.ts",
     "start-win": "nodemon --exec ts-node index.ts",
     "lint": "eslint . --ext .ts --quiet --fix",

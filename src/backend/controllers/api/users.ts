@@ -4,7 +4,7 @@ import auth from "../../middlewares/auth";
 
 const app = express();
 
-app.get("/time/api/users", auth, async (req, res) => {
+app.get("/cucop/api/users", auth, async (req, res) => {
   const { status = "all" } = req.query;
   const users = await User.getAll({
     status: status as "all" | "active" | "inactive",
@@ -12,23 +12,33 @@ app.get("/time/api/users", auth, async (req, res) => {
   res.status(200).send({ code: 200, users });
 });
 
-app.get("/time/api/users/:id", auth, async (req, res) => {
+app.get("/cucop/api/users/:id", auth, async (req, res) => {
   const user = await User.getById(req.params.id);
   res.status(200).send({ code: 200, user });
 });
 
-app.post("/time/api/users", auth, async (req, res) => {
-  const id = await User.create(req.body);
+app.post("/cucop/api/users", auth, async (req, res) => {
+  const userData = {
+    firstNames: req.body.firstNames,
+    lastNames: req.body.lastNames,
+    email: req.body.email,
+    password: req.body.password,
+    rol: req.body.rol,
+    active: true,
+  };
+
+  const id = await User.create(userData);
+
   res.status(200).send({ code: 200, id });
 });
 
-app.put("/time/api/users/:id", auth, async (req, res) => {
+app.put("/cucop/api/users/:id", auth, async (req, res) => {
   const updated = await User.update(req.params.id, req.body);
   const code = updated ? 200 : 400;
   res.status(code).send({ code });
 });
 
-app.delete("/time/api/users/:id", auth, async (req, res) => {
+app.delete("/cucop/api/users/:id", auth, async (req, res) => {
   const deleted = await User.remove(req.params.id);
   const code = deleted ? 200 : 400;
   res.status(code).send({ code });

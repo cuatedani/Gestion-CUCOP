@@ -26,6 +26,12 @@ import customersApiController from "./src/backend/controllers/api/customers";
 import checksApiController from "./src/backend/controllers/api/checks";
 import reportsApiController from "./src/backend/controllers/api/reports";
 import sessionApiController from "./src/backend/controllers/api/session";
+import listsApiController from "./src/backend/controllers/api/lists";
+import cucopApiController from "./src/backend/controllers/api/cucop";
+import productsApiController from "./src/backend/controllers/api/products";
+import listproductsApiController from "./src/backend/controllers/api/list_products";
+import suppliersApiController from "./src/backend/controllers/api/suppliers";
+import quotationsApiController from "./src/backend/controllers/api/quotations";
 
 import commonController from "./src/backend/controllers/common/common";
 
@@ -65,6 +71,13 @@ app.use(customersApiController);
 app.use(checksApiController);
 app.use(reportsApiController);
 app.use(sessionApiController);
+app.use(listsApiController);
+app.use(cucopApiController);
+app.use(productsApiController);
+app.use(listproductsApiController);
+app.use(suppliersApiController);
+app.use(quotationsApiController);
+
 app.use(commonController);
 
 export default app.listen(PORT, () => {

@@ -22,8 +22,8 @@ app.get("/cucop/api/list-products/:id", auth, async (req, res) => {
 app.post("/cucop/api/list-products/", auth, async (req, res) => {
   const listId = Number(req.body.listId);
   const productId = Number(req.body.productId);
-  const quantity = req.body.type;
-  const price = req.body.type;
+  const quantity = req.body.quantity;
+  const price = req.body.price;
   const id = await ListProduct.create({
     listId,
     productId,

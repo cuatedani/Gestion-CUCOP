@@ -18,7 +18,10 @@ export interface IList {
   user: IUser;
 }
 
-export type ICreateList = Omit<IList, "listId" | "createdAt" | "updatedAt">;
+export type ICreateList = Omit<
+  IList,
+  "listId" | "createdAt" | "updatedAt" | "user"
+>;
 
 export type IUpdateList = ICreateList;
 

@@ -27,7 +27,7 @@ export interface ICucop {
   active: boolean;
 }
 
-export type ICreateCucop = Omit<ICucop, "cucopId" | "createdAt" | "updatedAt">;
+export type ICreateCucop = Omit<ICucop, "cucopId">;
 
 export type IUpdateCucop = ICreateCucop;
 
@@ -75,7 +75,7 @@ const getAll = async ({
       select 
         *
       from cucop ${active}
-      order by createdAt ${sort} ${amount}
+      order by fechaalta ${sort} ${amount}
     `);
 
     const data = rows as ICucop[];
@@ -131,7 +131,7 @@ const create = async ({
   try {
     const [rows] = await db.query(
       `
-      insert into users (
+      insert into cucop (
         clavecucopid,
         clavecucop,
         descripcion,
@@ -147,7 +147,7 @@ const create = async ({
         desccapitulo,
         fechaalta,
         fechamodificacion,
-        active,
+        active
       ) values(?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       [

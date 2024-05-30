@@ -24,7 +24,7 @@ export interface IListProduct {
 
 export type ICreateListProduct = Omit<
   IListProduct,
-  "listProductId" | "createdAt" | "updatedAt"
+  "listProductId" | "createdAt" | "updatedAt" | "list" | "product"
 >;
 
 export type IUpdateListProduct = ICreateListProduct;
@@ -150,7 +150,7 @@ const update = async (
         productId=?,
         quantity=?,
         price=?,
-        active=?,
+        active=?
       WHERE listProductId=?
     `,
       [listId, productId, quantity, price, active, listProductId],

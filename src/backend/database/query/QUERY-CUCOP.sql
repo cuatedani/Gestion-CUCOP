@@ -59,8 +59,8 @@ CREATE TABLE `cucop` (
   `descconcepto` varchar(120),
   `capitulo` INT NOT NULL,
   `desccapitulo` varchar(120),
-  `fechaalta` DATE,
-  `fechamodificacion` DATE,
+  `fechaalta` varchar(120),
+  `fechamodificacion` varchar(120),
   `active` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`cucopId`),
   KEY `idx_cucopId` (`cucopId`)
@@ -125,3 +125,28 @@ CREATE TABLE `quotations` (
   CONSTRAINT `quotations_ibfk_1` FOREIGN KEY (`supplierId`) REFERENCES `suppliers` (`supplierId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+/*
+		S E D D E R S
+	
+ INSERT INTO SUPPLIERS (name, description, tin, phone, address, active)
+ VALUES
+ ("La Verduleria", "Venden frutas y verduras al menudeo", "ABCDEFG", "3271091111", "Villas de la colonial #44", true),
+ ("La Officina", "Extenso surtido de material de ofina", "HIJKLM", "3271092222", "ChecoPerez #1223", true);
+
+ */
+ 
+-- 		S E L E C T S
+ 
+-- SELECT * FROM USERS;
+-- SELECT * FROM SUPPLIERS;
+-- SELECT * FROM CUCOP;
+-- SELECT * FROM PRODUCTS;
+-- SELECT * FROM QUOTATIONS;
+-- SELECT * FROM LISTS;
+-- SELECT * FROM LIST_PRODUCTS;
+
+--  	D R O P S
+-- DROP TABLE LIST_PRODUCTS;
+-- DROP TABLE PRODUCTS;
+-- DROP TABLE CUCOP;
