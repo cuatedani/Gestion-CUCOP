@@ -20,39 +20,7 @@ app.get("/cucop/api/cucop/:id", auth, async (req, res) => {
 });
 
 app.post("/cucop/api/cucop", auth, async (req, res) => {
-  const clavecucopid = req.body.clavecucopid;
-  const clavecucop = req.body.clavecucop;
-  const descripcion = req.body.descripcion;
-  const unidaddemedida = req.body.unidaddemedida;
-  const tipodecontratacion = req.body.tipodecontratacion;
-  const partidaespecifica = req.body.partidaespecifica;
-  const descpartidaespecifica = req.body.descpartidaespecifica;
-  const partidagenerica = req.body.partidagenerica;
-  const descpartidagenerica = req.body.descpartidagenerica;
-  const concepto = req.body.concepto;
-  const descconcepto = req.body.descconcepto;
-  const capitulo = req.body.capitulo;
-  const desccapitulo = req.body.desccapitulo;
-  const fechaalta = req.body.fechaalta;
-  const fechamodificacion = req.body.fechamodificacion;
-  const id = await Cucop.create({
-    clavecucopid,
-    clavecucop,
-    descripcion,
-    unidaddemedida,
-    tipodecontratacion,
-    partidaespecifica,
-    descpartidaespecifica,
-    partidagenerica,
-    descpartidagenerica,
-    concepto,
-    descconcepto,
-    capitulo,
-    desccapitulo,
-    fechaalta,
-    fechamodificacion,
-    active: true,
-  });
+  const id = await Cucop.create(req.body);
   const code = id == -1 ? 400 : 200;
   res.status(code).send({ id });
 });

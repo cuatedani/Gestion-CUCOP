@@ -21,9 +21,7 @@ app.get("/cucop/api/lists/:id", auth, async (req, res) => {
 });
 
 app.post("/cucop/api/lists", auth, async (req, res) => {
-  const userId = Number(req.body.userId);
-  const status = req.body.type;
-  const id = await List.create({ userId, status, active: true });
+  const id = await List.create(req.body);
   const code = id == -1 ? 400 : 200;
   res.status(code).send({ id });
 });

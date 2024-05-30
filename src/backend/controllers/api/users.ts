@@ -18,17 +18,7 @@ app.get("/cucop/api/users/:id", auth, async (req, res) => {
 });
 
 app.post("/cucop/api/users", auth, async (req, res) => {
-  const userData = {
-    firstNames: req.body.firstNames,
-    lastNames: req.body.lastNames,
-    email: req.body.email,
-    password: req.body.password,
-    rol: req.body.rol,
-    active: true,
-  };
-
-  const id = await User.create(userData);
-
+  const id = await User.create(req.body);
   res.status(200).send({ code: 200, id });
 });
 

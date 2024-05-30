@@ -23,19 +23,7 @@ app.get("/cucop/api/suppliers/:id", auth, async (req, res) => {
 });
 
 app.post("/cucop/api/suppliers/", auth, async (req, res) => {
-  const name = req.body.name;
-  const description = req.body.description;
-  const tin = req.body.tin;
-  const phone = req.body.phone;
-  const address = req.body.address;
-  const id = await Supplier.create({
-    name,
-    description,
-    tin,
-    phone,
-    address,
-    active: true,
-  });
+  const id = await Supplier.create(req.body);
   const code = id == -1 ? 400 : 200;
   res.status(code).send({ id });
 });

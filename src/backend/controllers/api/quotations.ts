@@ -20,15 +20,7 @@ app.get("/cucop/api/quotations/:id", auth, async (req, res) => {
 });
 
 app.post("/cucop/api/quotations", auth, async (req, res) => {
-  const supplierId = Number(req.body.supplierId);
-  const price = req.body.price;
-  const description = req.body.description;
-  const id = await Quotation.create({
-    supplierId,
-    price,
-    description,
-    active: true,
-  });
+  const id = await Quotation.create(req.body);
   const code = id == -1 ? 400 : 200;
   res.status(code).send({ id });
 });

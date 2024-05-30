@@ -20,10 +20,7 @@ app.get("/cucop/api/products/:id", auth, async (req, res) => {
 });
 
 app.post("/cucop/api/products", auth, async (req, res) => {
-  const cucopId = Number(req.body.cucopId);
-  const name = req.body.name;
-  const description = req.body.description;
-  const id = await Product.create({ cucopId, name, description, active: true });
+  const id = await Product.create(req.body);
   const code = id == -1 ? 400 : 200;
   res.status(code).send({ id });
 });

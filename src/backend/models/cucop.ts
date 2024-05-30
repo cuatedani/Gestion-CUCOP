@@ -125,8 +125,7 @@ const create = async ({
   desccapitulo,
   fechaalta,
   fechamodificacion,
-  // eslint-disable-next-line prettier/prettier
-  active
+  active,
 }: ICreateCucop): Promise<number> => {
   try {
     const [rows] = await db.query(

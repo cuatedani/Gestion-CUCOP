@@ -20,17 +20,7 @@ app.get("/cucop/api/list-products/:id", auth, async (req, res) => {
 });
 
 app.post("/cucop/api/list-products/", auth, async (req, res) => {
-  const listId = Number(req.body.listId);
-  const productId = Number(req.body.productId);
-  const quantity = req.body.quantity;
-  const price = req.body.price;
-  const id = await ListProduct.create({
-    listId,
-    productId,
-    quantity,
-    price,
-    active: true,
-  });
+  const id = await ListProduct.create(req.body);
   const code = id == -1 ? 400 : 200;
   res.status(code).send({ id });
 });

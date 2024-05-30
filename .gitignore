@@ -3,3 +3,4 @@ coverage
 .log
 
 src/frontend/public/reports
+src/.vscode/launch.json
