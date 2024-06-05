@@ -1,0 +1,27 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th
+              .th-sortable
+                span Id
+                +sort("id", "sortByIdDes")
+            th Propietario
+            th Estado
+            th Activo
+            th Fecha de creación
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="list in filteredLists") 
+            td {{list.listId}}
+            td {{list.userId}}
+            td {{list.status}}
+            td {{list.active ? "Sí" : "No"}}
+            td {{new Date(list.createdAt).parseDate()}}
+            td.center
+              a(:href=`"/cucop/lists/"+list.listId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(list.listId)").btn.btn-danger Eliminar 

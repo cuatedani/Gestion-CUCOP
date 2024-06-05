@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { filteringUsers } from "/time/public/js/general/users/filters.js";
+import { filteringUsers } from "/cucop/public/js/general/users/filters.js";
 
 const { createApp } = Vue;
 const app = createApp({
@@ -27,7 +27,7 @@ const app = createApp({
   methods: {
     loadUsers: async function () {
       try {
-        const request = await axios.get("/time/api/users");
+        const request = await axios.get("/cucop/api/users");
         this.data = request.data.users;
       } catch (ex) {
         console.log(ex);
@@ -45,7 +45,7 @@ const app = createApp({
     },
     delete: async function () {
       try {
-        await axios.delete(`/time/api/users/${this.id}`);
+        await axios.delete(`/cucop/api/users/${this.id}`);
         $("#modalDelete").modal("toggle");
         this.loadUsers();
       } catch (ex) {

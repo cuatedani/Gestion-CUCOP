@@ -117,7 +117,7 @@ const create = async ({
   try {
     const [rows] = await db.query(
       `
-      insert into list_products (S
+      insert into list_products (
         listId,
         productId,
         quantity,

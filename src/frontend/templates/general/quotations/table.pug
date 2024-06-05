@@ -1,0 +1,29 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th
+              .th-sortable
+                span Id
+                +sort("id", "sortByIdDes")
+            th Proveedor
+            th Precio
+            th Descripción
+            th Activo
+            th Fecha de creación
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="quotation in filteredQuotations") 
+            td {{quotation.quotationId}}
+            td {{quotation.supplierId}}
+            td {{quotation.price}}
+            td {{quotation.description}}
+            td {{quotation.active ? "Sí" : "No"}}
+            td {{new Date(quotation.createdAt).parseDate()}}
+            td.center
+              a(:href=`"/cucop/quotations/"+quotation.quotationId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(quotation.quotationId)").btn.btn-danger Eliminar 

@@ -1,0 +1,25 @@
+mixin filters()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Filtros
+      a(href="/cucop/quotations/create").btn.btn-link.p-0 Agregar cotización
+    hr.white-hr
+    .white-body-container
+      .row
+        .col
+          label.form-label Proveedor
+          input(type="text" placeholder="Ej. 1" v-model="supplierId").form-control
+        .col
+          label.form-label Precio
+          input(type="text" placeholder="Ej. 10.00" v-model="price").form-control
+      .row.mt-3
+        .col
+          label.form-label description
+          input(type="text" placeholder="Ej. Hojas al pormayor" v-model="description").form-control
+      .row.mt-3
+        .col
+          label(for="active").form-label Activo
+          select(id="active" v-model="active").form-select
+            option(value="") Todos
+            option(value="1") Activo
+            option(value="0") Inactivo

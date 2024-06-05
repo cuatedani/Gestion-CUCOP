@@ -1,0 +1,51 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th
+              .th-sortable
+                span Id
+                +sort("id", "sortByIdDes")
+            th Clave CUCOP+
+            th Clave CUCOP
+            th Descripción
+            th Unidad de Medida
+            th Tipo de Contratación
+            th Partida Especifica
+            th Desc. Partida Especifica
+            th Partida Generica
+            th Desc. Partida Generica
+            th Concepto
+            th Desc. Concepto
+            th Capitulo
+            th Desc. Capitulo
+            th Fecha de creación
+            th Fecha de modificación
+            th Activo
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="cucop in filteredCucop") 
+            td {{cucop.cucopId}}
+            td {{cucop.clavecucopid}}
+            td {{cucop.clavecucop}}
+            td {{cucop.descripcion}}
+            td {{cucop.unidaddemedida}}
+            td {{cucop.tipodecontratacion}}
+            td {{cucop.partidaespecifica}}
+            td {{cucop.descpartidaespecifica}}
+            td {{cucop.partidagenerica}}
+            td {{cucop.descpartidagenerica}}
+            td {{cucop.concepto}}
+            td {{cucop.descconcepto}}
+            td {{cucop.capitulo}}
+            td {{cucop.desccapitulo}}
+            td {{new Date(cucop.fechaalta).parseDate()}}
+            td {{new Date(cucop.fechamodificacion).parseDate()}}
+            td {{cucop.active ? "Sí" : "No"}}
+            td.center
+              a(:href=`"/cucop/cucop/"+cucop.cucopId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(cucop.cucopId)").btn.btn-danger Eliminar 

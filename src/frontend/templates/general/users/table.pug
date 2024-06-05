@@ -24,6 +24,6 @@ mixin table()
             td {{user.active ? "Sí" : "No"}}
             td {{new Date(user.createdAt).parseDate()}}
             td.center
-              a(:href=`"/time/users/"+user.userId+"/edit"`).btn.btn-primary Editar
+              a(:href=`"/cucop/users/"+user.userId+"/edit"`).btn.btn-primary Editar
             td.center
               button(@click="showDialog(user.userId)").btn.btn-danger Eliminar 

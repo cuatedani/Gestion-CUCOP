@@ -1,0 +1,33 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th
+              .th-sortable
+                span Id
+                +sort("id", "sortByIdDes")
+            th Nombre
+            th Descripción
+            th TIN
+            th Dirección
+            th Teléfono
+            th Activo
+            th Fecha de creación
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="supplier in filteredSuppliers") 
+            td {{supplier.supplierId}}
+            td {{supplier.name}}
+            td {{supplier.description}}
+            td {{supplier.tin}}
+            td {{supplier.address}}
+            td {{supplier.phone}}
+            td {{supplier.active ? "Sí" : "No"}}
+            td {{new Date(supplier.createdAt).parseDate()}}
+            td.center
+              a(:href=`"/cucop/suppliers/"+supplier.supplierId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(supplier.supplierId)").btn.btn-danger Eliminar 

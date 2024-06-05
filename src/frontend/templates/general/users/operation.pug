@@ -1,47 +1,86 @@
 mixin operation()
   .white-container.mb-4
     .white-header-container
-      h4.white-title Datos del usuario
+      h4.white-title Datos del registro CUCOP
     hr.white-hr
     .white-body-container
       .row
         .col
-          label.form-label Nombres del usuario
-          <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. Carlos" v-model="user.firstNames").form-control
+          label.form-label Clave CUCOP+
+          span.text-red * 
+          input.form-control(type="text" placeholder="12201-0001" v-model="cucop.clavecucopid")
         .col
-          label.form-label Apellidos del usuario
-          <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. Ramirez" v-model="user.lastNames").form-control
-      .row.mt-3 
+          label.form-label Clave CUCOP
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. 12201001" v-model="cucop.clavecucop")
         .col
-          label.form-label Correo electrónico
-          <span class="text-red">*</span>
-          input(type="email" placeholder="Ej. email@example.com" v-model="user.email").form-control
+          label.form-label Descripción
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. Remuneraciones" v-model="cucop.description")
+      .row.mt-3
         .col
-          label.form-label Contraseña
-          <span class="text-red">*</span>
-          input(type="password" placeholder="Ej. **************" v-model="user.password").form-control
-      .row.mt-3 
+          label.form-label Unidad de Medida
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. Servicio" v-model="cucop.unidaddemedida")
         .col
-          label.form-label Rol
-          <span class="text-red">*</span>
-          select(name="rol" v-model="user.rol").form-select
-            option(value="") Selecciona un rol
-            option(value="normal") Normal
-            option(value="admin") Administrador
+          label.form-label Tipo de Contratación
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. Servicios" v-model="cucop.tipodecontratacion")
+      .row.mt-3
+        .col
+          label.form-label Partida Específica
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. 12201" v-model="cucop.partidaespecifica")
+        .col
+          label.form-label Descripción de Partida Específica
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. Remuneraciones al personal eventual" v-model="cucop.descpartidaespecifica")
+      .row.mt-3
+        .col
+          label.form-label Partida Genérica
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. 1212" v-model="cucop.partidagenerica")
+        .col
+          label.form-label Descripción de Partida Genérica
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. Sueldo base al personal eventual" v-model="cucop.descpartidagenerica")
+      .row.mt-3
+        .col
+          label.form-label Concepto
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. 1200" v-model="cucop.concepto")
+        .col
+          label.form-label Descripción del concepto
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. Remuneraciones al personal de carácter transitorio" v-model="cucop.descconcepto")
+      .row.mt-3
+        .col
+          label.form-label Capítulo
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. 1000" v-model="cucop.capitulo")
+        .col
+          label.form-label Descripción del capítulo
+          span.text-red * 
+          input.form-control(type="text" placeholder="Ej. Servicios Personales" v-model="cucop.desccapitulo")
+      .row.mt-3
+        .col
+          label.form-label Fecha Alta
+          input.form-control(type="text" placeholder="Ej. dd/mm/aaaa" v-model="cucop.fechaalta")
+        .col
+          label.form-label Fecha Modificación
+          input.form-control(type="text" placeholder="Ej. dd/mm/aaaa" v-model="cucop.fechamodificacion")
       .row.mt-3
         .col
           .form-check
             label.form-check-label Activo
-              input(type="checkbox" name="active" v-model="user.active").form-check-input
+              input.form-check-input(type="checkbox" name="active" v-model="cucop.active")
       .row.mt-3 
         .col-12.text-end
-          a(href="/time/users").btn.btn-secondary.me-3 Cancelar
-          button(type="sumbit" @click="sendForm").btn.btn-primary #{operation == "create" ? "Agregar" : "Actualizar"}
+          a.btn.btn-secondary.me-3(href="/cucop/cucop") Cancelar
+          button.btn.btn-primary(type="button" @click="sendForm") #{operation == "create" ? "Agregar" : "Actualizar"}
       .row.mt-3
         if operation == "create"
-          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Usuario creado exitosamente
+          div.alert.alert-success.mt-3(v-if="code==200" role="alert") Registro creado exitosamente
         else
-          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Usuario actualizado exitosamente
-        div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error al realizar la operación revisa los campos
+          div.alert.alert-success.mt-3(v-if="code==200" role="alert") Registro actualizado exitosamente
+        div.alert.alert-danger.mt-3(v-if="code!=0 && code!=200" role="alert") Error al realizar la operación, revisa los campos

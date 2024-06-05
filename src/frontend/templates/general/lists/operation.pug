@@ -1,0 +1,30 @@
+mixin operation()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Datos de la Lista de Pedidos
+    hr.white-hr
+    .white-body-container
+      .row
+        .col
+          label.form-label Propietario
+          <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Carlos" v-model="list.userId").form-control
+        .col
+          label.form-label Estado
+          <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Ramirez" v-model="list.status").form-control
+      .row.mt-3
+        .col
+          .form-check
+            label.form-check-label Activo
+              input(type="checkbox" name="active" v-model="list.active").form-check-input
+      .row.mt-3 
+        .col-12.text-end
+          a(href="/cucop/lists").btn.btn-secondary.me-3 Cancelar
+          button(type="sumbit" @click="sendForm").btn.btn-primary #{operation == "create" ? "Agregar" : "Actualizar"}
+      .row.mt-3
+        if operation == "create"
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Lista creada exitosamente
+        else
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Lista actualizada exitosamente
+        div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error al realizar la operación revisa los campos

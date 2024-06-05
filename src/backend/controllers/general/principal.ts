@@ -7,8 +7,8 @@ const app = express();
 app.set("views", path.join(__dirname, "../../../frontend/views/general"));
 
 // Routes
-app.get("/time", async (req, res) => {
-  res.redirect("/time/checks/create");
+app.get("/cucop", async (req, res) => {
+  res.redirect("/cucop/lists/create");
 });
 
 export default app;

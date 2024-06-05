@@ -1,0 +1,25 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/general/listproducts/operation.pug
+
+doctype html
+html(lang="es")
+  head
+    if operation == 'create'
+      +header("Agregar producto a lista")
+    else
+      +header("Editar producto en lista")
+  body
+    .main-container
+      +nav-bar(3)
+      .right-container
+        if operation == 'create'
+          +nav-top("Agregar producto a lista")
+        else
+          +nav-top("Editar producto en lista")
+        .content-container#app
+          +operation()
+    +scripts()
+    script(src="/cucop/public/js/general/listproducts/listproducts_operation.js")

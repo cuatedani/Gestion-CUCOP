@@ -7,11 +7,11 @@ const app = express();
 app.get("/cucop/api/list-products", auth, async (req, res) => {
   const { sort = "desc", status } = req.query;
 
-  const listproduct = await ListProduct.getAll({
+  const listproducts = await ListProduct.getAll({
     sort: sort as "desc" | "asc",
     status: status as "all" | "active" | "inactive",
   });
-  res.status(200).send({ code: 200, listproduct });
+  res.status(200).send({ code: 200, listproducts });
 });
 
 app.get("/cucop/api/list-products/:id", auth, async (req, res) => {

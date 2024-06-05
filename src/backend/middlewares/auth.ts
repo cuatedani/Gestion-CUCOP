@@ -21,17 +21,7 @@ type INotAllowed = {
 
 const notAllowed: INotAllowed = {
   admin: [],
-  normal: [
-    { method: "GET", path: "/time/customers" },
-    { method: "GET", path: "/time/customers/create" },
-    { method: "GET", path: "/time/customers/:id/edit" },
-    { method: "GET", path: "/time/users" },
-    { method: "GET", path: "/time/users/create" },
-    { method: "GET", path: "/time/users/:id/edit" },
-    { method: "GET", path: "/time/reports" },
-    { method: "GET", path: "/time/reports/create" },
-    { method: "GET", path: "/time/reports/:id/edit" },
-  ],
+  normal: [],
 };
 
 app.use(async (req, res, next) => {
@@ -42,7 +32,7 @@ app.use(async (req, res, next) => {
   const exists = notAllowed[rol].find(
     (x) => x.method == method && x.path == route.path,
   );
-  if (exists) res.redirect("/time/checks/create");
+  if (exists) res.redirect("/cucop/lists/create");
   next();
 });
 

@@ -1,0 +1,25 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/general/quotations/operation.pug
+
+doctype html
+html(lang="es")
+  head
+    if operation == 'create'
+      +header("Agregar cotización")
+    else
+      +header("Editar cotización")
+  body
+    .main-container
+      +nav-bar(3)
+      .right-container
+        if operation == 'create'
+          +nav-top("Agregar cotización")
+        else
+          +nav-top("Editar cotización")
+        .content-container#app
+          +operation()
+    +scripts()
+    script(src="/cucop/public/js/general/quotations/quotations_operation.js")

@@ -1,0 +1,29 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th
+              .th-sortable
+                span Id
+                +sort("id", "sortByIdDes")
+            th Registro Cucop
+            th Nombre
+            th Descripción
+            th Activo
+            th Fecha de creación
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="product in filteredProducts") 
+            td {{product.productId}}
+            td {{product.cucopId}}
+            td {{product.name}}
+            td {{product.description}}
+            td {{product.active ? "Sí" : "No"}}
+            td {{new Date(product.createdAt).parseDate()}}
+            td.center
+              a(:href=`"/cucop/products/"+product.productId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(product.productId)").btn.btn-danger Eliminar 
