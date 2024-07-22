@@ -1,0 +1,19 @@
+mixin load()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Cargar Archivo
+    hr.white-hr
+    .white-body-container
+      .row
+        input(type="file" @change="handleFileUpload" accept=".csv, .xlsx, .xls")
+      .row.mt-3
+        .col-6
+          #logs.row.collapse
+            textarea(v-model="log" rows="10" cols="50").form-control
+        .col-6.text-end
+          button.btn.btn-primary.me-3(data-bs-toggle="collapse", data-bs-target="#logs" @click="toggleLogs") {{ LogsButtonText }}
+          a(href="/cucop/cucop").btn.btn-secondary.me-3 Cancelar
+          button(type="sumbit" @click="processFile").btn.btn-primary Cargar
+      .row.mt-3
+        div(role="alert" v-if="code==200").alert.alert-success.mt-3 Archivo cargado exitosamente
+        div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error {{ errorMessage }}

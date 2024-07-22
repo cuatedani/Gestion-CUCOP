@@ -5,25 +5,57 @@ mixin table()
       table.table
         thead
           tr
-            th
-              .th-sortable
-                span Id
-                +sort("id", "sortByIdDes")
-            th Registro Cucop
             th Nombre
             th Descripción
+            th Registro CUCOP
             th Activo
             th Fecha de creación
             th.center(colspan="2") Acciones
         tbody
-          tr(v-for="product in filteredProducts") 
-            td {{product.productId}}
-            td {{product.cucopId}}
-            td {{product.name}}
-            td {{product.description}}
-            td {{product.active ? "Sí" : "No"}}
-            td {{new Date(product.createdAt).parseDate()}}
+          tr(v-for="product in paginatedProducts") 
+            td(v-html="product.name")
+            td(v-html="product.description")
+            td(v-html="`${product.cucop.descpartidaespecifica}: ${product.cucop.descripcion}`")
+            td(v-html="product.active ? 'Sí' : 'No'")
+            td(v-html="new Date(product.createdAt).parseDate()")
             td.center
               a(:href=`"/cucop/products/"+product.productId+"/edit"`).btn.btn-primary Editar
             td.center
               button(@click="showDialog(product.productId)").btn.btn-danger Eliminar 
+      .pagination
+        button(@click="prevPage" :disabled="currentPage === 1").btn.btn-secondary Anterior
+        .row
+          .col
+            span Página
+          .col-6
+            input(type="number" v-model.number="currentPage" @input="handlePageInput" @blur="validatePage").form-control.form-control-sm.pagination-input
+          .col
+            span de {{ totalPages }}
+        button(@click="nextPage" :disabled="currentPage === totalPages").btn.btn-secondary Siguiente
+style.
+  .white-body-container {
+    display: block;
+    overflow-x: auto;
+  }
+  .table {
+    width: 100%;
+    table-layout: auto;
+  }
+  .pagination {
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    text-align: center;
+  }
+  .pagination button {
+    margin: 0 5px;
+  }
+  .pagination span  {
+    text-align: center;
+  }
+  .pagination-input {
+    width: 50px;
+    display: inline-block;
+    text-align: center;
+  }

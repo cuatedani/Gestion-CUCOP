@@ -6,20 +6,26 @@ mixin filters()
     hr.white-hr
     .white-body-container
       .row
-        .col
-          label.form-label Registro CUCOP
-          input(type="text" placeholder="Ej. 123" v-model="cucopId").form-control
-        .col
-          label.form-label nombre
-          input(type="text" placeholder="Ej. Lapiz" v-model="name").form-control
-      .row.mt-3
-        .col
-          label.form-label Descripción
-          input(type="text" placeholder="Ej. Mirador No.2" v-model="description").form-control
-      .row.mt-3
-        .col
-          label(for="active").form-label Activo
-          select(id="active" v-model="active").form-select
-            option(value="") Todos
-            option(value="1") Activo
-            option(value="0") Inactivo
+        .col-10
+          label.form-label Todos los campos
+          input.form-control(type="text", placeholder="Ej. Lapiz, Mirador No.2", v-model="wherever")
+        .col-2.btn-toggle-more-filters
+          button.btn.btn-primary(data-bs-toggle="collapse", data-bs-target="#extraFilters" @click="toggleExtraFilters") {{ extraFiltersButtonText }}
+      #extraFilters.row.collapse
+        .row.mt-3
+          .col
+            label.form-label Nombre
+            input(type="text" placeholder="Ej. Lapiz" v-model="name").form-control
+          .col-5
+            label.form-label Registro CUCOP
+            input(type="text" placeholder="Ej. Producto de Oficina" v-model="iscucop").form-control
+        .row.mt-3
+          .col
+            label.form-label Descripción
+            input(type="text" placeholder="Ej. Mirador No.2" v-model="description").form-control
+          .col-2
+            label(for="active").form-label Activo
+            select(id="active" v-model="active").form-select
+              option(value="") Todos
+              option(value="1") Activo
+              option(value="0") Inactivo

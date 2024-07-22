@@ -100,6 +100,30 @@ const getById = async (userId: number | string): Promise<IUser | undefined> => {
   }
 };
 
+const getPublicById = async (
+  userId: number | string,
+): Promise<IUser | undefined> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT 
+        *
+      from users
+      where userId=?
+    `,
+      [userId],
+    );
+
+    const data = rows as RowDataPacket[];
+    if (data.length == 0) throw new OperationError(400, "Not found");
+    data[0][4] = "encriptado";
+    return data[0] as IUser;
+  } catch (ex) {
+    console.log(ex);
+    return undefined;
+  }
+};
+
 const create = async ({
   firstNames,
   lastNames,
@@ -202,6 +226,7 @@ export default {
   exists,
   getAll,
   getById,
+  getPublicById,
   create,
   update,
   remove,

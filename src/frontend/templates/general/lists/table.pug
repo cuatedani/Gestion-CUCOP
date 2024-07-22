@@ -5,23 +5,35 @@ mixin table()
       table.table
         thead
           tr
-            th
-              .th-sortable
-                span Id
-                +sort("id", "sortByIdDes")
             th Propietario
+            th Titulo
+            th Descripción
             th Estado
             th Activo
             th Fecha de creación
-            th.center(colspan="2") Acciones
+            th.center(colspan="3") Acciones
         tbody
           tr(v-for="list in filteredLists") 
-            td {{list.listId}}
-            td {{list.userId}}
-            td {{list.status}}
-            td {{list.active ? "Sí" : "No"}}
-            td {{new Date(list.createdAt).parseDate()}}
+            td(v-html="`${list.user.firstNames} ${list.user.lastNames}`") 
+            td(v-html="list.title")
+            td(v-html="list.description")
+            td(v-html="list.status")
+            td(v-html="list.active ? 'Sí' : 'No'")
+            td(v-html="new Date(list.createdAt).parseDate()")
+            td.center
+              a(:href=`"/cucop/lists/"+list.listId`).btn.btn-link.p-0 Ver
             td.center
               a(:href=`"/cucop/lists/"+list.listId+"/edit"`).btn.btn-primary Editar
             td.center
-              button(@click="showDialog(list.listId)").btn.btn-danger Eliminar 
+              button(@click="showDialog(list.listId)").btn.btn-danger Eliminar
+      .pagination
+style.
+  .white-body-container {
+    display: block;
+    overflow-x: auto;
+  }
+  .table {
+    width: 100%;
+    table-layout: auto;
+  }
+            

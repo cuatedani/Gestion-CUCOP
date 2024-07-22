@@ -1,3 +1,3 @@
 mixin sort(type, variable)
-  span(@click=`sort('${type}')`).icon-sortable
-    img(:src=`'/cucop/public/images/table/'+(${variable}?'abajo':'arriba')+'.png'`)
+  span(@click=`sort('${variable}')`).icon-sortable
+    img(:src=`'/cucop/public/images/table/'+(${type}?'abajo':'arriba')+'.png'`)

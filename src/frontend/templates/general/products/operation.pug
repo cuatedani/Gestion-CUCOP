@@ -8,7 +8,11 @@ mixin operation()
         .col
           label.form-label Registro Cucop
           <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. 123" v-model="product.cucopId").form-control
+          .row
+            .col
+              input(type="text" placeholder="Sin Seleccionar" v-model="cucopelement.clavecucop" disabled).form-control
+            .col
+              button(@click="selectCUCOP()").btn.btn-secondary Seleccionar
         .col
           label.form-label Nombre del producto
           <span class="text-red">*</span>
@@ -16,7 +20,7 @@ mixin operation()
       .row.mt-3 
         .col
           label.form-label Descripción
-          input(type="text" placeholder="Ej. Mirador No.2" v-model="product.description").form-control
+          textarea(placeholder="Ej. Mirador No.2" v-model="product.description" rows="2" cols="50").form-control
       .row.mt-3
         .col
           .form-check

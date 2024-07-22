@@ -2,6 +2,7 @@ include ../../templates/common/constants.pug
 include ../../templates/common/header.pug
 include ../../templates/common/scripts.pug
 include ../../templates/common/layout.pug
+include ../../templates/common/search_field.pug
 include ../../templates/general/quotations/operation.pug
 
 doctype html
@@ -13,7 +14,7 @@ html(lang="es")
       +header("Editar cotización")
   body
     .main-container
-      +nav-bar(3)
+      +nav-bar(4)
       .right-container
         if operation == 'create'
           +nav-top("Agregar cotización")

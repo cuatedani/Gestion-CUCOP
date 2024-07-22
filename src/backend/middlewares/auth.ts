@@ -32,7 +32,7 @@ app.use(async (req, res, next) => {
   const exists = notAllowed[rol].find(
     (x) => x.method == method && x.path == route.path,
   );
-  if (exists) res.redirect("/cucop/lists/create");
+  if (exists) res.redirect("/cucop/lists");
   next();
 });
 

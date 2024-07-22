@@ -6,22 +6,37 @@ mixin filters()
     hr.white-hr
     .white-body-container
       .row
-        .col
-          label.form-label Propietario
-          input(type="text" placeholder="Ej. Carlos" v-model="userId").form-control
-      .row.mt-3
-        .col
-          label.form-label Estado
-          select(name="rol" v-model="status").form-select
-            option(value="") Todos
-            option(value="pendiente") Pendiente
-            option(value="revisada") Revisada
-            option(value="revisando") Revisando
-            option(value="aprovada") Aprovada
-            option(value="rechazada") Rechazada
-        .col
-          label(for="active").form-label Activo
-          select(id="active" v-model="active").form-select
-            option(value="") Todos
-            option(value="1") Activo
-            option(value="0") Inactivo
+        .col-10
+          label.form-label Todos los campos
+          input.form-control(type="text", placeholder="Ej. Carlos, Piezas Computadora", v-model="wherever")
+        .col-2.btn-toggle-more-filters
+          button.btn.btn-primary(data-bs-toggle="collapse", data-bs-target="#extraFilters" @click="toggleExtraFilters") {{ extraFiltersButtonText }}
+      #extraFilters.row.collapse
+        .row.mt-3
+          .col
+            label.form-label Titulo
+            input(type="text" placeholder="Ej. Piezas Computadora" v-model="title").form-control
+          .col
+            label.form-label Propietario
+            input(type="text" placeholder="Ej. Carlos" v-model="owner").form-control
+        .row.mt-3
+          .col
+            label.form-label Descripción
+            input(type="text" placeholder="Ej. Piezas para Armar Pc Gamer" v-model="description").form-control
+        .row.mt-3
+          .col
+            label.form-label Estado
+            select(name="rol" v-model="status").form-select
+              option(value="") Todos
+              option(value="creada") Creada
+              option(value="pendiente") Pendiente
+              option(value="revisada") Revisada
+              option(value="revisando") Revisando
+              option(value="aprobada") Aprobada
+              option(value="rechazada") Rechazada
+          .col
+            label(for="active").form-label Activo
+            select(id="active" v-model="active").form-select
+              option(value="") Todos
+              option(value="1") Activo
+              option(value="0") Inactivo

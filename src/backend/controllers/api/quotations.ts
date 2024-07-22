@@ -14,6 +14,11 @@ app.get("/cucop/api/quotations", auth, async (req, res) => {
   res.status(200).send({ code: 200, quotations });
 });
 
+app.get("/cucop/api/list/quotations/:id", auth, async (req, res) => {
+  const quotations = await Quotation.getByList(req.params.id);
+  res.status(200).send({ code: 200, quotations });
+});
+
 app.get("/cucop/api/quotations/:id", auth, async (req, res) => {
   const quotation = await Quotation.getById(req.params.id);
   res.status(200).send({ code: 200, quotation });

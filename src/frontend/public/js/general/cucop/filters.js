@@ -1,25 +1,17 @@
 export const filteringCucop = ({
   data,
-  clavecucopid,
   clavecucop,
   descripcion,
   unidaddemedida,
   tipodecontratacion,
   partidaespecifica,
-  descpartidaespecifica,
   partidagenerica,
-  descpartidagenerica,
   concepto,
-  descconcepto,
   capitulo,
-  desccapitulo,
-  fechaalta,
-  fechamodificacion,
-  active,
+  wherever,
 }) => {
-  if (clavecucopid)
-    data = data.filter((x) => x.clavecucopid.includes(clavecucopid));
-  if (clavecucop) data = data.filter((x) => x.clavecucop.includes(clavecucop));
+  if (clavecucop)
+    data = data.filter((x) => x.clavecucop.toString().includes(clavecucop));
   if (descripcion)
     data = data.filter((x) =>
       x.descripcion.toLowerCase().includes(descripcion.toLowerCase()),
@@ -34,35 +26,69 @@ export const filteringCucop = ({
         .toLowerCase()
         .includes(tipodecontratacion.toLowerCase()),
     );
+
   if (partidaespecifica)
-    data = data.filter((x) => x.partidaespecifica.includes(partidaespecifica));
-  if (descpartidaespecifica)
     data = data.filter((x) =>
-      x.descpartidaespecifica
-        .toLowerCase()
-        .includes(descpartidaespecifica.toLowerCase()),
+      (x.partidaespecifica.toString() + " - " + x.descpartidaespecifica)
+        .toLocaleLowerCase()
+        .includes(partidaespecifica.toLocaleLowerCase()),
     );
   if (partidagenerica)
-    data = data.filter((x) => x.partidagenerica.includes(partidagenerica));
-  if (descpartidagenerica)
     data = data.filter((x) =>
-      x.descpartidagenerica
-        .toLowerCase()
-        .includes(descpartidagenerica.toLowerCase()),
+      (x.partidagenerica.toString() + " - " + x.descpartidagenerica)
+        .toLocaleLowerCase()
+        .includes(partidagenerica.toLocaleLowerCase()),
     );
-  if (concepto) data = data.filter((x) => x.concepto.includes(concepto));
-  if (descconcepto)
-    data = data.filter((x) =>
-      x.descconcepto.toLowerCase().includes(descconcepto.toLowerCase()),
+  if (concepto)
+    data = data.filter(
+      (x) =>
+        x.concepto.toString() +
+        " - " +
+        x.descconcepto.includes(concepto.toLocaleLowerCase()),
     );
-  if (capitulo) data = data.filter((x) => x.capitulo.includes(capitulo));
-  if (desccapitulo)
-    data = data.filter((x) =>
-      x.desccapitulo.toLowerCase().includes(desccapitulo.toLowerCase()),
+  if (capitulo)
+    data = data.filter(
+      (x) =>
+        x.capitulo.toString() +
+        " - " +
+        x.desccapitulo
+          .toLocaleLowerCase()
+          .includes(concepto.toLocaleLowerCase()),
     );
-  if (fechaalta) data = data.filter((x) => x.fechaalta.includes(fechaalta));
-  if (fechamodificacion)
-    data = data.filter((x) => x.fechamodificacion.includes(fechamodificacion));
-  if (active) data = data.filter((x) => x.active == active);
+  if (wherever)
+    data = data.filter(
+      (x) =>
+        x.clavecucop
+          .toString()
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.descripcion || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.unidaddemedida || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.tipodecontratacion || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.partidaespecifica.toString() || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.descpartidaespecifica || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.partidagenerica.toString() || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.descpartidagenerica || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.concepto.toString() || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.descconcepto || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.capitulo.toString() || "")
+          .toLowerCase()
+          .includes(wherever.toLowerCase()) ||
+        (x.desccapitulo || "").toLowerCase().includes(wherever.toLowerCase()),
+    );
   return data;
 };

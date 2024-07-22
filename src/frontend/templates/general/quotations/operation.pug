@@ -5,19 +5,21 @@ mixin operation()
     hr.white-hr
     .white-body-container
       .row
-        .col
-          label.form-label Proveedor
+        .col-5
+          label.form-label Proveedor <span class="text-danger">*</span>
+          +search_field("supplierName", "filteredSuppliers", "item.name", "Especifique un Proveedor", "")
+        .col-3
+          label.form-label Número de cotización
+          input(type="text" placeholder="Ej. 10.00" v-model="quotation.quotNumber").form-control
+        .col-2
+          label.form-label Fecha de Cotización
           <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. 1" v-model="quotation.supplierId").form-control
-        .col
-          label.form-label Precio
-          <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. 10.00" v-model="quotation.price").form-control
+          input(type="date" placeholder="Ej. 10.00" v-model="quotation.date").form-control
       .row.mt-3 
         .col
           label.form-label Descripción
           <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. Lapices al pormayor" v-model="quotation.description").form-control
+          textarea(placeholder="Ej. Lapices al pormayor" v-model="quotation.description" rows="3" cols="50").form-control
       .row.mt-3
         .col
           .form-check
@@ -25,7 +27,7 @@ mixin operation()
               input(type="checkbox" name="active" v-model="quotation.active").form-check-input
       .row.mt-3 
         .col-12.text-end
-          a(href="/cucop/quotations").btn.btn-secondary.me-3 Cancelar
+          a(:href="`/cucop/lists/${quotation.listId}`").btn.btn-secondary.me-3 Cancelar
           button(type="sumbit" @click="sendForm").btn.btn-primary #{operation == "create" ? "Agregar" : "Actualizar"}
       .row.mt-3
         if operation == "create"

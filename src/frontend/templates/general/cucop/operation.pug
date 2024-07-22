@@ -5,75 +5,59 @@ mixin operation()
     hr.white-hr
     .white-body-container
       .row
-        .col
-          label.form-label Clave CUCOP+
-          <span class="text-red">*</span>
-          input(type="text" placeholder="12201-0001" v-model="cucop.clavecucopid").form-control
-        .col
+        .col-2
           label.form-label Clave CUCOP
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. 12201001" v-model="cucop.clavecucop").form-control
-        .col
+        .col-10
           label.form-label Descripción
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Remuneraciones" v-model="cucop.descripcion").form-control
       .row.mt-3
-        .col
+        .col-2
           label.form-label Unidad de Medida
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Servicio" v-model="cucop.unidaddemedida").form-control
-        .col
-          label.form-label Tipo de Contrataación
+        .col-10
+          label.form-label Tipo de Contratación
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Servicios" v-model="cucop.tipodecontratacion").form-control
       .row.mt-3
-        .col
+        .col-2
           label.form-label Partida Especifica
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. 12201" v-model="cucop.partidaespecifica").form-control
-        .col
+        .col-10
           label.form-label Descripción de Partida Especifica
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Remuneraciones al personal eventual" v-model="cucop.descpartidaespecifica").form-control
       .row.mt-3
-        .col
+        .col-2
           label.form-label Partida Generica
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. 1212" v-model="cucop.partidagenerica").form-control
-        .col
+        .col-10
           label.form-label Descripción de Partida Generica
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Sueldo base al personal eventual" v-model="cucop.descpartidagenerica").form-control
       .row.mt-3
-        .col
+        .col-2
           label.form-label Concepto
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. 1200" v-model="cucop.concepto").form-control
-        .col
+        .col-10
           label.form-label Descripción del concepto
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Remuneraciones al personal de caracter transitorio" v-model="cucop.descconcepto").form-control
       .row.mt-3
-        .col
+        .col-2
           label.form-label Capítulo
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. 1000" v-model="cucop.capitulo").form-control
-        .col
+        .col-10
           label.form-label Descripción del capítulo
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Servicios Personales" v-model="cucop.desccapitulo").form-control
-      .row.mt-3
-        .col
-          label.form-label Fecha Alta
-          input(type="text" placeholder="Ej. dd/mm/aaaa" v-model="cucop.fechaalta").form-control
-        .col
-          label.form-label Fecha Modificación
-          input(type="text" placeholder="Ej. dd/mm/aaaa" v-model="cucop.fechamodificacion").form-control
-      .row.mt-3
-        .col
-          .form-check
-            label.form-check-label Activo
-              input(type="checkbox" name="active" v-model="cucop.active").form-check-input
       .row.mt-3 
         .col-12.text-end
           a(href="/cucop/cucop").btn.btn-secondary.me-3 Cancelar

@@ -5,15 +5,15 @@ const { createApp } = Vue;
 const app = createApp({
   data() {
     return {
+      id: "",
       firstNames: "",
       lastNames: "",
       email: "",
       rol: "",
       active: "1",
-      id: "",
-      sortByIdDes: false,
+      wherever: "",
       data: [],
-      users: [],
+      showExtraFilters: false,
     };
   },
   mounted() {
@@ -21,7 +21,21 @@ const app = createApp({
   },
   computed: {
     filteredUsers() {
-      return filteringUsers(this);
+      return filteringUsers(this).map((user) => ({
+        ...user,
+        firstNames: this.highlight(
+          user.firstNames,
+          this.wherever || this.firstNames,
+        ),
+        lastNames: this.highlight(
+          user.lastNames,
+          this.wherever || this.lastNames,
+        ),
+        email: this.highlight(user.email, this.wherever || this.email),
+      }));
+    },
+    extraFiltersButtonText() {
+      return this.showExtraFilters ? "Ocultar filtros" : "Mostrar filtros";
     },
   },
   methods: {
@@ -29,6 +43,7 @@ const app = createApp({
       try {
         const request = await axios.get("/cucop/api/users");
         this.data = request.data.users;
+        this.users = [...this.data];
       } catch (ex) {
         console.log(ex);
         this.data = [];
@@ -52,15 +67,14 @@ const app = createApp({
         console.log(ex);
       }
     },
-    sort: function (type) {
-      if (type == "id") {
-        this.sortByIdDes = !this.sortByIdDes;
-        this.users.sort(
-          (a, b) =>
-            (this.sortByIdDes ? a : b).userId -
-            (this.sortByIdDes ? b : a).userId,
-        );
-      }
+    toggleExtraFilters() {
+      this.showExtraFilters = !this.showExtraFilters;
+    },
+    highlight(text, search) {
+      if (!search) return text;
+      return text
+        .toString()
+        .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
     },
   },
 }).mount("#app");

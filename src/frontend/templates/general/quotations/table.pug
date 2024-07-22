@@ -5,25 +5,24 @@ mixin table()
       table.table
         thead
           tr
-            th
-              .th-sortable
-                span Id
-                +sort("id", "sortByIdDes")
             th Proveedor
-            th Precio
             th Descripción
+            th Número de cotización
+            th Fecha de cotización
             th Activo
             th Fecha de creación
-            th.center(colspan="2") Acciones
+            th.center(colspan="3") Acciones
         tbody
           tr(v-for="quotation in filteredQuotations") 
-            td {{quotation.quotationId}}
-            td {{quotation.supplierId}}
-            td {{quotation.price}}
-            td {{quotation.description}}
-            td {{quotation.active ? "Sí" : "No"}}
-            td {{new Date(quotation.createdAt).parseDate()}}
+            td(v-html="quotation.supplier.name")
+            td(v-html="quotation.description")
+            td(v-html="quotation.quotNumber")
+            td(v-html="quotation.date")
+            td(v-html="quotation.active ? 'Sí' : 'No'")
+            td(v-html="new Date(quotation.createdAt).parseDate()")
             td.center
-              a(:href=`"/cucop/quotations/"+quotation.quotationId+"/edit"`).btn.btn-primary Editar
+              a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotation.quotationId`).btn.btn-link.p-0 Ver
+            td.center
+              a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotation.quotationId+"/edit"`).btn.btn-primary Editar
             td.center
               button(@click="showDialog(quotation.quotationId)").btn.btn-danger Eliminar 

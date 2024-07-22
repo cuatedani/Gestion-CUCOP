@@ -1,24 +1,44 @@
 export const filteringQuotations = ({
   data,
-  supplierId,
-  price,
+  quotations,
+  supplied,
   description,
+  date,
+  quotNumber,
   active,
+  wherever,
 }) => {
-  // Convertir los números a cadenas de texto
-  const supplierIdStr = supplierId ? supplierId.toString() : "";
-  const priceStr = price ? price.toString() : "";
+  const normalizeDate = (date) => new Date(date).toLocaleDateString("es-ES");
+  if (supplied)
+    data = quotations.filter((x) =>
+      x.supplier.name.toLowerCase().includes(supplied.toLowerCase()),
+    );
+  if (description)
+    data = quotations.filter((x) =>
+      x.description.toLowerCase().includes(description.toLowerCase()),
+    );
 
-  // Realizar el filtrado basado en los criterios proporcionados
-  return data.filter((x) => {
-    const supplierIdMatch =
-      !supplierIdStr || x.supplierId.toString().includes(supplierIdStr);
-    const priceMatch = !priceStr || x.price.toString().includes(priceStr);
-    const descriptionMatch =
-      !description ||
-      x.description.toLowerCase().includes(description.toLowerCase());
-    const activeMatch = active === undefined || x.active == active;
+  if (date) {
+    const normalizedDate = normalizeDate(date).toLowerCase();
+    data = quotations.filter((x) =>
+      normalizeDate(x.date).toLowerCase().includes(normalizedDate),
+    );
+  }
+  if (quotNumber)
+    data = quotations.filter((x) =>
+      x.quotNumber.toLowerCase().includes(quotNumber.toLowerCase()),
+    );
 
-    return supplierIdMatch && priceMatch && descriptionMatch && activeMatch;
-  });
+  if (wherever)
+    data = quotations.filter(
+      (x) =>
+        x.supplier.name.toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.description || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.date || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.quotNumber || "").toLowerCase().includes(wherever.toLowerCase()),
+    );
+
+  if (active) data = quotations.filter((x) => x.active == active);
+
+  return data;
 };

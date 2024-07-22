@@ -5,13 +5,20 @@ const { createApp } = Vue;
 const app = createApp({
   data() {
     return {
+      id: "",
       userId: "",
+      title: "",
+      description: "",
       status: "",
       active: "1",
-      id: "",
-      sortByIdDes: false,
+      user: {
+        firstNames: "",
+        lastNames: "",
+      },
+      wherever: "",
+      owner: "",
       data: [],
-      lists: [],
+      showExtraFilters: false,
     };
   },
   mounted() {
@@ -19,7 +26,28 @@ const app = createApp({
   },
   computed: {
     filteredLists() {
-      return filteringLists(this);
+      return filteringLists(this).map((list) => ({
+        ...list,
+        title: this.highlight(list.title, this.title || this.wherever),
+        description: this.highlight(
+          list.description,
+          this.description || this.wherever,
+        ),
+        user: {
+          ...list.user,
+          lastNames: this.highlight(
+            list.user.lastNames,
+            this.owner || this.wherever,
+          ),
+          firstNames: this.highlight(
+            list.user.firstNames,
+            this.owner || this.wherever,
+          ),
+        },
+      }));
+    },
+    extraFiltersButtonText() {
+      return this.showExtraFilters ? "Ocultar filtros" : "Mostrar filtros";
     },
   },
   methods: {
@@ -36,7 +64,7 @@ const app = createApp({
       const data = this.data.find((tmp) => tmp.listId == id);
       $("#modalDeleteBody").html(`
       <p>¿Estás seguro de eliminar esta lista?</p>
-      <p><b>${data.listId}</b></p>
+      <p><b>${data.title}</b></p>
       `);
       $("#modalDelete").modal("toggle");
       this.id = id;
@@ -50,15 +78,14 @@ const app = createApp({
         console.log(ex);
       }
     },
-    sort: function (type) {
-      if (type == "id") {
-        this.sortByIdDes = !this.sortByIdDes;
-        this.lists.sort(
-          (a, b) =>
-            (this.sortByIdDes ? a : b).listId -
-            (this.sortByIdDes ? b : a).listId,
-        );
-      }
+    toggleExtraFilters() {
+      this.showExtraFilters = !this.showExtraFilters;
+    },
+    highlight(text, search) {
+      if (!search) return text;
+      return text
+        .toString()
+        .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
     },
   },
 }).mount("#app");

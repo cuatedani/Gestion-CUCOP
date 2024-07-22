@@ -2,51 +2,37 @@
   const options = [
     {
       "id":0,
-      "img":"icons8-agregar-propiedad-30.png",
-      "text":"Usuarios",
-      "url":"/cucop/users",
+      "img":"icons8-lista-32.png",
+      "text":"Listas de Pedidos",
+      "url":"/cucop/lists",
       "items":[]
     },
     {
       "id":1,
-      "img":"icons8-agregar-propiedad-30.png",
+      "img":"icons8-tienda-50.png",
       "text":"Proveedores",
       "url":"/cucop/suppliers",
       "items":[]
     },
     {
+      "id":4,
+      "img":"icons8-producto-nuevo-30.png",
+      "text":"Productos",
+      "url":"/cucop/products",
+      "items":[]
+    },
+    {
       "id":2,
-      "img":"icons8-agregar-propiedad-30.png",
+      "img":"icons8-editor-de-registro-50.png",
       "text":"Cucop",
       "url":"/cucop/cucop",
       "items":[]
     },
     {
       "id":3,
-      "img":"icons8-agregar-propiedad-30.png",
-      "text":"List",
-      "url":"/cucop/lists",
-      "items":[]
-    },
-    {
-      "id":4,
-      "img":"icons8-agregar-propiedad-30.png",
-      "text":"Cotizaciones",
-      "url":"/cucop/quotations",
-      "items":[]
-    },
-    {
-      "id":5,
-      "img":"icons8-agregar-propiedad-30.png",
-      "text":"Productos",
-      "url":"/cucop/products",
-      "items":[]
-    },
-    {
-      "id":6,
-      "img":"icons8-agregar-propiedad-30.png",
-      "text":"Productos Listados",
-      "url":"/cucop/list-products",
+      "img":"icons8-usuario-30.png",
+      "text":"Usuarios",
+      "url":"/cucop/users",
       "items":[]
     },
   ]
@@ -55,7 +41,7 @@ mixin nav-bar(index)
   nav.left-container
     .logo-container
       img(src="/cucop/public/images/cicese.png").logo-img
-    +nav-bar-ul(index, options, 7)
+    +nav-bar-ul(index, options, 5)
 
 mixin nav-bar-ul(index, items, padding)
   ul.list-container
@@ -77,8 +63,6 @@ mixin nav-top(title)
         img(src=`/cucop/public/images/nav-bar/icons8-menú-50.png`).top-left-img
       .top-right-text 
         h4.top-right-title #{title}
-    .top-center-container
-      h4#nav-bar-date
     .top-right-container
       - if (user)
         h4.white-title #{user.firstNames} #{user.lastNames}

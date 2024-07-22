@@ -9,7 +9,6 @@ import OperationError from "../utils/error";
 
 export interface ICucop {
   cucopId: number;
-  clavecucopid: string;
   clavecucop: number;
   descripcion: string;
   unidaddemedida: string;
@@ -22,20 +21,11 @@ export interface ICucop {
   descconcepto: string;
   capitulo: number;
   desccapitulo: string;
-  fechaalta: string;
-  fechamodificacion: string;
-  active: boolean;
 }
 
 export type ICreateCucop = Omit<ICucop, "cucopId">;
 
 export type IUpdateCucop = ICreateCucop;
-
-interface IGetAllFilters {
-  limit?: number;
-  sort?: "asc" | "desc";
-  status?: "all" | "active" | "inactive";
-}
 
 /**
  * Methods
@@ -62,21 +52,131 @@ const exists = async (cucopId: number | boolean): Promise<boolean> => {
   }
 };
 
-const getAll = async ({
-  limit,
-  sort = "desc",
-  status = "all",
-}: IGetAllFilters): Promise<ICucop[]> => {
+const existsclv = async (clavecucop: number | string): Promise<number> => {
   try {
-    const amount = limit ? `limit ${limit}` : "";
-    const active = status != "all" ? `where active=${status == "active"}` : "";
+    const [rows] = await db.query(
+      `
+      SELECT 
+        cucopId
+      FROM cucop
+      WHERE clavecucop = ?
+    `,
+      [clavecucop],
+    );
 
+    const data = rows as RowDataPacket[];
+    if (data.length === 0) {
+      return 0;
+    }
+
+    return data[0].cucopId as number;
+  } catch (ex) {
+    console.log(ex);
+    return 0;
+  }
+};
+
+const getAll = async (): Promise<ICucop[]> => {
+  try {
     const [rows] = await db.query(`
       select 
         *
-      from cucop ${active}
-      order by fechaalta ${sort} ${amount}
+      from cucop
     `);
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
+const getCapitulos = async (): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(`
+      SELECT DISTINCT 
+      desccapitulo, capitulo 
+      FROM CUCOP;
+    `);
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
+const getConceptos = async (capitulo: string): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT DISTINCT 
+      descconcepto, concepto 
+      FROM CUCOP
+      WHERE capitulo=?
+    `,
+      [Number(capitulo)],
+    );
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
+const getGenericas = async (concepto: string): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT DISTINCT 
+      descpartidagenerica, partidagenerica 
+      FROM CUCOP
+      WHERE concepto=?;
+    `,
+      [Number(concepto)],
+    );
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
+const getEspecificas = async (generica: string): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT DISTINCT 
+      descpartidaespecifica, partidaespecifica 
+      FROM CUCOP
+      WHERE partidagenerica=?;
+    `,
+      [Number(generica)],
+    );
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
+const getRegistros = async (especifica: string): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT * FROM CUCOP
+      WHERE partidaespecifica=?;
+    `,
+      [Number(especifica)],
+    );
 
     const data = rows as ICucop[];
     return data;
@@ -110,7 +210,6 @@ const getById = async (
 };
 
 const create = async ({
-  clavecucopid,
   clavecucop,
   descripcion,
   unidaddemedida,
@@ -123,15 +222,11 @@ const create = async ({
   descconcepto,
   capitulo,
   desccapitulo,
-  fechaalta,
-  fechamodificacion,
-  active,
 }: ICreateCucop): Promise<number> => {
   try {
     const [rows] = await db.query(
       `
       insert into cucop (
-        clavecucopid,
         clavecucop,
         descripcion,
         unidaddemedida,
@@ -143,14 +238,10 @@ const create = async ({
         concepto,
         descconcepto,
         capitulo,
-        desccapitulo,
-        fechaalta,
-        fechamodificacion,
-        active
-      ) values(?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        desccapitulo
+      ) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       [
-        clavecucopid,
         clavecucop,
         descripcion,
         unidaddemedida,
@@ -163,12 +254,8 @@ const create = async ({
         descconcepto,
         capitulo,
         desccapitulo,
-        fechaalta,
-        fechamodificacion,
-        active,
       ],
     );
-
     const { insertId } = rows as ResultSetHeader;
     return insertId as number;
   } catch (ex) {
@@ -180,7 +267,6 @@ const create = async ({
 const update = async (
   cucopId: number | string,
   {
-    clavecucopid,
     clavecucop,
     descripcion,
     unidaddemedida,
@@ -193,9 +279,6 @@ const update = async (
     descconcepto,
     capitulo,
     desccapitulo,
-    fechaalta,
-    fechamodificacion,
-    active,
   }: IUpdateCucop,
 ): Promise<boolean> => {
   try {
@@ -204,7 +287,6 @@ const update = async (
       UPDATE  
         cucop 
       SET 
-        clavecucopid=?,
         clavecucop=?,
         descripcion=?,
         unidaddemedida=?,
@@ -216,14 +298,10 @@ const update = async (
         concepto=?,
         descconcepto=?,
         capitulo=?,
-        desccapitulo=?,
-        fechaalta=?,
-        fechamodificacion=?,
-        active=?
+        desccapitulo=?
       WHERE cucopId=?
     `,
       [
-        clavecucopid,
         clavecucop,
         descripcion,
         unidaddemedida,
@@ -236,9 +314,6 @@ const update = async (
         descconcepto,
         capitulo,
         desccapitulo,
-        fechaalta,
-        fechamodificacion,
-        active,
         cucopId,
       ],
     );
@@ -255,14 +330,12 @@ const remove = async (cucopId: number | string): Promise<boolean> => {
   try {
     const [rows] = await db.query(
       `
-      update
-        cucop 
-      set
-        active=? 
+      DELETE
+      FROM cucop  
       where
         cucopId=?
     `,
-      [false, cucopId],
+      [cucopId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;
@@ -275,8 +348,14 @@ const remove = async (cucopId: number | string): Promise<boolean> => {
 
 export default {
   exists,
+  existsclv,
   getAll,
   getById,
+  getCapitulos,
+  getConceptos,
+  getGenericas,
+  getEspecificas,
+  getRegistros,
   create,
   update,
   remove,

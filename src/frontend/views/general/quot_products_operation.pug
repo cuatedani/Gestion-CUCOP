@@ -1,0 +1,29 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/common/search_field.pug
+include ../../templates/common/search_modal.pug
+include ../../templates/general/quot_products/operation.pug
+include ../../templates/general/quot_products/load.pug
+
+doctype html
+html(lang="es")
+  head
+    if operation == 'create'
+      +header("Agregar producto a la cotización")
+    else
+      +header("Editar producto en la cotización")
+  body
+    .main-container
+      +nav-bar(0)
+      .right-container
+        if operation == 'create'
+          +nav-top("Agregar producto a la cotización")
+        if operation == 'edit'
+          +nav-top("Editar producto de la cotización")
+        .content-container#app
+          +operation()
+          +search_modal()
+    +scripts()
+    script(src="/cucop/public/js/general/quot_products/quot_products_operation.js")

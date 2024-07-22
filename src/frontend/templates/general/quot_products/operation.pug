@@ -1,0 +1,50 @@
+mixin operation()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Datos del Producto Cotizado
+    hr.white-hr
+    .white-body-container
+      .row
+        .col-5
+          label.form-label Producto <span class="text-danger">*</span>
+          +search_field("productName", "filteredProducts", "item.name", "Especifique un Producto", "")
+        .col-3
+          label.form-label Registro Cucop
+          <span class="text-red">*</span>
+          .row
+            .col
+              input(type="text" placeholder="Sin Seleccionar" v-model="cucopelement.clavecucop" disabled).form-control       
+            .col
+              button(@click="selectCUCOP()").btn.btn-secondary Seleccionar
+        .col-2
+          label.form-label Cantidad
+          span.text-red *
+          input(type="text" placeholder="Ej. 10" v-model="quotProduct.quantity").form-control
+        .col-2
+          label.form-label Precio Unitario
+          span.text-red *
+          input(type="text" placeholder="Ej. 10.00" v-model="quotProduct.price").form-control
+      .row.mt-3
+        .col
+          label.form-label Descripción del Producto
+          textarea(placeholder="Ej. Mirador No.2" v-model="product.description" rows="2" cols="50").form-control
+      .row.mt-3
+        .col
+          label.form-label Detalles
+          textarea(placeholder="Ej. Para uso en oficina" v-model="quotProduct.details" rows="2" cols="50").form-control
+      .row.mt-3
+        .col
+          .form-check
+            label.form-check-label Activo
+              input(type="checkbox" name="active" v-model="quotProduct.active").form-check-input
+      .row.mt-3
+        .col-12.text-end
+          a(:href="`/cucop/lists/${listId}/quotation/${quotProduct.quotationId}`").btn.btn-secondary.me-3 Cancelar
+          button(type="submit" @click="sendForm").btn.btn-primary #{operation == "create" ? "Agregar" : "Actualizar"}
+      .row.mt-3
+        if operation == "create"
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Producto cotizado creado exitosamente
+        else
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Producto cotizado actualizado exitosamente
+          div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error al realizar la operación, revisa los campos
+          div(role="alert" v-if="prodcode!=0 && prodcode!=200").alert.alert-danger.mt-3 Error al añadir producto, revisa los campos

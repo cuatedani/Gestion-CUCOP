@@ -1,0 +1,28 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th Producto
+            th Cantidad
+            th Precio Unitario
+            th Precio Total
+            th Detalles
+            th Activo
+            th Fecha de creación
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="quotProduct in filteredQuotProducts") 
+            td(v-html="quotProduct.product.name")
+            td(v-html="quotProduct.quantity")
+            td(v-html="quotProduct.price")
+            td(v-html="quotProduct.totalPrice")
+            td(v-html="quotProduct.details")
+            td(v-html="quotProduct.active ? 'Sí' : 'No'")
+            td(v-html="new Date(quotProduct.createdAt).parseDate()")
+            td.center
+              a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotProduct.quotationId+"/product/"+quotProduct.quotProductId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(quotProduct.quotProductId)").btn.btn-danger Eliminar

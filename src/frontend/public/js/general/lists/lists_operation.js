@@ -5,21 +5,30 @@ createApp({
     return {
       list: {
         userId: "",
-        status: "",
+        title: "",
+        description: "",
+        status: "creada",
         active: true,
       },
+      users: [],
       id: "",
       code: 0,
-      areas: [],
     };
   },
-  mounted() {
+  async mounted() {
     const href = window.location.href;
     const id = href.split("/")[5];
     try {
       this.id = parseInt(id);
     } catch (ex) {
       this.id = 0;
+    }
+    try {
+      const request = await axios.get("/cucop/api/users");
+      this.users = request.data.users.filter((user) => user.active);
+    } catch (ex) {
+      console.log(ex);
+      this.users = [];
     }
     if (!isNaN(this.id)) this.loadList();
   },
@@ -35,7 +44,7 @@ createApp({
       }
     },
     validateEmpty: function () {
-      return !this.list.userId || !this.list.status;
+      return !this.list.userId || !this.list.title;
     },
     sendForm: async function () {
       this.code = 0;
@@ -47,11 +56,15 @@ createApp({
         let result;
         if (isNaN(this.id)) {
           result = await axios.post("/cucop/api/lists", this.list);
-          window.location.replace(`/cucop/lists`);
         } else {
           result = await axios.put(`/cucop/api/lists/${this.id}`, this.list);
         }
         this.code = result.status;
+        if (this.code == 200) {
+          setTimeout(() => {
+            window.location.replace(`/cucop/lists`);
+          }, 1500);
+        }
       } catch (ex) {
         this.code = ex.response.status;
       }

@@ -10,20 +10,24 @@ mixin operation()
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Papeleria" v-model="supplier.name").form-control
         .col
-          label.form-label TIN
+          label.form-label RFC
           <span class="text-red">*</span>
-          input(type="email" placeholder="Ej. 15-3424" v-model="supplier.tin").form-control
+          input(type="email" placeholder="Ej. EJM951103H34" v-model="supplier.tin").form-control
       .row.mt-3 
         .col
           label.form-label Descripción
-          input(type="text" placeholder="Ej. Extenso Surtido" v-model="supplier.description").form-control
+          textarea(placeholder="Ej. Extenso Surtido" v-model="supplier.description" rows="3" cols="50").form-control
       .row.mt-3
-      .col
-        label.form-label Dirección
-        input(type="text" placeholder="Ej. Av.Mexico #122" v-model="supplier.address").form-control
         .col
           label.form-label Teléfono
           input(type="text" placeholder="Ej. 311-100-1111" v-model="supplier.phone").form-control
+        .col
+          label.form-label Correo Electrónico
+          input(type="text" placeholder="Ej. proveedor@mail.com" v-model="supplier.email").form-control
+      .row.mt-3
+        .col
+          label.form-label Dirección
+          input(type="text" placeholder="Ej. Av.Mexico #122" v-model="supplier.address").form-control
       .row.mt-3
         .col
           .form-check

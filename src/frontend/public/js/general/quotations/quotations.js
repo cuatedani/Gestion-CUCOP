@@ -5,32 +5,98 @@ const { createApp } = Vue;
 const app = createApp({
   data() {
     return {
-      supplierId: "",
-      price: "",
-      description: "",
-      active: "1",
       id: "",
-      sortByIdDes: false,
-      data: [], // Inicializado como array vacío
-      quotations: [], // Inicializado como array vacío
+      listId: "",
+      supplierId: "",
+      description: "",
+      date: "",
+      quotNumber: "",
+      active: "1",
+      supplier: {
+        name: "",
+      },
+      list: {
+        title: "",
+        user: {
+          firstNames: "",
+          lastNames: "",
+        },
+        description: "",
+        status: "",
+        active: 0,
+      },
+      wherever: "",
+      supplied: "",
+      quotations: [],
+      data: [],
+      showTableInfo: false,
+      showExtraFilters: false,
     };
   },
   mounted() {
+    const href = window.location.href;
+    const lid = href.split("/")[5];
+    try {
+      this.listId = parseInt(lid);
+    } catch (ex) {
+      this.listId = 0;
+    }
+    this.loadList();
     this.loadQuotations();
   },
   computed: {
     filteredQuotations() {
-      return filteringQuotations(this);
+      return filteringQuotations(this).map((quot) => ({
+        ...quot,
+        description: this.highlight(
+          quot.description,
+          this.description || this.wherever,
+        ),
+        date: this.highlight(
+          new Date(quot.date).toLocaleDateString("es-ES"),
+          this.date || this.wherever,
+        ),
+        quotNumber: this.highlight(
+          quot.quotNumber,
+          this.quotNumber || this.wherever,
+        ),
+        supplier: {
+          ...quot.supplier,
+          name: this.highlight(
+            quot.supplier.name,
+            this.supplied || this.wherever,
+          ),
+        },
+      }));
+    },
+    tableInfoButtonText() {
+      return this.showTableInfo ? "Ocultar Información" : "Mostrar Información";
+    },
+    extraFiltersButtonText() {
+      return this.showExtraFilters ? "Ocultar filtros" : "Mostrar filtros";
     },
   },
   methods: {
-    loadQuotations: async function () {
+    loadList: async function () {
       try {
-        const request = await axios.get("/cucop/api/quotations");
-        this.data = request.data.quotations || []; // Asegúrate de que es un array
+        const request = await axios.get("/cucop/api/lists/" + this.listId);
+        this.list = request.data.list;
       } catch (ex) {
         console.log(ex);
-        this.data = []; // Asegúrate de que se asigna un array en caso de error
+        this.list = {};
+      }
+    },
+    loadQuotations: async function () {
+      try {
+        const request = await axios.get(
+          `/cucop/api/list/quotations/${this.listId}`,
+        );
+        this.quotations = request.data.quotations || [];
+        this.data = this.quotations;
+      } catch (ex) {
+        console.log(ex);
+        this.quotations = [];
+        this.data = [];
       }
     },
     showDialog: function (id) {
@@ -53,15 +119,17 @@ const app = createApp({
         console.log(ex);
       }
     },
-    sort: function (type) {
-      if (type == "id") {
-        this.sortByIdDes = !this.sortByIdDes;
-        this.quotations.sort(
-          (a, b) =>
-            (this.sortByIdDes ? a : b).quotationId -
-            (this.sortByIdDes ? b : a).quotationId,
-        );
-      }
+    toggleTableInfo() {
+      this.showTableInfo = !this.showTableInfo;
+    },
+    toggleExtraFilters() {
+      this.showExtraFilters = !this.showExtraFilters;
+    },
+    highlight(text, search) {
+      if (!search) return text;
+      return text
+        .toString()
+        .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
     },
   },
 }).mount("#app");

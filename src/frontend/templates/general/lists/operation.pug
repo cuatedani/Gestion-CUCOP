@@ -6,13 +6,19 @@ mixin operation()
     .white-body-container
       .row
         .col
+          label.form-label Titulo
+          <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Piezas Computadora" v-model="list.title").form-control
+        .col
           label.form-label Propietario
           <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. Carlos" v-model="list.userId").form-control
+          select.form-control(v-model="list.userId")
+            option(value="") Selecciona un usuario
+            option(v-for="user in users" :key="user.userId" :value="user.userId") {{ user.firstNames }} {{user.lastNames}}
+      .row.mt-3
         .col
-          label.form-label Estado
-          <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. Ramirez" v-model="list.status").form-control
+          label.form-label Descripción
+          textarea(placeholder="Ej. Piezas para Armar Pc Gamer" v-model="list.description" rows="4" cols="50").form-control
       .row.mt-3
         .col
           .form-check

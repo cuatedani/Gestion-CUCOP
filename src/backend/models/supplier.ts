@@ -13,6 +13,7 @@ export interface ISupplier {
   description: string;
   tin: string;
   phone: string;
+  email: string;
   address: string;
   active: boolean;
   updatedAt: string;
@@ -110,8 +111,21 @@ const create = async ({
   tin,
   phone,
   address,
+  email,
   active,
 }: ICreateSupplier): Promise<number> => {
+  if (!description) {
+    description = "Sin descripción";
+  }
+  if (!phone) {
+    phone = "Sin telefono";
+  }
+  if (!address) {
+    address = "Sin dirección";
+  }
+  if (!email) {
+    email = "Sin correo";
+  }
   try {
     const [rows] = await db.query(
       `
@@ -121,10 +135,11 @@ const create = async ({
         tin,
         phone,
         address,
+        email,
         active
-      ) values(?, ?, ?, ?, ?, ?)
+      ) values(?, ?, ?, ?, ?, ?, ?)
     `,
-      [name, description, tin, phone, address, active],
+      [name, description, tin, phone, address, email, active],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -137,8 +152,20 @@ const create = async ({
 
 const update = async (
   supplierId: number | string,
-  { name, description, tin, phone, address, active }: IUpdateSupplier,
+  { name, description, tin, phone, address, email, active }: IUpdateSupplier,
 ): Promise<boolean> => {
+  if (!description) {
+    description = "Sin descripción";
+  }
+  if (!phone) {
+    phone = "Sin telefono";
+  }
+  if (!address) {
+    address = "Sin dirección";
+  }
+  if (!email) {
+    email = "Sin correo";
+  }
   try {
     const [rows] = await db.query(
       `
@@ -150,10 +177,11 @@ const update = async (
         tin=?,
         phone=?,
         address=?,
+        email=?,
         active=?
       WHERE supplierId=?
     `,
-      [name, description, tin, phone, address, active, supplierId],
+      [name, description, tin, phone, address, email, active, supplierId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;

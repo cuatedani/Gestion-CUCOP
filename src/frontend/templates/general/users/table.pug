@@ -5,24 +5,19 @@ mixin table()
       table.table
         thead
           tr
-            th
-              .th-sortable
-                span Id
-                +sort("id", "sortByIdDes")
-            th Nombres y apellidos
+            th Nombres y Apellidos
             th Rol
             th Correo electrónico
             th Activo
-            th Fecha de creación
+            th Fecha de Creación
             th.center(colspan="2") Acciones
         tbody
-          tr(v-for="user in filteredUsers") 
-            td {{user.userId}}
-            td {{user.firstNames}} {{user.lastNames}}
-            td {{user.rol == "admin" ? "Administrador" : "Normal"}}
-            td {{user.email}}
-            td {{user.active ? "Sí" : "No"}}
-            td {{new Date(user.createdAt).parseDate()}}
+          tr(v-for="user in filteredUsers" :key="user.userId")
+            td(v-html="`${user.firstNames} ${user.lastNames}`")
+            td(v-html="user.rol == 'admin' ? 'Administrador' : 'Normal'")
+            td(v-html="user.email")
+            td(v-html="user.active ? 'Sí' : 'No'")
+            td(v-html="new Date(user.createdAt).parseDate()")
             td.center
               a(:href=`"/cucop/users/"+user.userId+"/edit"`).btn.btn-primary Editar
             td.center

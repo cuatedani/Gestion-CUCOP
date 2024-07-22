@@ -3,6 +3,7 @@ include ../../templates/common/header.pug
 include ../../templates/common/scripts.pug
 include ../../templates/common/layout.pug
 include ../../templates/general/products/operation.pug
+include ../../templates/common/search_modal.pug
 
 doctype html
 html(lang="es")
@@ -13,7 +14,7 @@ html(lang="es")
       +header("Editar producto")
   body
     .main-container
-      +nav-bar(3)
+      +nav-bar(4)
       .right-container
         if operation == 'create'
           +nav-top("Agregar producto")
@@ -21,5 +22,6 @@ html(lang="es")
           +nav-top("Editar producto")
         .content-container#app
           +operation()
+          +search_modal()
     +scripts()
     script(src="/cucop/public/js/general/products/products_operation.js")

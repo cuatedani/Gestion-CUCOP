@@ -5,14 +5,22 @@ const { createApp } = Vue;
 const app = createApp({
   data() {
     return {
+      id: "",
       cucopId: "",
       name: "",
       description: "",
       active: "1",
-      id: "",
-      sortByIdDes: false,
+      cucop: {
+        descripcion: "",
+        descpartidaespecifica: "",
+      },
+      wherever: "",
+      iscucop: "",
       data: [],
       products: [],
+      currentPage: 1,
+      itemsPerPage: 20,
+      showExtraFilters: false,
     };
   },
   mounted() {
@@ -20,7 +28,40 @@ const app = createApp({
   },
   computed: {
     filteredProducts() {
-      return filteringProducts(this);
+      return filteringProducts(this).map((product) => ({
+        ...product,
+        name: this.highlight(product.name, this.name || this.wherever),
+        description: this.highlight(
+          product.description,
+          this.description || this.wherever,
+        ),
+        cucop: {
+          ...product.cucop,
+          descripcion: this.highlight(
+            product.cucop.descripcion,
+            this.iscucop || this.wherever,
+          ),
+          descpartidaespecifica: this.highlight(
+            product.cucop.descpartidaespecifica,
+            this.iscucop || this.wherever,
+          ),
+        },
+      }));
+    },
+    paginatedProducts() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      const paginatedResult = this.filteredProducts.slice(start, end);
+      return paginatedResult;
+    },
+    totalPages() {
+      const totalPages = Math.ceil(
+        this.filteredProducts.length / this.itemsPerPage,
+      );
+      return totalPages;
+    },
+    extraFiltersButtonText() {
+      return this.showExtraFilters ? "Ocultar filtros" : "Mostrar filtros";
     },
   },
   methods: {
@@ -51,15 +92,38 @@ const app = createApp({
         console.log(ex);
       }
     },
-    sort: function (type) {
-      if (type == "id") {
-        this.sortByIdDes = !this.sortByIdDes;
-        this.products.sort(
-          (a, b) =>
-            (this.sortByIdDes ? a : b).productId -
-            (this.sortByIdDes ? b : a).productId,
-        );
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
       }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    handlePageInput() {
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      } else if (this.currentPage < 1) {
+        this.currentPage = 1;
+      }
+    },
+    validatePage() {
+      if (isNaN(this.currentPage) || this.currentPage < 1) {
+        this.currentPage = 1;
+      } else if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      }
+    },
+    toggleExtraFilters() {
+      this.showExtraFilters = !this.showExtraFilters;
+    },
+    highlight(text, search) {
+      if (!search) return text;
+      return text
+        .toString()
+        .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
     },
   },
 }).mount("#app");

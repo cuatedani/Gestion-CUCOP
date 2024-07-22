@@ -13,6 +13,25 @@ $("#btn-collapse").click(() => {
   }
 });
 
+export const searchFieldData = {
+  methods: {
+    searchFieldSelectItem: function (item, type) {
+      this.handleSearchSelection(item, type);
+    },
+    searchFieldFocus: function (evt, type) {
+      this.searchFieldShowList(type);
+    },
+    searchFieldBlur: function (evt, type) {
+      this.searchFieldHideList(type);
+      const text = evt.target.value;
+      if (text == "") this.handleSearchSelection(null, type);
+    },
+    searchFieldKeyUp: function (evt, type) {
+      if (!this.searchFieldIsShowed(type)) this.searchFieldShowList(type);
+    },
+  },
+};
+
 Date.prototype.addHours = function (h) {
   this.setTime(this.getTime() + h * 60 * 60 * 1000);
   return this;
@@ -64,25 +83,4 @@ Date.prototype.differenceParsed = function (date) {
   difference += minutes === 0 || hours === 1 ? `${minutes} m` : `${minutes} m`;
 
   return difference;
-};
-
-/* Search field */
-
-export const searchFieldData = {
-  methods: {
-    searchFieldSelectItem: function (item, type) {
-      this.handleSearchSelection(item, type);
-    },
-    searchFieldFocus: function (evt, type) {
-      this.searchFieldShowList(type);
-    },
-    searchFieldBlur: function (evt, type) {
-      this.searchFieldHideList(type);
-      const text = evt.target.value;
-      if (text == "") this.handleSearchSelection(null, type);
-    },
-    searchFieldKeyUp: function (evt, type) {
-      if (!this.searchFieldIsShowed(type)) this.searchFieldShowList(type);
-    },
-  },
 };

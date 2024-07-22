@@ -3,23 +3,31 @@ include ../../templates/common/header.pug
 include ../../templates/common/scripts.pug
 include ../../templates/common/layout.pug
 include ../../templates/general/cucop/operation.pug
+include ../../templates/general/cucop/load.pug
 
 doctype html
 html(lang="es")
   head
     if operation == 'create'
       +header("Agregar registro CUCOP")
-    else
+    if operation == 'edit'
       +header("Editar registro CUCOP")
+    else
+      +header("Cargar registros CUCOP")
   body
     .main-container
-      +nav-bar(3)
+      +nav-bar(2)
       .right-container
         if operation == 'create'
           +nav-top("Agregar registro CUCOP")
-        else
+        if operation == 'edit'
           +nav-top("Editar registro CUCOP")
+        if operation == 'load'
+          +nav-top("Cargar registros CUCOP")
         .content-container#app
-          +operation()
+          if operation == 'load'
+            +load()
+          else
+            +operation()
     +scripts()
     script(src="/cucop/public/js/general/cucop/cucop_operation.js")

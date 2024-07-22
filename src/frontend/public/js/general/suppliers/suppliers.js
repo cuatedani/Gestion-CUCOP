@@ -5,16 +5,17 @@ const { createApp } = Vue;
 const app = createApp({
   data() {
     return {
+      id: "",
       name: "",
       description: "",
       tin: "",
       phone: "",
       address: "",
+      email: "",
       active: "1",
-      id: "",
-      sortByIdDes: false,
+      wherever: "",
       data: [],
-      suppliers: [],
+      showExtraFilters: false,
     };
   },
   mounted() {
@@ -22,7 +23,24 @@ const app = createApp({
   },
   computed: {
     filteredSuppliers() {
-      return filteringSuppliers(this);
+      return filteringSuppliers(this).map((supplier) => ({
+        ...supplier,
+        name: this.highlight(supplier.name, this.name || this.wherever),
+        description: this.highlight(
+          supplier.description,
+          this.description || this.wherever,
+        ),
+        tin: this.highlight(supplier.tin, this.tin || this.wherever),
+        phone: this.highlight(supplier.phone, this.phone || this.wherever),
+        address: this.highlight(
+          supplier.address,
+          this.address || this.wherever,
+        ),
+        email: this.highlight(supplier.email, this.email || this.wherever),
+      }));
+    },
+    extraFiltersButtonText() {
+      return this.showExtraFilters ? "Ocultar filtros" : "Mostrar filtros";
     },
   },
   methods: {
@@ -53,15 +71,14 @@ const app = createApp({
         console.log(ex);
       }
     },
-    sort: function (type) {
-      if (type == "id") {
-        this.sortByIdDes = !this.sortByIdDes;
-        this.suppliers.sort(
-          (a, b) =>
-            (this.sortByIdDes ? a : b).supplierId -
-            (this.sortByIdDes ? b : a).supplierId,
-        );
-      }
+    toggleExtraFilters() {
+      this.showExtraFilters = !this.showExtraFilters;
+    },
+    highlight(text, search) {
+      if (!search) return text;
+      return text
+        .toString()
+        .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
     },
   },
 }).mount("#app");

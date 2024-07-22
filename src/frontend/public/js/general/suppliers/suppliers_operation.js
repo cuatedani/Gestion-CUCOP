@@ -9,6 +9,7 @@ createApp({
         tin: "",
         phone: "",
         address: "",
+        email: "",
         active: true,
       },
       id: "",

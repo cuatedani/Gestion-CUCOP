@@ -24,4 +24,10 @@ app.get("/cucop/cucop/:id/edit", auth, async function (req, res) {
   });
 });
 
+app.get("/cucop/cucop/load", auth, async function (req, res) {
+  res.render("cucop_load", {
+    user: req.session.user,
+  });
+});
+
 export default app;

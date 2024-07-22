@@ -5,7 +5,9 @@ export const filteringSuppliers = ({
   tin,
   phone,
   address,
+  email,
   active,
+  wherever,
 }) => {
   if (name)
     data = data.filter((x) =>
@@ -24,6 +26,20 @@ export const filteringSuppliers = ({
   if (address)
     data = data.filter((x) =>
       x.address.toLowerCase().includes(address.toLowerCase()),
+    );
+  if (email)
+    data = data.filter((x) =>
+      x.email.toLowerCase().includes(email.toLowerCase()),
+    );
+  if (wherever)
+    data = data.filter(
+      (x) =>
+        x.name.toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.description || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.tin || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.phone || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.address || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.email || "").toLowerCase().includes(wherever.toLowerCase()),
     );
   if (active) data = data.filter((x) => x.active == active);
   return data;

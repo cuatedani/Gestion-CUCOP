@@ -4,7 +4,6 @@ createApp({
   data() {
     return {
       cucop: {
-        clavecucopid: "",
         clavecucop: "",
         descripcion: "",
         unidaddemedida: "",
@@ -17,9 +16,6 @@ createApp({
         descconcepto: "",
         capitulo: "",
         desccapitulo: "",
-        fechaalta: "",
-        fechamodificacion: "",
-        active: true,
       },
       id: "",
       code: 0,
@@ -48,7 +44,6 @@ createApp({
     },
     validateEmpty: function () {
       return (
-        !this.cucop.clavecucopid ||
         !this.cucop.clavecucop ||
         !this.cucop.descripcion ||
         !this.cucop.unidaddemedida ||

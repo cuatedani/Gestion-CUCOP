@@ -6,25 +6,35 @@ mixin filters()
     hr.white-hr
     .white-body-container
       .row
-        .col
-          label.form-label Nombre de Proveedor
-          input(type="text" placeholder="Ej. Papeleria Mariposa" v-model="name").form-control
-        .col
-          label.form-label TIN
-          input(type="text" placeholder="Ej. 15-3424" v-model="tin").form-control
-      .row.mt-3
-        .col
-          label.form-label Descripción
-          input(type="text" placeholder="Ej. Extenso Surtido" v-model="description").form-control
-      .row.mt-3
-        .col
-          label.form-label Dirección
-          input(type="text" placeholder="Ej. Av.Mexico #122" v-model="address").form-control
-        .col
-          label.form-label Telefono
-          input(type="text" placeholder="Ej. 311-100-1111" v-model="phone").form-control
-      .row.mt-3
+        .col-10
+          label.form-label Todos los campos
+          input.form-control(type="text", placeholder="Ej. Papeleria Mariposa, EJM951103H34", v-model="wherever")
+        .col-2.btn-toggle-more-filters
+          button.btn.btn-primary(data-bs-toggle="collapse", data-bs-target="#extraFilters" @click="toggleExtraFilters") {{ extraFiltersButtonText }}
+      #extraFilters.row.collapse
+        .row.mt-3
           .col
+            label.form-label Nombre
+            input(type="text" placeholder="Ej. Papeleria Mariposa" v-model="name").form-control
+          .col
+            label.form-label RFC
+            input(type="text" placeholder="Ej. EJM951103H34" v-model="tin").form-control
+        .row.mt-3
+          .col
+            label.form-label Descripción
+            input(type="text" placeholder="Ej. Extenso Surtido" v-model="description").form-control
+        .row.mt-3
+          .col
+            label.form-label Teléfono
+            input(type="text" placeholder="Ej. 311-100-1111" v-model="phone").form-control
+          .col
+            label.form-label Correo Electrónico
+            input(type="text" placeholder="Ej. proveedor@mail.com" v-model="email").form-control
+        .row.mt-3
+          .col
+            label.form-label Dirección
+            input(type="text" placeholder="Ej. Av.Mexico #122" v-model="address").form-control
+          .col-2
             label(for="active").form-label Activo
             select(id="active" v-model="active").form-select
               option(value="") Todos

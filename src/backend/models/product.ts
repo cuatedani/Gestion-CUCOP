@@ -2,7 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 import db from "../database";
 import OperationError from "../utils/error";
-import { ICucop } from "./cucop";
+import Cucop, { ICucop } from "./cucop";
 
 /**
  * Interfaces
@@ -16,7 +16,7 @@ export interface IProduct {
   active: boolean;
   updatedAt: string;
   createdAt: string;
-  cucop: ICucop;
+  cucop?: ICucop;
 }
 
 export type ICreateProduct = Omit<
@@ -74,6 +74,12 @@ const getAll = async ({
     `);
 
     const data = rows as IProduct[];
+    await Promise.all(
+      data.map(async (prod) => {
+        const procuc = await Cucop.getById(prod.cucopId);
+        prod.cucop = procuc;
+      }),
+    );
     return data;
   } catch (ex) {
     console.log(ex);
@@ -97,7 +103,9 @@ const getById = async (
 
     const data = rows as RowDataPacket[];
     if (data.length == 0) throw new OperationError(400, "Not found");
-    return data[0] as IProduct;
+    const prod = data[0] as IProduct;
+    prod.cucop = await Cucop.getById(prod.cucopId);
+    return prod;
   } catch (ex) {
     console.log(ex);
     return undefined;

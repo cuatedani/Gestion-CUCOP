@@ -1,30 +1,24 @@
 /* eslint-disable no-undef */
+const { createApp } = Vue;
 import { filteringCucop } from "/cucop/public/js/general/cucop/filters.js";
 
-const { createApp } = Vue;
 const app = createApp({
   data() {
     return {
-      clavecucopid: "",
+      id: "",
       clavecucop: "",
       descripcion: "",
       unidaddemedida: "",
       tipodecontratacion: "",
       partidaespecifica: "",
-      descpartidaespecifica: "",
       partidagenerica: "",
-      descpartidagenerica: "",
       concepto: "",
-      descconcepto: "",
       capitulo: "",
-      desccapitulo: "",
-      fechaalta: "",
-      fechamodificacion: "",
-      active: "1",
-      id: "",
-      sortByIdDes: false,
+      wherever: "",
       data: [],
-      cucop: [],
+      currentPage: 1,
+      itemsPerPage: 20,
+      showExtraFilters: false,
     };
   },
   mounted() {
@@ -32,7 +26,72 @@ const app = createApp({
   },
   computed: {
     filteredCucop() {
-      return filteringCucop(this);
+      return filteringCucop(this).map((cucop) => ({
+        ...cucop,
+        clavecucop: this.highlight(
+          cucop.clavecucop,
+          this.clavecucop || this.wherever,
+        ),
+        descripcion: this.highlight(
+          cucop.descripcion,
+          this.descripcion || this.wherever,
+        ),
+        unidaddemedida: this.highlight(
+          cucop.unidaddemedida,
+          this.unidaddemedida || this.wherever,
+        ),
+        tipodecontratacion: this.highlight(
+          cucop.tipodecontratacion,
+          this.tipodecontratacion || this.wherever,
+        ),
+        partidaespecifica: this.highlight(
+          cucop.partidaespecifica,
+          this.partidaespecifica || this.wherever,
+        ),
+        descpartidaespecifica: this.highlight(
+          cucop.descpartidaespecifica,
+          this.partidaespecifica || this.wherever,
+        ),
+        partidagenerica: this.highlight(
+          cucop.partidagenerica,
+          this.partidagenerica || this.wherever,
+        ),
+        descpartidagenerica: this.highlight(
+          cucop.descpartidagenerica,
+          this.partidagenerica || this.wherever,
+        ),
+        concepto: this.highlight(
+          cucop.concepto,
+          this.concepto || this.wherever,
+        ),
+        descconcepto: this.highlight(
+          cucop.descconcepto,
+          this.concepto || this.wherever,
+        ),
+        capitulo: this.highlight(
+          cucop.capitulo,
+          this.capitulo || this.wherever,
+        ),
+        desccapitulo: this.highlight(
+          cucop.desccapitulo,
+          this.capitulo || this.wherever,
+        ),
+      }));
+    },
+    paginatedCucop() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      const paginatedResult = this.filteredCucop.slice(start, end);
+      return paginatedResult;
+    },
+    totalPages() {
+      const totalPages = Math.ceil(
+        this.filteredCucop.length / this.itemsPerPage,
+      );
+      return totalPages;
+    },
+    extraFiltersButtonText() {
+      return this.showExtraFilters ? "Ocultar filtros" : "Mostrar filtros";
     },
   },
   methods: {
@@ -63,15 +122,38 @@ const app = createApp({
         console.log(ex);
       }
     },
-    sort: function (type) {
-      if (type == "id") {
-        this.sortByIdDes = !this.sortByIdDes;
-        this.cucop.sort(
-          (a, b) =>
-            (this.sortByIdDes ? a : b).cucopId -
-            (this.sortByIdDes ? b : a).cucopId,
-        );
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
       }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    handlePageInput() {
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      } else if (this.currentPage < 1) {
+        this.currentPage = 1;
+      }
+    },
+    validatePage() {
+      if (isNaN(this.currentPage) || this.currentPage < 1) {
+        this.currentPage = 1;
+      } else if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      }
+    },
+    toggleExtraFilters() {
+      this.showExtraFilters = !this.showExtraFilters;
+    },
+    highlight(text, search) {
+      if (!search) return text;
+      return text
+        .toString()
+        .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
     },
   },
 }).mount("#app");

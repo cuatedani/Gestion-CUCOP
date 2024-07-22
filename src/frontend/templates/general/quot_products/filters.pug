@@ -1,0 +1,66 @@
+mixin filters()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Información de la Cotización
+      .white-header-container-links
+        a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/edit"`).btn.btn-link.p-0 Editar cotización
+        button.btn.btn-link.p-0(data-bs-toggle="collapse", data-bs-target="#tableInfo" @click="toggleTableInfo") {{ tableInfoButtonText }}
+    hr.white-hr
+    .white-body-container
+      #tableInfo.row.collapse
+        .row
+          .col
+            label.form-label Proveedor
+            h6.white-title {{quotation.supplier.name}}
+          .col
+            label.form-label Numero de Cotización
+            h6.white-title {{quotation.quotNumber}}
+          .col
+            label.form-label Descripción
+            h6.white-title {{quotation.description}}
+        .row.mt-3
+          .col
+            label.form-label Fecha de Cotización
+            h6.white-title {{new Date(quotation.date).parseDate()}}
+          .col
+            label.form-label Fecha de Creación
+            h6.white-title {{new Date(quotation.createdAt).parseDate()}}
+          .col
+            label.form-label Activo
+            h6.white-title {{quotation.active ? "Activa" : "Inactiva"}}
+          
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Filtros
+      .white-header-container-links
+          a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/product/create"`).btn.btn-link.p-0 Agregar producto a la cotización
+          a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/product/load"`).btn.btn-link.p-0 Cargar productos a la cotización
+    hr.white-hr
+    .white-body-container
+      .row
+        .col-10
+          label.form-label Todos los campos
+          input.form-control(type="text", placeholder="Ej. Producto, Cantidad, Precio", v-model="wherever")
+        .col-2.btn-toggle-more-filters
+          button.btn.btn-primary(data-bs-toggle="collapse", data-bs-target="#extraFilters" @click="toggleExtraFilters") {{ extraFiltersButtonText }}
+      #extraFilters.row.collapse
+        .row.mt-3
+          .col
+            label.form-label Producto
+            input(type="text" placeholder="Ej. Lapices" v-model="isproduct").form-control
+          .col
+            label.form-label Cantidad
+            input(type="text" placeholder="Ej. 10" v-model="quantity").form-control
+          .col
+            label.form-label Precio
+            input(type="text" placeholder="Ej. 10.00" v-model="price").form-control
+        .row.mt-3
+          .col
+            label.form-label Detalles
+            input(type="text" placeholder="Ej. Para la oficina" v-model="details").form-control
+          .col-2
+            label(for="active").form-label Activo
+            select(id="active" v-model="active").form-select
+              option(value="") Todos
+              option(value="1") Activo
+              option(value="0") Inactivo
