@@ -2,20 +2,19 @@ include ../../templates/common/constants.pug
 include ../../templates/common/header.pug
 include ../../templates/common/scripts.pug
 include ../../templates/common/layout.pug
-include ../../templates/general/cucop/load.pug
-include ../../templates/general/cucop/tableimport.pug
+include ../../templates/common/search_field.pug
+include ../../templates/general/quotations/load.pug
 
 doctype html
 html(lang="es")
   head
-    +header("Importar registros CUCoP")
+    +header("Archivo adjunto")
   body
     .main-container
-      +nav-bar(2)
+      +nav-bar(0)
       .right-container
-        +nav-top("Importar registros CUCoP")
+        +nav-top("Archivo adjunto")
         .content-container#app
           +load()
-          +table()
     +scripts()
-    script(src="/cucop/public/js/general/cucop/cucop_load.js")
+    script(src="/cucop/public/js/general/quotations/quotations_file.js")

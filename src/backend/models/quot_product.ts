@@ -1,8 +1,8 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-
 import db from "../database";
 import OperationError from "../utils/error";
 import Quotation, { IQuotation } from "./quotation";
+import Cucop from "./cucop";
 import Product, { IProduct } from "./product";
 
 /**
@@ -50,16 +50,16 @@ const exists = async (quotProductId: number | boolean): Promise<boolean> => {
   try {
     const [rows] = await db.query(
       `
-      select 
+      SELECT 
         quotProductId
-      from quotations_products
-      where quotProductId=?
+      FROM quotations_products
+      WHERE quotProductId=?
     `,
       [quotProductId],
     );
 
     const data = rows as RowDataPacket[];
-    if (data.length == 0) throw new OperationError(400, "Not found");
+    if (data.length === 0) throw new OperationError(400, "Not found");
     return true;
   } catch (ex) {
     console.log(ex);
@@ -73,14 +73,15 @@ const getAll = async ({
   status = "all",
 }: IGetAllFilters): Promise<IQuotProduct[]> => {
   try {
-    const amount = limit ? `limit ${limit}` : "";
-    const active = status != "all" ? `where active=${status == "active"}` : "";
+    const amount = limit ? `LIMIT ${limit}` : "";
+    const active =
+      status !== "all" ? `WHERE active=${status === "active"}` : "";
 
     const [rows] = await db.query(`
-      select 
+      SELECT 
         *
-      from quotations_products ${active}
-      order by createdAt ${sort} ${amount}
+      FROM quotations_products ${active}
+      ORDER BY createdAt ${sort} ${amount}
     `);
 
     const data = rows as IQuotProduct[];
@@ -105,16 +106,16 @@ const getById = async (
   try {
     const [rows] = await db.query(
       `
-      select 
+      SELECT 
         *
-      from quotations_products
-      where quotProductId=?
+      FROM quotations_products
+      WHERE quotProductId=?
     `,
       [quotProductId],
     );
 
     const data = rows as RowDataPacket[];
-    if (data.length == 0) throw new OperationError(400, "Not found");
+    if (data.length === 0) throw new OperationError(400, "Not found");
     const quotpro = data[0] as IQuotProduct;
     const quot = await Quotation.getById(quotpro.quotationId);
     const product = await Product.getById(quotpro.productId);
@@ -133,11 +134,11 @@ const getByQuotId = async (
   try {
     const [rows] = await db.query(
       `
-      select 
+      SELECT 
         *
-      from quotations_products
-      where quotationId=?
-      order by createdAt
+      FROM quotations_products
+      WHERE quotationId=?
+      ORDER BY createdAt
     `,
       [QuotId],
     );
@@ -162,20 +163,20 @@ const create = async ({
   quotationId,
   quantity,
   price,
-  details,
+  details = "N/A",
   active,
 }: ICreateQuotProduct): Promise<number> => {
   try {
     const [rows] = await db.query(
       `
-      insert into quotations_products (
+      INSERT INTO quotations_products (
         productId,
         quotationId,
         quantity,
         price,
         details,
         active
-      ) values(?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `,
       [productId, quotationId, quantity, price, details, active],
     );
@@ -188,6 +189,110 @@ const create = async ({
   }
 };
 
+const parseCSVLine = (line: string): string[] => {
+  const fields: string[] = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      fields.push(field.trim());
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+
+  fields.push(field.trim());
+
+  return fields;
+};
+
+const load = async (fileBuffer: Buffer, qid: number | string) => {
+  const logs = [];
+  try {
+    logs.push({
+      time: new Date().toISOString(),
+      message: "Archivo recibido correctamente",
+    });
+
+    const content = fileBuffer.toString("utf-8");
+    const lines = content.split("\n");
+    let c = 1;
+    const cgen = await Cucop.getDefalt();
+    for (const line of lines.slice(1)) {
+      logs.push({
+        time: new Date().toISOString(),
+        message: `Procesado fila #${c}`,
+      });
+      const [Producto, Cantidad, Precio, Detalles] = parseCSVLine(line);
+      let pid = 0;
+
+      // Buscar si existe el producto
+      const prod = await Product.getByName(Producto);
+
+      // Si existe tomar su id y si no crearlo
+      if (prod) {
+        pid = prod.productId;
+      } else {
+        if (cgen == 0) {
+          logs.push({
+            time: new Date().toISOString(),
+            message: `Fila #${c}: Error al registrar nuevo producto `,
+          });
+          c++;
+          continue; // Saltar al siguiente elemento del bucle
+        }
+        pid = await Product.create({
+          cucopId: cgen,
+          name: Producto,
+          description: "N/A",
+          active: true,
+        });
+        if (!pid || cgen == 0) {
+          logs.push({
+            time: new Date().toISOString(),
+            message: `Fila #${c}: Error al registrar nuevo producto`,
+          });
+          c++;
+          continue; // Saltar al siguiente elemento del bucle
+        }
+      }
+
+      const iqp = await create({
+        productId: pid,
+        quotationId: Number(qid), // Convertir a número
+        quantity: Cantidad,
+        price: Precio,
+        details: Detalles || "N/A",
+        active: true,
+      });
+      if (iqp) {
+        logs.push({
+          time: new Date().toISOString(),
+          message: `Fila #${c}: Procesada correctamente`,
+        });
+      } else {
+        logs.push({
+          time: new Date().toISOString(),
+          message: `Fila #${c}: Error al añadir producto a la cotización`,
+        });
+        c++;
+        continue; // Saltar al siguiente elemento del bucle
+      }
+      c++;
+    }
+  } catch (ex) {
+    console.log(ex);
+    return `Error al procesar el Archivo: ${ex}`;
+  }
+  return logs;
+};
+
 const update = async (
   quotProductId: number | string,
   {
@@ -195,7 +300,7 @@ const update = async (
     quotationId,
     quantity,
     price,
-    details,
+    details = "N/A",
     active,
   }: IUpdateQuotProduct,
 ): Promise<boolean> => {
@@ -228,11 +333,11 @@ const remove = async (quotProductId: number | string): Promise<boolean> => {
   try {
     const [rows] = await db.query(
       `
-      update
+      UPDATE
         quotations_products 
-      set
+      SET
         active=? 
-      where
+      WHERE
         quotProductId=?
     `,
       [false, quotProductId],
@@ -252,6 +357,7 @@ export default {
   getById,
   getByQuotId,
   create,
+  load,
   update,
   remove,
 };

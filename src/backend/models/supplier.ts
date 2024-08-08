@@ -107,25 +107,13 @@ const getById = async (
 
 const create = async ({
   name,
-  description,
+  description = "N/A",
   tin,
-  phone,
-  address,
-  email,
+  phone = "N/A",
+  address = "N/A",
+  email = "N/A",
   active,
 }: ICreateSupplier): Promise<number> => {
-  if (!description) {
-    description = "Sin descripción";
-  }
-  if (!phone) {
-    phone = "Sin telefono";
-  }
-  if (!address) {
-    address = "Sin dirección";
-  }
-  if (!email) {
-    email = "Sin correo";
-  }
   try {
     const [rows] = await db.query(
       `
@@ -152,20 +140,16 @@ const create = async ({
 
 const update = async (
   supplierId: number | string,
-  { name, description, tin, phone, address, email, active }: IUpdateSupplier,
+  {
+    name,
+    description = "N/A",
+    tin,
+    phone = "N/A",
+    address = "N/A",
+    email = "N/A",
+    active,
+  }: IUpdateSupplier,
 ): Promise<boolean> => {
-  if (!description) {
-    description = "Sin descripción";
-  }
-  if (!phone) {
-    phone = "Sin telefono";
-  }
-  if (!address) {
-    address = "Sin dirección";
-  }
-  if (!email) {
-    email = "Sin correo";
-  }
   try {
     const [rows] = await db.query(
       `

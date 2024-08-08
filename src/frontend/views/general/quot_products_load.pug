@@ -6,17 +6,19 @@ include ../../templates/common/search_field.pug
 include ../../templates/common/search_modal.pug
 include ../../templates/general/quot_products/operation.pug
 include ../../templates/general/quot_products/load.pug
+include ../../templates/general/quot_products/tableimport.pug
 
 doctype html
 html(lang="es")
   head
-    +header("Cargar productos en la cotización")
+    +header("Importar productos en la cotización")
   body
     .main-container
       +nav-bar(0)
       .right-container
-        +nav-top("Cargar productos a la cotización")
+        +nav-top("Importar productos a la cotización")
         .content-container#app
             +load()
+            +table()
     +scripts()
     script(src="/cucop/public/js/general/quot_products/quot_products_load.js")

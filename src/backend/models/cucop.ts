@@ -76,6 +76,28 @@ const existsclv = async (clavecucop: number | string): Promise<number> => {
   }
 };
 
+const getDefalt = async (): Promise<number> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT 
+        cucopId
+      FROM cucop
+    `,
+    );
+
+    const data = rows as RowDataPacket[];
+    if (data.length === 0) {
+      return 0;
+    }
+
+    return data[0].cucopId as number;
+  } catch (ex) {
+    console.log(ex);
+    return 0;
+  }
+};
+
 const getAll = async (): Promise<ICucop[]> => {
   try {
     const [rows] = await db.query(`
@@ -108,6 +130,25 @@ const getCapitulos = async (): Promise<ICucop[]> => {
   }
 };
 
+const getRegCapitulos = async (capitulo: string): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT *
+      FROM CUCOP
+      WHERE capitulo=?
+    `,
+      [Number(capitulo)],
+    );
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
 const getConceptos = async (capitulo: string): Promise<ICucop[]> => {
   try {
     const [rows] = await db.query(
@@ -118,6 +159,25 @@ const getConceptos = async (capitulo: string): Promise<ICucop[]> => {
       WHERE capitulo=?
     `,
       [Number(capitulo)],
+    );
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
+const getRegConceptos = async (concepto: string): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT *
+      FROM CUCOP
+      WHERE concepto=?;
+    `,
+      [Number(concepto)],
     );
 
     const data = rows as ICucop[];
@@ -148,6 +208,25 @@ const getGenericas = async (concepto: string): Promise<ICucop[]> => {
   }
 };
 
+const getRegGenericas = async (generica: string): Promise<ICucop[]> => {
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT * 
+      FROM CUCOP
+      WHERE partidagenerica=?;
+    `,
+      [Number(generica)],
+    );
+
+    const data = rows as ICucop[];
+    return data;
+  } catch (ex) {
+    console.log(ex);
+    return [];
+  }
+};
+
 const getEspecificas = async (generica: string): Promise<ICucop[]> => {
   try {
     const [rows] = await db.query(
@@ -168,7 +247,7 @@ const getEspecificas = async (generica: string): Promise<ICucop[]> => {
   }
 };
 
-const getRegistros = async (especifica: string): Promise<ICucop[]> => {
+const getRegEspecificas = async (especifica: string): Promise<ICucop[]> => {
   try {
     const [rows] = await db.query(
       `
@@ -264,6 +343,140 @@ const create = async ({
   }
 };
 
+const parseCSVLine = (line: string): string[] => {
+  const fields: string[] = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      fields.push(field.trim());
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+
+  fields.push(field.trim());
+
+  return fields;
+};
+
+const load = async (fileBuffer: Buffer) => {
+  const logs: { time: string; message: string }[] = [];
+  try {
+    logs.push({
+      time: new Date().toISOString(),
+      message: "Archivo recibido correctamente",
+    });
+
+    const content = fileBuffer.toString("utf-8");
+    const lines = content.split("\n");
+    let c = 1;
+
+    for (const line of lines.slice(1)) {
+      logs.push({
+        time: new Date().toISOString(),
+        message: `Procesado fila #${c}`,
+      });
+
+      const [
+        clavecucop,
+        descripcion,
+        unidaddemedida,
+        tipodecontratacion,
+        partidaespecifica,
+        descpartidaespecifica,
+        partidagenerica,
+        descpartidagenerica,
+        concepto,
+        descconcepto,
+        capitulo,
+        desccapitulo,
+      ] = parseCSVLine(line);
+
+      let cid = 0;
+      let upd = false;
+
+      // Buscar si existe el registro
+      const clv = await existsclv(clavecucop);
+
+      // Si existe actualizar sino agregar
+      if (clv) {
+        upd = await update(clv, {
+          clavecucop: Number(clavecucop),
+          descripcion: descripcion,
+          unidaddemedida: unidaddemedida,
+          tipodecontratacion: tipodecontratacion,
+          partidaespecifica: Number(partidaespecifica),
+          descpartidaespecifica: descpartidaespecifica,
+          partidagenerica: Number(partidagenerica),
+          descpartidagenerica: descpartidagenerica,
+          concepto: Number(concepto),
+          descconcepto: descconcepto,
+          capitulo: Number(capitulo),
+          desccapitulo: desccapitulo,
+        });
+        if (upd) {
+          logs.push({
+            time: new Date().toISOString(),
+            message: `Fila #${c}: Registro actualizado correctamente`,
+          });
+        } else {
+          logs.push({
+            time: new Date().toISOString(),
+            message: `Fila #${c}: Error al actualizar registro`,
+          });
+          c++;
+          continue;
+        }
+      } else {
+        cid = await create({
+          clavecucop: Number(clavecucop),
+          descripcion: descripcion,
+          unidaddemedida: unidaddemedida,
+          tipodecontratacion: tipodecontratacion,
+          partidaespecifica: Number(partidaespecifica),
+          descpartidaespecifica: descpartidaespecifica,
+          partidagenerica: Number(partidagenerica),
+          descpartidagenerica: descpartidagenerica,
+          concepto: Number(concepto),
+          descconcepto: descconcepto,
+          capitulo: Number(capitulo),
+          desccapitulo: desccapitulo,
+        });
+        if (cid) {
+          logs.push({
+            time: new Date().toISOString(),
+            message: `Fila #${c}: Registro agregado correctamente `,
+          });
+        } else {
+          logs.push({
+            time: new Date().toISOString(),
+            message: `Fila #${c}: Error al agregar registro`,
+          });
+          c++;
+          continue;
+        }
+      }
+
+      c++;
+    }
+    logs.push({
+      time: new Date().toISOString(),
+      message: `Procesado Finalizado`,
+    });
+  } catch (ex) {
+    console.log(ex);
+    return `Error al procesar el Archivo: ${ex}`;
+  }
+  return logs;
+};
+
 const update = async (
   cucopId: number | string,
   {
@@ -349,14 +562,19 @@ const remove = async (cucopId: number | string): Promise<boolean> => {
 export default {
   exists,
   existsclv,
+  getDefalt,
   getAll,
   getById,
   getCapitulos,
+  getRegCapitulos,
   getConceptos,
+  getRegConceptos,
   getGenericas,
+  getRegGenericas,
   getEspecificas,
-  getRegistros,
+  getRegEspecificas,
   create,
+  load,
   update,
   remove,
 };

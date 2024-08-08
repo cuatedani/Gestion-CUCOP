@@ -12,7 +12,7 @@ const app = createApp({
       price: "",
       totalPrice: "",
       details: "",
-      active: true,
+      active: "1",
       quotation: {
         quotationId: "",
         description: "",
@@ -22,6 +22,11 @@ const app = createApp({
         createdAt: "",
         supplier: {
           name: "",
+          description: "",
+          tin: "",
+          phone: "",
+          address: "",
+          email: "",
         },
       },
       product: {
@@ -128,6 +133,143 @@ const app = createApp({
       return text
         .toString()
         .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
+    },
+    exportData() {
+      // Crea un libro de trabajo de XLSX
+      const workbook = XLSX.utils.book_new();
+
+      // Filtra y transforma los datos para la exportación
+      const modifiedData = this.data
+        .filter((item) => item.active)
+        .map((item) => ({
+          Producto: item.product.name,
+          Cantidad: item.quantity,
+          PrecioUnitario: item.price,
+          PrecioTotal: item.price,
+          Detalles: item.details,
+        }));
+
+      // Convierte los datos modificados a una hoja de cálculo
+      const worksheet = XLSX.utils.json_to_sheet(modifiedData);
+
+      // Añade la hoja de cálculo al libro de trabajo
+      XLSX.utils.book_append_sheet(workbook, worksheet, "ProductosCotizados");
+
+      // Exporta el libro de trabajo a un archivo .xlsx
+      XLSX.writeFile(workbook, "ProductosCotizados.xlsx");
+    },
+    downloadQuotation() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      let i = 30;
+
+      doc.setFontSize(12);
+      // Información de la cotización
+      doc.setFont("helvetica", "bold");
+      doc.text(`Número de cotización:`, 14, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.quotNumber}`, 60, i);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Fecha:`, 100, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.date}`, 115, i);
+      i += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Detalles:`, 14, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.description}`, 32, i);
+
+      // Información del proveedor
+      doc.setFontSize(14);
+      i += 10;
+      doc.setFont("helvetica", "bold");
+      doc.text(`${this.quotation.supplier.name}`, 14, i);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      i += 6;
+      doc.setFont("helvetica", "bold");
+      doc.text(`RFC:`, 14, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.supplier.tin}`, 25, i);
+      i += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Descripción:`, 14, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.supplier.description}`, 40, i);
+
+      doc.setFontSize(14);
+      i += 8;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Contacto`, 14, i);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      i += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Telefóno:`, 14, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.supplier.phone}`, 34, i);
+      i += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Dirección:`, 14, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.supplier.address}`, 36, i);
+      i += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Email:`, 14, i);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${this.quotation.supplier.email}`, 28, i);
+
+      // Configuración de la tabla
+      const headers = [
+        "Producto",
+        "Cantidad",
+        "Precio Unitario",
+        "Precio Total",
+        "Detalles",
+      ];
+
+      const modifiedData = this.data
+        .filter((item) => item.active)
+        .map((item) => ({
+          Producto: item.product.name,
+          Cantidad: item.quantity,
+          PrecioUnitario: item.price,
+          PrecioTotal: item.price,
+          Detalles: item.details,
+        }));
+
+      const rows = modifiedData.map((item) => [
+        item.Producto,
+        item.Cantidad,
+        item.PrecioUnitario,
+        item.PrecioTotal,
+        item.Detalles,
+      ]);
+
+      // Añade la tabla al documento
+      i += 10;
+      doc.autoTable({
+        startY: i,
+        head: [headers],
+        body: rows,
+        theme: "grid",
+        styles: {
+          fillColor: [27, 38, 44],
+          textColor: 255,
+        },
+        headStyles: {
+          ffillColor: [58, 133, 255, 0.39],
+          textColor: [255, 255, 255],
+        },
+        bodyStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+        },
+      });
+
+      // Guarda el documento como PDF
+      doc.save("Cotización.pdf");
     },
   },
 }).mount("#app");

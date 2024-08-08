@@ -155,6 +155,35 @@ const app = createApp({
         .toString()
         .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
     },
+    exportData() {
+      // Crea un libro de trabajo de XLSX
+      const workbook = XLSX.utils.book_new();
+
+      // Filtra y transforma los datos para la exportación
+      const modifiedData = this.data.map((item) => ({
+        "Clave CUCoP": item.clavecucop,
+        Descripción: item.descripcion,
+        "Unidad de Medida": item.unidaddemedida,
+        "Tipo de Contratación": item.tipodecontratacion,
+        "Partida Especifica": item.partidaespecifica,
+        "Desc Partida Especifica": item.descpartidaespecifica,
+        "Partida Generica": item.partidagenerica,
+        "Desc Partida Generica": item.descpartidagenerica,
+        Concepto: item.concepto,
+        "Desc Concepto": item.descconcepto,
+        Capitulo: item.capitulo,
+        "Desc Capitulo": item.desccapitulo,
+      }));
+
+      // Convierte los datos modificados a una hoja de cálculo
+      const worksheet = XLSX.utils.json_to_sheet(modifiedData);
+
+      // Añade la hoja de cálculo al libro de trabajo
+      XLSX.utils.book_append_sheet(workbook, worksheet, "RegistrosCUCop");
+
+      // Exporta el libro de trabajo a un archivo .xlsx
+      XLSX.writeFile(workbook, "RegistrosCUCop.xlsx");
+    },
   },
 }).mount("#app");
 

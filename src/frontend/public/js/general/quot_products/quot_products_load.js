@@ -4,28 +4,21 @@ createApp({
   data() {
     return {
       listId: 0,
-      id: 0,
-      quotProduct: {
-        quotationId: 0,
-        productId: 0,
-        quantity: 0,
-        price: 0,
-        details: "",
-        active: true,
-      },
+      quotationId: 0,
       code: 0,
-      prodcode: 0,
-      log: "",
+      logs: [],
+      isLoading: false,
+      processButtonText: "Cargar",
       errorMessage: "",
       successMessage: "",
-      fileContent: [],
-      showLogs: false,
+      quotProducts: [],
+      file: null,
+      verified: false,
     };
   },
   mounted() {
     const href = window.location.href;
     const lid = href.split("/")[5];
-    console.log("Esta es la lista: ", lid);
     try {
       this.listId = parseInt(lid);
     } catch (ex) {
@@ -33,57 +26,96 @@ createApp({
     }
 
     const qid = href.split("/")[7];
-    console.log("Esta es la cotización: ", qid);
     try {
-      this.quotProduct.quotationId = parseInt(qid);
+      this.quotationId = parseInt(qid);
     } catch (ex) {
-      this.quotProduct.quotationId = 0;
+      this.quotationId = 0;
     }
   },
   computed: {
-    LogsButtonText() {
-      return this.showLogs ? "Ocultar Registros" : "Mostrar Registros";
+    loadQuotProducts() {
+      return this.quotProducts;
+    },
+    loadLogs() {
+      return this.logs;
     },
   },
 
   methods: {
     handleFileUpload(event) {
+      this.code = 0;
+      this.quotProducts = [];
       const file = event.target.files[0];
       if (file) {
-        this.log += "Archivo cargado.\n";
+        this.file = file;
+        this.verified = false;
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "Archivo cargado",
+        });
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = e.target.result;
           const extension = file.name.split(".").pop().toLowerCase();
 
           if (extension === "csv") {
-            this.log += "Archivo CSV detectado.\n";
+            this.logs.push({
+              time: new Date().toISOString(),
+              message: "Archivo CSV detectado",
+            });
             this.verifyFileContent(content);
           } else if (extension === "xlsx" || extension === "xls") {
-            this.log += "Transformando archivo a CSV.\n";
+            this.logs.push({
+              time: new Date().toISOString(),
+              message: "Transformando archivo a CSV",
+            });
             const workbook = XLSX.read(content, { type: "binary" });
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
             const csvContent = XLSX.utils.sheet_to_csv(sheet);
             this.verifyFileContent(csvContent);
           } else {
+            this.code = 204;
             this.errorMessage =
               "Formato de archivo no soportado. Por favor sube un archivo CSV, XLSX o XLS.";
-            this.log += "Formato de archivo no soportado.\n";
+            this.logs.push({
+              time: new Date().toISOString(),
+              message: "Formato de archivo no soportado",
+            });
           }
         };
         reader.readAsBinaryString(file);
       }
     },
+
+    parseCSVLine(line) {
+      const fields = [];
+      let field = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === "," && !inQuotes) {
+          fields.push(field);
+          field = "";
+        } else {
+          field += char;
+        }
+      }
+
+      fields.push(field);
+
+      return fields;
+    },
     verifyFileContent(content) {
-      this.log += "Analizando campos del archivo.\n";
-      const requiredFields = [
-        "id",
-        "productId",
-        "quantity",
-        "price",
-        "details",
-      ];
+      this.logs.push({
+        time: new Date().toISOString(),
+        message: "Analizando campos del archivo",
+      });
+      const requiredFields = ["Producto", "Cantidad", "Precio", "Detalles"];
       const lines = content.split("\n");
       const headers = lines[0].split(",");
 
@@ -96,83 +128,114 @@ createApp({
           ", ",
         )}`;
         this.successMessage = "";
-        this.log += `Faltan los siguientes campos requeridos: ${missingFields.join(
-          ", ",
-        )}.\n`;
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: `Faltan los siguientes campos requeridos: ${missingFields.join(
+            ", ",
+          )}.`,
+        });
+        this.verified = false;
       } else {
-        this.successMessage =
-          "El archivo contiene todos los campos requeridos.";
         this.errorMessage = "";
-        this.log += "El archivo contiene todos los campos requeridos.\n";
-        this.fileContent = lines.slice(1); // Almacena las filas del archivo (sin los encabezados)
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "El archivo contiene todos los campos requeridos",
+        });
+        this.quotProducts = lines
+          .slice(1)
+          .map((line) => {
+            const [Producto, Cantidad, Precio, Detalles] =
+              this.parseCSVLine(line);
+            return { Producto, Cantidad, Precio, Detalles };
+          })
+          .filter(
+            (product) => product.Producto && product.Cantidad && product.Precio,
+          );
+        this.verified = true;
       }
     },
-    async processFile() {
+    async SendFile() {
       try {
-        let c = 1;
-        for (const line of this.fileContent) {
-          try {
-            const values = line.split(",");
-            if (values[1] == "" || values[2] == "" || values[3] == "") {
-              this.log += `Fila No.${c} vacía o incompleta, omitiendo...\n`;
-              c++;
-              continue;
-            }
-            this.id = values[0];
-            this.quotProduct.productId = values[1];
-            this.quotProduct.quantity = values[2];
-            this.quotProduct.price = values[3];
-            this.quotProduct.details = values[4];
-            await setTimeout(500);
-            this.log += `Revisando fila No.${c}...\n`;
-            await setTimeout(500);
-            let result;
-            if (this.id == 0) {
-              this.log += "Añadiendo producto cotizado...\n";
-              await setTimeout(500);
-              result = await axios.post(
-                "/cucop/api/quot-products",
-                this.quotProduct,
-              );
-              this.prodcode = result.status;
-              if (this.prodcode == 200) {
-                this.log += `Producto cotizado añadido.\n`;
-              } else {
-                this.log += `Error al añadir producto cotizado.\n`;
-              }
-            } else {
-              this.log += "Editando producto de cotizado...\n";
-              await setTimeout(500);
-              result = await axios.put(
-                `/cucop/api/quot-products/${this.id}`,
-                this.quotProduct,
-              );
-              this.prodcode = result.status;
-              if (this.prodcode == 200) {
-                this.log += `Producto cotizado editado.\n`;
-              } else {
-                this.log += `Error al editar producto cotizado.\n`;
-              }
-            }
-          } catch (ex) {
-            console.log(ex);
-            this.log += `Error al procesar la fila No.${c}.\n`;
-          }
-          c++;
+        const formData = new FormData();
+        const filteredProducts = this.quotProducts.filter(
+          (product) => product.Producto && product.Cantidad && product.Precio,
+        );
+        const csvContent = [
+          "Producto,Cantidad,Precio,Detalles",
+          ...filteredProducts.map(
+            (product) =>
+              `"${product.Producto}",${product.Cantidad},${product.Precio},"${product.Detalles}"`,
+          ),
+        ].join("\n");
+
+        formData.append(
+          "file",
+          new Blob([csvContent], { type: "text/csv" }),
+          "QuotProducts-Data.csv",
+        );
+
+        // Mostrar loader y desactivar botón
+        this.isLoading = true;
+        this.processButtonText = "Cargando...";
+
+        const result = await axios.post(
+          `/cucop/api/quot-products/load/${this.quotationId}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+
+        // Esperar 2 segundos
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Terminar loader y activar botón
+        this.isLoading = false;
+        this.processButtonText = "Cargar";
+
+        this.code = result.status;
+        console.log(result.data.logs);
+        this.logs.push(...result.data.logs);
+        if (this.code == 200) {
+          this.successMessage = `Archivo Procesado Correctamente.\n`;
+          this.logs.push({
+            time: new Date().toISOString(),
+            message: "Archivo Procesado Correctamente",
+          });
+        } else {
+          this.logs.push({
+            time: new Date().toISOString(),
+            message: "Error al Procesar el Archivo",
+          });
         }
-        this.log += "Archivo procesado exitosamente.\n";
-        await setTimeout(() => {
-          window.location.replace(
-            `/cucop/lists/${this.listId}/quotation/${this.quotProduct.quotationId}`,
-          );
-        }, 1500);
       } catch (ex) {
         console.log(ex);
-        this.log += "Error al procesar el archivo.\n";
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "Error al Procesar el Archivo",
+        });
       }
     },
     toggleLogs() {
       this.showLogs = !this.showLogs;
+    },
+    processFile() {
+      if (!this.file) {
+        this.code = 404;
+        this.errorMessage = "Por favor, sube un archivo antes de procesarlo.";
+        this.log += "Archivo no encontrado.\n";
+        return;
+      }
+      if (!this.verified) {
+        this.code = 203;
+        this.errorMessage =
+          "El archivo no ha sido verificado o no es válido. Por favor, verifica el archivo antes de procesarlo.";
+        this.log += "Archivo no verificado o no válido.\n";
+        return;
+      }
+      this.SendFile();
     },
   },
 }).mount("#app");

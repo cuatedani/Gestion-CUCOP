@@ -3,191 +3,335 @@ const { createApp } = Vue;
 createApp({
   data() {
     return {
-      id: 0,
-      cucop: {
-        clavecucop: 0,
-        descripcion: "",
-        unidaddemedida: "",
-        tipodecontratacion: "",
-        partidaespecifica: 0,
-        descpartidaespecifica: "",
-        partidagenerica: 0,
-        descpartidagenerica: "",
-        concepto: 0,
-        descconcepto: "",
-        capitulo: 0,
-        desccapitulo: "",
-      },
       code: 0,
-      cucopcode: 0,
-      log: "",
+      logs: [],
+      isLoading: false,
+      processButtonText: "Cargar",
       errorMessage: "",
       successMessage: "",
-      fileContent: [],
-      showLogs: false,
+      cucopdata: [],
+      file: null,
+      verified: false,
+      currentPage: 1,
+      currentPageLogs: 1,
+      itemsPerPage: 20,
     };
   },
   computed: {
     LogsButtonText() {
       return this.showLogs ? "Ocultar Registros" : "Mostrar Registros";
     },
+    paginatedCucop() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      const paginatedResult = this.cucopdata.slice(start, end);
+      return paginatedResult;
+    },
+    paginatedLogs() {
+      const start = (this.currentPageLogs - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      const paginatedResult = this.logs.slice(start, end);
+      return paginatedResult;
+    },
+    totalPages() {
+      const totalPages = Math.ceil(this.cucopdata.length / this.itemsPerPage);
+      return totalPages;
+    },
+    totalPagesLogs() {
+      const totalPagesLogs = Math.ceil(this.logs.length / this.itemsPerPage);
+      return totalPagesLogs;
+    },
   },
   methods: {
     handleFileUpload(event) {
+      this.code = 0;
+      this.cucopdata = [];
       const file = event.target.files[0];
       if (file) {
-        this.log += "Archivo cargado.\n";
+        this.file = file;
+        this.verified = false;
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "Archivo cargado",
+        });
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = e.target.result;
           const extension = file.name.split(".").pop().toLowerCase();
 
           if (extension === "csv") {
-            this.log += "Archivo CSV detectado.\n";
+            this.logs.push({
+              time: new Date().toISOString(),
+              message: "Archivo CSV detectado",
+            });
             this.verifyFileContent(content);
           } else if (extension === "xlsx" || extension === "xls") {
-            this.log += "Transformando archivo a CSV.\n";
+            this.logs.push({
+              time: new Date().toISOString(),
+              message: "Transformando archivo a CSV",
+            });
             const workbook = XLSX.read(content, { type: "binary" });
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
             const csvContent = XLSX.utils.sheet_to_csv(sheet);
             this.verifyFileContent(csvContent);
           } else {
+            this.code = 204;
             this.errorMessage =
               "Formato de archivo no soportado. Por favor sube un archivo CSV, XLSX o XLS.";
-            this.log += "Formato de archivo no soportado.\n";
+            this.logs.push({
+              time: new Date().toISOString(),
+              message: "Formato de archivo no soportado",
+            });
           }
         };
         reader.readAsBinaryString(file);
       }
     },
-    verifyFileContent(content) {
-      this.log += "Analizando campos del archivo...\n";
-      const requiredFields = [
-        "CLAVE CUCoP",
-        "DESCRIPCIÓN",
-        "UNIDAD DE MEDIDA (sugerida)",
-        "TIPO DE CONTRATACIÓN",
-        "PARTIDA ESPECÍFICA",
-        "DESC. PARTIDA ESPECÍFICA",
-        "PARTIDA GENÉRICA",
-        "DESC. PARTIDA GENÉRICA",
-        "CONCEPTO",
-        "DESC. CONCEPTO",
-        "CAPÍTULO",
-        "DESC. CAPÍTULO",
-      ];
+    parseCSVLine(line) {
+      const fields = [];
+      let field = "";
+      let inQuotes = false;
 
-      Papa.parse(content, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const headers = results.meta.fields;
-          const missingFields = requiredFields.filter(
-            (field) => !headers.includes(field),
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        if (char === '"') {
+          inQuotes = !inQuotes; // Toggle inQuotes flag
+        } else if (char === "," && !inQuotes) {
+          fields.push(field);
+          field = "";
+        } else {
+          field += char;
+        }
+      }
+
+      fields.push(field); // Push the last field
+
+      return fields;
+    },
+    verifyFileContent(content) {
+      this.logs.push({
+        time: new Date().toISOString(),
+        message: "Analizando campos del archivo",
+      });
+      const requiredFields = [
+        "Clave CUCoP",
+        "Descripción",
+        "Unidad de Medida",
+        "Tipo de Contratación",
+        "Partida Especifica",
+        "Desc Partida Especifica",
+        "Partida Generica",
+        "Desc Partida Generica",
+        "Concepto",
+        "Desc Concepto",
+        "Capitulo",
+        "Desc Capitulo",
+      ];
+      const lines = content.split("\n");
+      const headers = lines[0].split(",");
+      const missingFields = requiredFields.filter(
+        (field) => !headers.includes(field),
+      );
+      if (missingFields.length > 0) {
+        this.code = 111;
+        this.errorMessage = `Faltan los siguientes campos requeridos: ${missingFields.join(
+          ", ",
+        )}`;
+        this.successMessage = "";
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: `Faltan los siguientes campos requeridos: ${missingFields.join(
+            ", ",
+          )}.`,
+        });
+        this.verified = false;
+      } else {
+        this.errorMessage = "";
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "El archivo contiene todos los campos requeridos",
+        });
+        this.cucopdata = lines
+          .slice(1)
+          .map((line) => {
+            const [
+              clavecucop,
+              descripcion,
+              unidaddemedida,
+              tipodecontratacion,
+              partidaespecifica,
+              descpartidaespecifica,
+              partidagenerica,
+              descpartidagenerica,
+              concepto,
+              descconcepto,
+              capitulo,
+              desccapitulo,
+            ] = this.parseCSVLine(line);
+            return {
+              clavecucop,
+              descripcion,
+              unidaddemedida,
+              tipodecontratacion,
+              partidaespecifica,
+              descpartidaespecifica,
+              partidagenerica,
+              descpartidagenerica,
+              concepto,
+              descconcepto,
+              capitulo,
+              desccapitulo,
+            };
+          })
+          .filter(
+            (cucop) =>
+              cucop.clavecucop &&
+              cucop.descripcion &&
+              cucop.partidaespecifica &&
+              cucop.partidagenerica &&
+              cucop.concepto &&
+              cucop.capitulo,
           );
 
-          if (missingFields.length > 0) {
-            this.code = 111;
-            this.errorMessage = `Faltan los siguientes campos requeridos: ${missingFields.join(
-              ", ",
-            )}`;
-            this.successMessage = "";
-            this.log += `Faltan los siguientes campos requeridos: ${missingFields.join(
-              ", ",
-            )}.\n`;
-          } else {
-            this.successMessage =
-              "El archivo contiene todos los campos requeridos.";
-            this.errorMessage = "";
-            this.log += "El archivo contiene todos los campos requeridos.\n";
-
-            this.fileContent = results.data.map((row) =>
-              requiredFields.map((field) => row[field]),
-            );
-          }
-        },
-        error: (error) => {
-          this.errorMessage = "Error al analizar el archivo CSV.";
-          this.log += `Error al analizar el archivo CSV: ${error.message}\n`;
-        },
-      });
-    },
-    async processFile() {
-      try {
-        let c = 1;
-        for (const line of this.fileContent) {
-          try {
-            if (!Array.isArray(line)) {
-              this.log += `Fila No.${c} no es un arreglo, omitiendo...\n`;
-              c++;
-              continue;
-            }
-
-            const values = line;
-
-            if (values.some((field) => !field)) {
-              this.log += `Fila No.${c} vacía o incompleta, omitiendo...\n`;
-              c++;
-              continue;
-            }
-
-            this.cucop.clavecucop = values[0];
-            this.cucop.descripcion = values[1];
-            this.cucop.unidaddemedida = values[2];
-            this.cucop.tipodecontratacion = values[3];
-            this.cucop.partidaespecifica = values[4];
-            this.cucop.descpartidaespecifica = values[5];
-            this.cucop.partidagenerica = values[6];
-            this.cucop.descpartidagenerica = values[7];
-            this.cucop.concepto = values[8];
-            this.cucop.descconcepto = values[9];
-            this.cucop.capitulo = values[10];
-            this.cucop.desccapitulo = values[11];
-
-            this.log += `Revisando fila No.${c}...\n`;
-            let result;
-            result = await axios.get(
-              `/cucop/api/cucop/load/${this.cucop.clavecucop}`,
-            );
-            this.id = result.data.id;
-            if (this.id == 0) {
-              this.log += "Añadiendo registro CUCoP...\n";
-              result = await axios.post("/cucop/api/cucop", this.cucop);
-              this.cucopcode = result.status;
-              if (this.cucopcode == 200) {
-                this.log += `Registro CUCoP añadido.\n`;
-              } else {
-                this.log += `Error al añadir registro CUCoP.\n`;
-              }
-            } else {
-              this.log += "Editando registro CUCoP...\n";
-              result = await axios.put(
-                `/cucop/api/cucop/${this.id}`,
-                this.cucop,
-              );
-              this.cucopcode = result.status;
-              if (this.cucopcode == 200) {
-                this.log += `registro CUCoP editado.\n`;
-              } else {
-                this.log += `Error al editar registro CUCoP.\n`;
-              }
-            }
-          } catch (ex) {
-            console.log(ex);
-            this.log += `Error al procesar la fila No.${c}.\n`;
-          }
-          c++;
-        }
-        this.code = 200;
-        this.log += "Archivo procesado exitosamente.\n";
-      } catch (ex) {
-        console.log(ex);
-        this.log += "Error al procesar el archivo.\n";
+        this.verified = true;
       }
     },
-    toggleLogs() {
-      this.showLogs = !this.showLogs;
+    async processFile() {
+      if (!this.file) {
+        this.code = 404;
+        this.errorMessage = "Por favor, sube un archivo antes de procesarlo.";
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "Archivo no encontrado",
+        });
+        return;
+      }
+      if (!this.verified) {
+        this.code = 203;
+        this.errorMessage =
+          "El archivo no ha sido verificado o no es válido. Por favor, verifica el archivo antes de procesarlo.";
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "Archivo no verificado o no válido",
+        });
+        return;
+      }
+      this.SendFile();
+    },
+    async SendFile() {
+      try {
+        const formData = new FormData();
+        const filteredCucops = this.cucopdata.filter(
+          (cucop) =>
+            cucop.clavecucop &&
+            cucop.descripcion &&
+            cucop.partidaespecifica &&
+            cucop.partidagenerica &&
+            cucop.concepto &&
+            cucop.capitulo,
+        );
+        const csvContent = [
+          "Clave CUCoP, Descripción, Unidad de Medida, Tipo de Contratación, Partida Especifica, Desc Partida Especifica, Partida Generica, Desc Partida Generica, Concepto, Desc Concepto, Capitulo, Desc Capitulo",
+          ...filteredCucops.map(
+            (cucop) =>
+              `${cucop.clavecucop},"${cucop.descripcion}",${cucop.unidaddemedida},${cucop.tipodecontratacion},${cucop.partidaespecifica},"${cucop.descpartidaespecifica}",${cucop.partidagenerica},"${cucop.descpartidagenerica}",${cucop.concepto},"${cucop.descconcepto}",${cucop.capitulo},"${cucop.desccapitulo}"`,
+          ),
+        ].join("\n");
+
+        formData.append(
+          "file",
+          new Blob([csvContent], { type: "text/csv" }),
+          "CUCoP-Data.csv",
+        );
+
+        // Mostrar loader y desactivar botón
+        this.isLoading = true;
+        this.processButtonText = "Cargando...";
+
+        const result = await axios.post(`/cucop/api/cucop/load`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        // Esperar 2 segundos
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Terminar loader y activar botón
+        this.isLoading = false;
+        this.processButtonText = "Cargar";
+
+        this.code = result.status;
+        this.logs.push(...result.data.logs);
+        if (this.code == 200) {
+          this.successMessage = `Archivo Procesado Correctamente.\n`;
+          this.logs.push({
+            time: new Date().toISOString(),
+            message: "Archivo Procesado Correctamente",
+          });
+        } else {
+          this.logs.push({
+            time: new Date().toISOString(),
+            message: "Error al editar producto cotizado",
+          });
+        }
+      } catch (ex) {
+        console.log(ex);
+        this.logs.push({
+          time: new Date().toISOString(),
+          message: "Error al procesar el archivo",
+        });
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    handlePageInput() {
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      } else if (this.currentPage < 1) {
+        this.currentPage = 1;
+      }
+    },
+    validatePage() {
+      if (isNaN(this.currentPage) || this.currentPage < 1) {
+        this.currentPage = 1;
+      } else if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      }
+    },
+    nextPageLogs() {
+      if (this.currentPageLogs < this.totalPagesLogs) {
+        this.currentPageLogs++;
+      }
+    },
+    prevPageLogs() {
+      if (this.currentPageLogs > 1) {
+        this.currentPageLogs--;
+      }
+    },
+    handlePageInputLogs() {
+      if (this.currentPageLogs > this.totalPagesLogs) {
+        this.currentPageLogs = this.totalPagesLogs;
+      } else if (this.currentPageLogs < 1) {
+        this.currentPageLogs = 1;
+      }
+    },
+    validatePageLogs() {
+      if (isNaN(this.currentPageLogs) || this.currentPageLogs < 1) {
+        this.currentPageLogs = 1;
+      } else if (this.currentPageLogs > this.totalPagesLogs) {
+        this.currentPageLogs = this.totalPagesLogs;
+      }
     },
   },
 }).mount("#app");

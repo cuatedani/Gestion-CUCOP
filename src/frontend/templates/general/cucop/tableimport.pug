@@ -1,0 +1,105 @@
+include ../../common/table
+mixin table()
+  ul.nav.nav-tabs
+      li.nav-item(role="presentation")
+        button.nav-link.active(id="calendar-tab" data-bs-toggle="tab" data-bs-target="#data-pane" type="button" role="tab") Datos
+      li.nav-item(role="presentation")
+        button.nav-link(id="table-tab" data-bs-toggle="tab" data-bs-target="#logs-pane" type="button" role="tab") Logs
+  .tab-content(id="myTabContent")
+    .tab-pane.fade(id="logs-pane")
+      .white-container-tab
+        .white-body-container
+          table.table
+            thead
+              tr
+                th Hora
+                th Mensaje
+            tbody
+              tr(v-for="log in paginatedLogs") 
+                td(v-html="log.time")
+                td(v-html="log.message")
+          .pagination
+            button(@click="prevPageLogs" :disabled="currentPageLogs === 1").btn.btn-secondary Anterior
+            .row
+              .col
+                span Página
+              .col-6
+                input(type="number" v-model.number="currentPageLogs" @input="handlePageInputLogs" @blur="validatePageLogs").form-control.form-control-sm.pagination-input
+              .col
+                span de {{ totalPagesLogs }}
+            button(@click="nextPageLogs" :disabled="currentPageLogs === totalPagesLogs").btn.btn-secondary Siguiente
+    .tab-pane.fade.show.active(id="data-pane")
+      .white-container-tab
+        .white-body-container
+          table.table
+            thead
+              tr
+                th Clave CUCoP
+                th Descripción
+                th Unidad de Medida
+                th Tipo de Contratación
+                th Partida Especifica
+                th Desc Partida Especifica
+                th Partida Generica
+                th Desc Partida Generica
+                th Concepto
+                th Desc Concepto
+                th Capitulo
+                th Desc Capitulo
+            tbody
+              tr(v-for="cucop in paginatedCucop")
+                td(v-html="cucop.clavecucop")
+                td(v-html="cucop.descripcion")
+                td(v-html="cucop.unidaddemedida")
+                td(v-html="cucop.tipodecontratacion")
+                td(v-html="cucop.partidaespecifica")
+                td(v-html="cucop.descpartidaespecifica")
+                td(v-html="cucop.partidagenerica")
+                td(v-html="cucop.descpartidagenerica")
+                td(v-html="cucop.concepto")
+                td(v-html="cucop.descconcepto")
+                td(v-html="cucop.capitulo") 
+                td(v-html="cucop.desccapitulo") 
+          .pagination
+            button(@click="prevPage" :disabled="currentPage === 1").btn.btn-secondary Anterior
+            .row
+              .col
+                span Página
+              .col-6
+                input(type="number" v-model.number="currentPage" @input="handlePageInput" @blur="validatePage").form-control.form-control-sm.pagination-input
+              .col
+                span de {{ totalPages }}
+            button(@click="nextPage" :disabled="currentPage === totalPages").btn.btn-secondary Siguiente
+style.
+  .white-container-tab {
+    background-color: white;
+    box-shadow: 0 0 3px rgb(0 0 0 / 20%);
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+  .white-body-container {
+    display: block;
+    overflow-x: auto;
+  }
+  .table {
+    width: 100%;
+    table-layout: auto;
+  }
+  .pagination {
+    width: 40%
+    display: flex;
+    justify-content: flex-end; 
+    margin-top: 10px;
+    text-align: left;
+  }
+  .pagination button {
+    margin: 0 5px;
+  }
+  .pagination span  {
+    text-align: center;
+  }
+  .pagination-input {
+    width: 50px;
+    display: inline-block;
+    text-align: center;
+  }

@@ -9,15 +9,15 @@ include ../../templates/general/cucop/table.pug
 doctype html
 html(lang="es")
   head
-    +header("Lista de registros CUCOP")
+    +header("Lista de registros CUCoP")
   body
     .main-container
       +nav-bar(2)
       .right-container
-        +nav-top("Lista de registros CUCOP")
+        +nav-top("Lista de registros CUCoP")
         .content-container#app
           +filters()
           +table()
-    +modal("modalDelete","Eliminar registro CUCOP",undefined,[{type:"secondary-dismiss",title:"Cerrar"},{type:"danger",title:"Eliminar", id:"btnDelete"}])      
+    +modal("modalDelete","Eliminar registro CUCoP",undefined,[{type:"secondary-dismiss",title:"Cerrar"},{type:"danger",title:"Eliminar", id:"btnDelete"}])      
     +scripts()
     script(src="/cucop/public/js/general/cucop/cucop.js" type="module")

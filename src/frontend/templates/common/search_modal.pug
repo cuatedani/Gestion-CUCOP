@@ -14,32 +14,28 @@ mixin search_modal()
                   input(type="text" placeholder="Ej. 12201001" v-model="cucopelement.clavecucop").form-control
                 .col-8
                   label.form-label Filtrar
-                  .row
-                    .col-8
-                      input(type="text" placeholder="Texto a Buscar" v-model="cucopDesc").form-control
-                    .col-4
-                      button(@click="reset()").btn.btn-secondary Limpiar Filtros
+                  input(type="text" placeholder="Texto a Buscar" v-model="cucopDesc").form-control
               .row.mt-3
                 .col
                   label.form-label Capítulo
-                  select.form-control(v-model="capitulo" @change="selectCapitulo")
-                    option(value="") Selecciona un Capítulo
+                  select.form-control.form-select(v-model="capitulo" @change="selectCapitulo")
+                    option(value="0") Selecciona un Capítulo
                     option(v-for="cap in capitulos" :key="cap.capitulo" :value="cap.capitulo") {{ cap.desccapitulo }}
                 .col
                   label.form-label Concepto
-                  select.form-control(v-model="concepto" @change="selectConcepto")
-                    option(value="") Selecciona un Concepto
+                  select.form-control.form-select(v-model="concepto" @change="selectConcepto")
+                    option(value="0") Selecciona un Concepto
                     option(v-for="con in conceptos" :key="con.concepto" :value="con.concepto") {{ con.descconcepto }}
               .row.mt-3
                 .col
                   label.form-label Partida Generica
-                  select.form-control(v-model="generica" @change="selectPartidaGenerica")
-                    option(value="") Selecciona una Partida Generica
+                  select.form-control.form-select(v-model="generica" @change="selectPartidaGenerica")
+                    option(value="0") Selecciona una Partida Generica
                     option(v-for="gen in genericas" :key="gen.partidagenerica" :value="gen.partidagenerica") {{ gen.descpartidagenerica }}
                 .col
                   label.form-label Partida Especifica
-                  select.form-control(v-model="especifica" @change="selectPartidaEspecifica")
-                    option(value="") Selecciona una Partida Especifica
+                  select.form-control.form-select(v-model="especifica" @change="selectPartidaEspecifica")
+                    option(value="0") Selecciona una Partida Especifica
                     option(v-for="esp in especificas" :key="esp.partidaespecifica" :value="esp.partidaespecifica") {{ esp.descpartidaespecifica }}
               .white-body-container
                 table.table
@@ -78,16 +74,19 @@ mixin search_modal()
                   button(@click="nextPage" :disabled="currentPage === totalPages").btn.btn-secondary Siguiente
 
 style.
+  .modal-lg, .modal-xl {
+    --bs-modal-width: 80% !important;
+  }
   .white-body-container {
     display: block;
     overflow-x: auto;
   }
   .pagination {
-    width: 60%;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    text-align: center;
+  width: 60%
+  display: flex;
+  justify-content: flex-end; 
+  margin-top: 10px;
+  text-align: left;
   }
   .pagination button {
     margin: 0 5px;

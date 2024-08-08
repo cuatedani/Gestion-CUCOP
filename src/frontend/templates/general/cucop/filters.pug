@@ -3,8 +3,9 @@ mixin filters()
     .white-header-container
       h4.white-title Filtros
       .white-header-container-links
-        a(href="/cucop/cucop/create").btn.btn-link.p-0 Agregar registro CUCOP
-        a(href="/cucop/cucop/load").btn.btn-link.p-0 Cargar registros CUCOP
+        a(href="/cucop/cucop/create").btn.btn-link.p-0 Agregar registro CUCoP
+        a(href="/cucop/cucop/load").btn.btn-link.p-0 Importar
+        button.btn.btn-link.p-0(@click="exportData") Exportar
     hr.white-hr
     .white-body-container
       .row
@@ -16,7 +17,7 @@ mixin filters()
       #extraFilters.row.collapse
         .row.mt-3
           .col
-            label.form-label Clave CUCOP
+            label.form-label Clave CUCoP
             input(type="text" placeholder="Ej. 12201001" v-model="clavecucop").form-control
           .col
             label.form-label Descripción

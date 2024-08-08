@@ -9,32 +9,38 @@ mixin filters()
     .white-body-container
       #tableInfo.row.collapse
         .row
-          .col
+          .col-3
             label.form-label Proveedor
             h6.white-title {{quotation.supplier.name}}
-          .col
+          .col-3
             label.form-label Numero de Cotización
             h6.white-title {{quotation.quotNumber}}
           .col
             label.form-label Descripción
             h6.white-title {{quotation.description}}
         .row.mt-3
-          .col
+          .col-3
             label.form-label Fecha de Cotización
             h6.white-title {{new Date(quotation.date).parseDate()}}
-          .col
+          .col-3
             label.form-label Fecha de Creación
             h6.white-title {{new Date(quotation.createdAt).parseDate()}}
-          .col
-            label.form-label Activo
+          .col-2
+            label.form-label.center Activo
             h6.white-title {{quotation.active ? "Activa" : "Inactiva"}}
+          .col
+            .row
+              button.btn.btn-link.p-0(@click="downloadQuotation") Descargar Información            
+            .row
+              a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/file"`).btn.btn-link.p-0 Archivo Adjunto
           
   .white-container.mb-4
     .white-header-container
       h4.white-title Filtros
       .white-header-container-links
           a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/product/create"`).btn.btn-link.p-0 Agregar producto a la cotización
-          a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/product/load"`).btn.btn-link.p-0 Cargar productos a la cotización
+          a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/product/load"`).btn.btn-link.p-0 Importar
+          button.btn.btn-link.p-0(@click="exportData") Exportar
     hr.white-hr
     .white-body-container
       .row

@@ -112,6 +112,31 @@ const getById = async (
   }
 };
 
+const getByName = async (name: string): Promise<IProduct | null> => {
+  try {
+    const [rows] = await db.query(
+      `
+      select 
+        *
+      from products
+      where name=?
+    `,
+      [name],
+    );
+
+    const data = rows as RowDataPacket[];
+    if (data.length == 0) {
+      return null;
+    }
+    const prod = data[0] as IProduct;
+    prod.cucop = await Cucop.getById(prod.cucopId);
+    return prod;
+  } catch (ex) {
+    console.log(ex);
+    return null;
+  }
+};
+
 const create = async ({
   cucopId,
   name,
@@ -192,6 +217,7 @@ export default {
   exists,
   getAll,
   getById,
+  getByName,
   create,
   update,
   remove,

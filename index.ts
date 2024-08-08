@@ -32,6 +32,7 @@ import productsApiController from "./src/backend/controllers/api/products";
 import quotproductsApiController from "./src/backend/controllers/api/quot_products";
 import suppliersApiController from "./src/backend/controllers/api/suppliers";
 import quotationsApiController from "./src/backend/controllers/api/quotations";
+import mediasApiController from "./src/backend/controllers/api/media";
 
 //Error
 import commonController from "./src/backend/controllers/common/common";
@@ -76,6 +77,7 @@ app.use(listsApiController);
 app.use(quotationsApiController);
 app.use(productsApiController);
 app.use(quotproductsApiController);
+app.use(mediasApiController);
 
 app.use(commonController);
 

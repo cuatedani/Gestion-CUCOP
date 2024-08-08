@@ -25,13 +25,13 @@ createApp({
         desccapitulo: "",
       },
       cucopDesc: "",
-      capitulo: "",
+      capitulo: "0",
       capitulos: [],
-      concepto: "",
+      concepto: "0",
       conceptos: [],
-      generica: "",
+      generica: "0",
       genericas: [],
-      especifica: "",
+      especifica: "0",
       especificas: [],
       data: [],
       cucopdata: [],
@@ -101,10 +101,6 @@ createApp({
       const end = start + this.itemsPerPage;
       const paginatedResult = this.filteredCucop.slice(start, end);
       return paginatedResult;
-    },
-    totalPages() {
-      const totalPages = Math.ceil(this.cucopdata.length / this.itemsPerPage);
-      return totalPages;
     },
   },
   methods: {
@@ -186,10 +182,11 @@ createApp({
     //Metodos Para el modal
     filteringCucop: function () {
       if (!this.cucopDesc || this.cucopDesc.trim() === "") {
+        this.totalPages = Math.ceil(this.cucopdata.length / this.itemsPerPage);
         return this.cucopdata;
       }
 
-      return this.cucopdata.filter((x) => {
+      let newdata = this.cucopdata.filter((x) => {
         const searchText = this.cucopDesc.toLowerCase();
         return (
           x.descripcion.toLowerCase().includes(searchText) ||
@@ -201,6 +198,14 @@ createApp({
           x.desccapitulo.toLowerCase().includes(searchText)
         );
       });
+
+      if (newdata.length == 0) {
+        this.totalPages = 0;
+      } else {
+        this.totalPages = Math.ceil(newdata.length / this.itemsPerPage);
+        this.currentPage = 1;
+      }
+      return newdata;
     },
     selectCUCOP: function () {
       $("#modalSelect").modal("toggle");
@@ -211,78 +216,107 @@ createApp({
       $("#modalSelect").removeClass("show").modal("hide");
     },
     selectCapitulo: async function () {
-      conceptos = [];
-      concepto = "";
-      genericas = [];
-      generica = "";
-      especificas = [];
-      especifica = "";
-      cucopdata = [];
-
-      try {
-        const request = await axios.get(
-          `/cucop/api/cucop/conceptos/${this.capitulo}`,
-        );
-        this.conceptos = request.data.cucop;
-      } catch (ex) {
-        console.log(ex);
+      this.currentPage = 1;
+      if (this.capitulo == 0) {
         this.conceptos = [];
+        this.concepto = "0";
+        this.genericas = [];
+        this.generica = "0";
+        this.especificas = [];
+        this.especifica = "0";
+        this.cucopdata = [];
+        await this.loadCucops();
+      } else {
+        this.conceptos = [];
+        this.concepto = "0";
+        this.genericas = [];
+        this.generica = "0";
+        this.especificas = [];
+        this.especifica = "0";
+        this.cucopdata = [];
+
+        try {
+          const request = await axios.get(
+            `/cucop/api/cucop/conceptos/${this.capitulo}`,
+          );
+          this.conceptos = request.data.cucop;
+          this.cucopdata = request.data.cucopdata;
+        } catch (ex) {
+          console.log(ex);
+          this.conceptos = [];
+        }
       }
     },
     selectConcepto: async function () {
-      genericas = [];
-      generica = "";
-      especificas = [];
-      especifica = "";
-      cucopdata = [];
-
-      try {
-        const request = await axios.get(
-          `/cucop/api/cucop/genericas/${this.concepto}`,
-        );
-        this.genericas = request.data.cucop;
-      } catch (ex) {
-        console.log(ex);
+      this.currentPage = 1;
+      if (this.concepto == 0) {
         this.genericas = [];
+        this.generica = "0";
+        this.especificas = [];
+        this.especifica = "0";
+        this.cucopdata = [];
+        await this.selectCapitulo();
+      } else {
+        this.genericas = [];
+        this.generica = "0";
+        this.especificas = [];
+        this.especifica = "0";
+        this.cucopdata = [];
+
+        try {
+          const request = await axios.get(
+            `/cucop/api/cucop/genericas/${this.concepto}`,
+          );
+          this.genericas = request.data.cucop;
+          this.cucopdata = request.data.cucopdata;
+        } catch (ex) {
+          console.log(ex);
+          this.genericas = [];
+        }
       }
     },
     selectPartidaGenerica: async function () {
-      especificas = [];
-      especifica = "";
-      cucopdata = [];
-
-      try {
-        const request = await axios.get(
-          `/cucop/api/cucop/especificas/${this.generica}`,
-        );
-        this.especificas = request.data.cucop;
-      } catch (ex) {
-        console.log(ex);
+      this.currentPage = 1;
+      if (this.generica == 0) {
         this.especificas = [];
+        this.especifica = "0";
+        this.cucopdata = [];
+        await this.selectConcepto();
+      } else {
+        this.especificas = [];
+        this.especifica = "0";
+        this.cucopdata = [];
+
+        try {
+          const request = await axios.get(
+            `/cucop/api/cucop/especificas/${this.generica}`,
+          );
+          this.especificas = request.data.cucop;
+          this.cucopdata = request.data.cucopdata;
+        } catch (ex) {
+          console.log(ex);
+          this.especificas = [];
+        }
       }
     },
     selectPartidaEspecifica: async function () {
-      cucopdata = [];
-
-      try {
-        const request = await axios.get(
-          `/cucop/api/cucop/registros/${this.especifica}`,
-        );
-        this.cucopdata = request.data.cucop;
-      } catch (ex) {
-        console.log(ex);
+      this.currentPage = 1;
+      if (this.especifica == 0) {
         this.cucopdata = [];
+        await this.selectPartidaGenerica();
+      } else {
+        this.cucopdata = [];
+
+        try {
+          const request = await axios.get(
+            `/cucop/api/cucop/registros/${this.especifica}`,
+          );
+          this.cucopdata = request.data.cucop;
+        } catch (ex) {
+          console.log(ex);
+          this.cucopdata = [];
+        }
       }
-    },
-    async reset() {
-      conceptos = [];
-      concepto = "";
-      genericas = [];
-      generica = "";
-      especificas = [];
-      especifica = "";
-      cucopdata = [];
-      await this.loadCucops();
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
