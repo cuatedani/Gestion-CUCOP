@@ -3,6 +3,7 @@ include ../../templates/common/header.pug
 include ../../templates/common/scripts.pug
 include ../../templates/common/layout.pug
 include ../../templates/common/modal.pug
+include ../../templates/common/upload_modal.pug
 include ../../templates/general/quot_products/filters.pug
 include ../../templates/general/quot_products/table.pug
 
@@ -18,6 +19,7 @@ html(lang="es")
         .content-container#app
           +filters()
           +table()
-    +modal("modalDelete","Eliminar producto cotizado",undefined,[{type:"secondary-dismiss",title:"Cerrar"},{type:"danger",title:"Eliminar", id:"btnDelete"}])      
+          +upload_modal() 
+    +modal("modalDelete","Eliminar producto cotizado",undefined,[{type:"secondary-dismiss",title:"Cerrar"},{type:"danger",title:"Eliminar", id:"btnDelete"}])   
     +scripts()
     script(src="/cucop/public/js/general/quot_products/quot_products.js" type="module")

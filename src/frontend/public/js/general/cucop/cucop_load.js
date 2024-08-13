@@ -174,7 +174,7 @@ createApp({
         });
 
         // Determina qué columnas mantener
-        columnsToKeep = headers.map((header, index) => {
+        columnsToKeep = headers.map((header) => {
           return !columnsToRemove.includes(header);
         });
 
@@ -299,7 +299,7 @@ createApp({
         ].join("\n");
 
         formData.append(
-          "file",
+          "media",
           new Blob([csvContent], { type: "text/csv" }),
           "CUCoP-Data.csv",
         );
@@ -308,7 +308,7 @@ createApp({
         this.isLoading = true;
         this.processButtonText = "Cargando...";
 
-        const result = await axios.post(`/cucop/api/cucop/load`, formData, {
+        const result = await axios.post(`/cucop/api/medias/cucop/0`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -322,8 +322,11 @@ createApp({
         this.processButtonText = "Cargar";
 
         this.code = result.status;
-        this.logs.push(...result.data.logs);
+
         if (this.code == 200) {
+          if (result.data.logs) {
+            this.logs.push(...result.data.logs);
+          }
           this.successMessage = `Archivo Procesado Correctamente.\n`;
           this.logs.push({
             time: new Date().toISOString(),
@@ -333,8 +336,8 @@ createApp({
         } else {
           this.logs.push({
             time: new Date().toISOString(),
-            type: "error",
-            message: "Error al editar producto cotizado",
+            type: result.data.type,
+            message: result.data.message,
           });
         }
       } catch (ex) {

@@ -40,6 +40,12 @@ const app = createApp({
       data: [],
       showTableInfo: true,
       showExtraFilters: false,
+      code: 0,
+      isLoading: false,
+      processButtonText: "Cargar",
+      errorMessage: "",
+      successMessage: "",
+      file: null,
     };
   },
   mounted() {
@@ -90,9 +96,11 @@ const app = createApp({
   methods: {
     loadQuotProducts: async function () {
       try {
-        const request = await axios.get(
-          "/cucop/api/quotations/quot-products/" + this.quotationId,
-        );
+        const request = await axios.get("/cucop/api/quotationProducts/", {
+          params: {
+            quotationId: this.quotationId,
+          },
+        });
         this.data = request.data.quotproducts;
       } catch (ex) {
         console.log(ex);
@@ -133,7 +141,7 @@ const app = createApp({
     },
     delete: async function () {
       try {
-        await axios.delete(`/cucop/api/quot-products/${this.id}`);
+        await axios.delete(`/cucop/api/quotationProducts/${this.id}`);
         $("#modalDelete").modal("toggle");
         this.loadQuotProducts();
       } catch (ex) {
@@ -161,6 +169,9 @@ const app = createApp({
       } catch (ex) {
         console.log(ex);
       }
+    },
+    showDialogLoad: function () {
+      $("#modalUpload").modal("toggle");
     },
     toggleTableInfo() {
       this.showTableInfo = !this.showTableInfo;
@@ -437,6 +448,59 @@ const app = createApp({
         // Guarda el documento como PDF
         doc.save("Cotización.pdf");
       };
+    },
+    handleFileUpload(event) {
+      this.code = 0;
+      const files = event.target.files;
+      if (files.length > 0) {
+        this.file = files;
+        this.fileUrl = Array.from(files).map((file) =>
+          URL.createObjectURL(file),
+        );
+      }
+    },
+    processFile() {
+      if (!this.file || this.file.length === 0) {
+        this.code = 404;
+        this.errorMessage =
+          "Por favor, sube al menos un archivo antes de cargarlo.";
+        return;
+      }
+      this.sendFile();
+    },
+    async sendFile() {
+      try {
+        this.isLoading = true;
+        const formData = new FormData();
+
+        Array.from(this.file).forEach((file) => {
+          formData.append("media", file);
+        });
+
+        const result = await fetch(
+          `/cucop/api/medias/quotations/${this.quotationId}/`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+
+        this.code = result.status;
+        if (this.code === 200) {
+          this.isLoading = false;
+          this.successMessage = "Archivos cargados exitosamente";
+          setTimeout(() => {
+            this.loadMedias();
+            $("#modalUpload").modal("toggle");
+          }, 1500);
+        } else {
+          throw new Error("Error en la carga de archivos");
+        }
+      } catch (ex) {
+        this.isLoading = false;
+        this.code = 500;
+        this.errorMessage = ex.message;
+      }
     },
   },
 }).mount("#app");

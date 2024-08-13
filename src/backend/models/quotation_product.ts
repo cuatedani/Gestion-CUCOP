@@ -4,18 +4,19 @@ import OperationError from "../utils/error";
 import Quotation, { IQuotation } from "./quotation";
 import Cucop from "./cucop";
 import Product, { IProduct } from "./product";
+import Log, { ILog } from "./log";
 
 /**
  * Interfaces
  */
 
-export interface IQuotProduct {
+export interface IQuotationProduct {
   quotProductId: number;
   quotationId: number;
   productId: number;
-  quantity: string;
-  price: string;
-  totalPrice: string;
+  quantity: number;
+  price: number;
+  totalPrice: number;
   details: string;
   active: boolean;
   updatedAt: string;
@@ -25,7 +26,7 @@ export interface IQuotProduct {
 }
 
 export type ICreateQuotProduct = Omit<
-  IQuotProduct,
+  IQuotationProduct,
   | "quotProductId"
   | "totalPrice"
   | "createdAt"
@@ -35,12 +36,6 @@ export type ICreateQuotProduct = Omit<
 >;
 
 export type IUpdateQuotProduct = ICreateQuotProduct;
-
-interface IGetAllFilters {
-  limit?: number;
-  sort?: "asc" | "desc";
-  status?: "all" | "active" | "inactive";
-}
 
 /**
  * Methods
@@ -68,23 +63,20 @@ const exists = async (quotProductId: number | boolean): Promise<boolean> => {
 };
 
 const getAll = async ({
-  limit,
-  sort = "desc",
-  status = "all",
-}: IGetAllFilters): Promise<IQuotProduct[]> => {
+  quotaionId,
+}: {
+  quotaionId?: number;
+}): Promise<IQuotationProduct[]> => {
   try {
-    const amount = limit ? `LIMIT ${limit}` : "";
-    const active =
-      status !== "all" ? `WHERE active=${status === "active"}` : "";
+    let query = "SELECT * FROM quotations_products WHERE 1=1";
+    const queryParams: number[] = [];
 
-    const [rows] = await db.query(`
-      SELECT 
-        *
-      FROM quotations_products ${active}
-      ORDER BY createdAt ${sort} ${amount}
-    `);
-
-    const data = rows as IQuotProduct[];
+    if (quotaionId) {
+      query += " AND partidaespecifica = ?";
+      queryParams.push(Number(quotaionId));
+    }
+    const [rows] = await db.query(query, queryParams);
+    const data = rows as IQuotationProduct[];
     await Promise.all(
       data.map(async (quotpro) => {
         const quot = await Quotation.getById(quotpro.quotationId);
@@ -102,7 +94,7 @@ const getAll = async ({
 
 const getById = async (
   quotProductId: number | string,
-): Promise<IQuotProduct | undefined> => {
+): Promise<IQuotationProduct | undefined> => {
   try {
     const [rows] = await db.query(
       `
@@ -116,7 +108,7 @@ const getById = async (
 
     const data = rows as RowDataPacket[];
     if (data.length === 0) throw new OperationError(400, "Not found");
-    const quotpro = data[0] as IQuotProduct;
+    const quotpro = data[0] as IQuotationProduct;
     const quot = await Quotation.getById(quotpro.quotationId);
     const product = await Product.getById(quotpro.productId);
     quotpro.quotation = quot;
@@ -128,42 +120,12 @@ const getById = async (
   }
 };
 
-const getByQuotId = async (
-  QuotId: number | string,
-): Promise<IQuotProduct[]> => {
-  try {
-    const [rows] = await db.query(
-      `
-      SELECT 
-        *
-      FROM quotations_products
-      WHERE quotationId=?
-      ORDER BY createdAt
-    `,
-      [QuotId],
-    );
-    const data = rows as IQuotProduct[];
-    await Promise.all(
-      data.map(async (quotpro) => {
-        const quot = await Quotation.getById(quotpro.quotationId);
-        const product = await Product.getById(quotpro.productId);
-        quotpro.quotation = quot;
-        quotpro.product = product;
-      }),
-    );
-    return data;
-  } catch (ex) {
-    console.log(ex);
-    return [];
-  }
-};
-
 const create = async ({
   productId,
   quotationId,
   quantity,
   price,
-  details = "N/A",
+  details,
   active,
 }: ICreateQuotProduct): Promise<number> => {
   try {
@@ -178,7 +140,7 @@ const create = async ({
         active
       ) VALUES (?, ?, ?, ?, ?, ?)
     `,
-      [productId, quotationId, quantity, price, details, active],
+      [productId, quotationId, quantity, price, details ?? "N/A", active],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -213,41 +175,34 @@ const parseCSVLine = (line: string): string[] => {
 };
 
 const load = async (fileBuffer: Buffer, qid: number | string) => {
-  const logs = [];
+  const logs: ILog[] = [];
   let ecount = 0;
   try {
-    logs.push({
-      time: new Date().toISOString(),
-      type: "info",
-      message: "Archivo recibido correctamente",
-    });
+    logs.push(Log.createLog("info", "Archivo recibido correctamente"));
 
     const content = fileBuffer.toString("utf-8");
     const lines = content.split("\n");
     let c = 1;
     const cgen = await Cucop.getDefalt();
     for (const line of lines.slice(1)) {
-      logs.push({
-        time: new Date().toISOString(),
-        type: "info",
-        message: `Procesado fila #${c}`,
-      });
+      logs.push(Log.createLog("info", `Procesado fila #${c}`));
       const [Producto, Cantidad, Precio, Detalles] = parseCSVLine(line);
       let pid = 0;
 
       // Buscar si existe el producto
-      const prod = await Product.getByName(Producto);
+      const prod = await Product.existsName(Producto);
 
       // Si existe tomar su id y si no crearlo
-      if (prod) {
-        pid = prod.productId;
+      if (prod != 0) {
+        pid = prod;
       } else {
         if (cgen == 0) {
-          logs.push({
-            time: new Date().toISOString(),
-            type: "error",
-            message: `Fila #${c}: Error al registrar nuevo producto `,
-          });
+          logs.push(
+            Log.createLog(
+              "error",
+              `Fila #${c}: Error al registrar nuevo producto`,
+            ),
+          );
           ecount++;
           c++;
           continue; // Saltar al siguiente elemento del bucle
@@ -259,47 +214,52 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
           active: true,
         });
         if (!pid) {
-          logs.push({
-            time: new Date().toISOString(),
-            type: "error",
-            message: `Fila #${c}: Error al registrar nuevo producto`,
-          });
+          logs.push(
+            Log.createLog(
+              "error",
+              `Fila #${c}: Error al registrar nuevo producto`,
+            ),
+          );
           ecount++;
           c++;
           continue; // Saltar al siguiente elemento del bucle
         }
-        logs.push({
-          time: new Date().toISOString(),
-          type: "succes",
-          message: `Fila #${c}: Producto registrado correctamente`,
+        logs.push(
+          Log.createLog(
+            "success",
+            `Fila #${c}: Producto registrado correctamente`,
+          ),
+        );
+      }
+      let iqp = null;
+      if (!isNaN(Number(Cantidad)) && !isNaN(Number(Precio))) {
+        iqp = await create({
+          productId: pid,
+          quotationId: Number(qid),
+          quantity: Number(Cantidad),
+          price: Number(Precio),
+          details: Detalles,
+          active: true,
         });
       }
-
-      const iqp = await create({
-        productId: pid,
-        quotationId: Number(qid), // Convertir a número
-        quantity: Cantidad,
-        price: Precio,
-        details: Detalles || "N/A",
-        active: true,
-      });
       if (iqp) {
-        logs.push({
-          time: new Date().toISOString(),
-          type: "success",
-          message: `Fila #${c}: Producto añadido a la cotización correctamente`,
-        });
-        logs.push({
-          time: new Date().toISOString(),
-          type: "success",
-          message: `Fila #${c}: Procesada correctamente`,
-        });
+        logs.push(
+          Log.createLog(
+            "success",
+            `Fila #${c}: Producto añadido a la cotización correctamente`,
+          ),
+        );
+        logs.push(
+          Log.createLog("success", `Fila #${c}: Procesada correctamente`),
+        );
       } else {
-        logs.push({
-          time: new Date().toISOString(),
-          type: "error",
-          message: `Fila #${c}: Error al añadir producto a la cotización`,
-        });
+        logs.push(
+          Log.createLog(
+            "error",
+            `Fila #${c}: Error al añadir producto a la cotización`,
+          ),
+        );
+        logs.push(Log.createLog("error", `Fila #${c}: Error al procesar`));
         ecount++;
         c++;
         continue;
@@ -312,11 +272,7 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
     return `Error al procesar el Archivo: ${ex}`;
   }
   if (ecount > 0) {
-    logs.push({
-      time: new Date().toISOString(),
-      type: "error",
-      message: `Se encontraron ${ecount} errores `,
-    });
+    logs.push(Log.createLog("error", `Se encontraron ${ecount} errores `));
   }
   return logs;
 };
@@ -328,7 +284,7 @@ const update = async (
     quotationId,
     quantity,
     price,
-    details = "N/A",
+    details,
     active,
   }: IUpdateQuotProduct,
 ): Promise<boolean> => {
@@ -346,7 +302,15 @@ const update = async (
         active=?
       WHERE quotProductId=?
     `,
-      [productId, quotationId, quantity, price, details, active, quotProductId],
+      [
+        productId,
+        quotationId,
+        quantity,
+        price,
+        details ?? "N/A",
+        active,
+        quotProductId,
+      ],
     );
 
     const { affectedRows } = rows as ResultSetHeader;
@@ -383,7 +347,6 @@ export default {
   exists,
   getAll,
   getById,
-  getByQuotId,
   create,
   load,
   update,

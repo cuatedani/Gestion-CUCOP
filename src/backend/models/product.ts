@@ -112,7 +112,7 @@ const getById = async (
   }
 };
 
-const getByName = async (name: string): Promise<IProduct | null> => {
+const existsName = async (name: string): Promise<number> => {
   try {
     const [rows] = await db.query(
       `
@@ -125,15 +125,14 @@ const getByName = async (name: string): Promise<IProduct | null> => {
     );
 
     const data = rows as RowDataPacket[];
-    if (data.length == 0) {
-      return null;
+    if (data.length === 0) {
+      return 0;
     }
-    const prod = data[0] as IProduct;
-    prod.cucop = await Cucop.getById(prod.cucopId);
-    return prod;
+
+    return data[0].cucopId as number;
   } catch (ex) {
     console.log(ex);
-    return null;
+    return 0;
   }
 };
 
@@ -215,9 +214,9 @@ const remove = async (productId: number | string): Promise<boolean> => {
 
 export default {
   exists,
+  existsName,
   getAll,
   getById,
-  getByName,
   create,
   update,
   remove,

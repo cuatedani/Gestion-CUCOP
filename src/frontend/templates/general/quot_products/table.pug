@@ -30,7 +30,7 @@ mixin table()
     .white-header-container
       h4.white-title Archivos Adjuntos
       .white-header-container-links
-          a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/file"`).btn.btn-link.p-0 Agregar Archivos Adjuntos
+          button(@click="showDialogLoad()").btn.btn-link.p-0 Agregar Archivos Adjuntos
     hr.white-hr
     .white-body-container
       table.table

@@ -1,5 +1,7 @@
 import express from "express";
 import Media, { ICreateMedia } from "../../models/media";
+import Cucop from "../../models/cucop";
+import QuotProduct from "../../models/quotation_product";
 import auth from "../../middlewares/auth";
 import multer from "multer";
 import path from "path";
@@ -10,70 +12,98 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const uploadImage = upload.fields([{ name: "media", maxCount: 10 }]);
+const uploadFile = upload.fields([{ name: "media", maxCount: 10 }]);
 
 app.post(
   "/cucop/api/medias/:category/:id/",
   auth,
-  uploadImage,
+  uploadFile,
   async (req, res) => {
     const { category } = req.params;
-    const allowed = ["quotations"];
+    const allowed = ["quotations", "cucop", "quotationProducts"];
     if (allowed.indexOf(category) == -1) {
-      return res.status(400).send({ code: 400, msg: "Invalid category" });
+      return res
+        .status(400)
+        .send({ code: 400, type: "error", message: `Categoria Invalida` });
     }
 
     const files = req.files as { [fileName: string]: Express.Multer.File[] };
 
-    const mediaRecords = await Promise.all(
-      files["media"].map(async (file) => {
-        const { name, ext } = path.parse(file.originalname);
-        const finalname = `${name}-${Math.floor(1000 + Math.random() * 9000)}`;
-        const extension = ext;
-        const finalPath = `public/uploads/${category}/${name}.${extension}`;
-        const filePath = path.join(__dirname, `../../../frontend/${finalPath}`);
-        await fs.writeFile(filePath, file.buffer);
+    if (category == "cucop") {
+      const file = files["media"]?.[0];
 
-        const body: ICreateMedia = {
-          objectId: parseInt(req.params.id),
-          name: finalname,
-          extension,
-          category,
-          rol: "main", // Cambia según sea necesario
-          owner: "CICESE-UT3", // Cambia según sea necesario
-          url: finalPath,
-        };
+      if (!file) {
+        return res
+          .status(400)
+          .send({ code: 400, type: "error", message: `Sin archivo cargado` });
+      }
 
-        const id = await Media.create(body);
-        return id;
-      }),
-    );
+      try {
+        const logs = await Cucop.load(file.buffer);
+        res.status(200).send({ code: 200, logs });
+      } catch (ex) {
+        console.log(ex);
+        res.status(500).send({
+          code: 500,
+          type: "error",
+          message: `Error al procesar el Archivo`,
+        });
+      }
+    } else if (category == "quotationProducts") {
+      const qid = req.params.id;
+      const file = files["media"]?.[0];
 
-    res.status(200).send({ ids: mediaRecords });
+      if (!file) {
+        return res
+          .status(400)
+          .send({ code: 400, type: "error", message: `Sin archivo cargado` });
+      }
+
+      try {
+        const logs = await QuotProduct.load(file.buffer, qid);
+        res.status(200).send({ code: 200, logs });
+      } catch (ex) {
+        console.log(ex);
+        res.status(500).send({
+          code: 500,
+          type: "error",
+          message: `Error al procesar el Archivo`,
+        });
+      }
+    } else {
+      const mediaRecords = await Promise.all(
+        files["media"].map(async (file) => {
+          const { name, ext } = path.parse(file.originalname);
+          const finalname = `${name}-${Math.floor(
+            1000 + Math.random() * 9000,
+          )}`;
+          const extension = ext;
+          const finalPath = `public/uploads/${category}/${name}.${extension}`;
+          const filePath = path.join(
+            __dirname,
+            `../../../frontend/${finalPath}`,
+          );
+          await fs.writeFile(filePath, file.buffer);
+
+          const body: ICreateMedia = {
+            objectId: parseInt(req.params.id),
+            name: finalname,
+            extension,
+            category,
+            rol: "main", // Cambia según sea necesario
+            owner: "CICESE-UT3", // Cambia según sea necesario
+            url: finalPath,
+          };
+
+          const id = await Media.create(body);
+          return id;
+        }),
+      );
+
+      res.status(200).send({ ids: mediaRecords });
+    }
   },
 );
-
-app.get("/cucop/api/medias/:mid", auth, async (req, res) => {
-  const id = req.params.id;
-  const cat = req.params.category;
-
-  try {
-    const medias = await Media.getByObjectId(parseInt(id), cat);
-
-    if (!medias) {
-      return res.status(404).send({ code: 404, msg: "Media not found" });
-    }
-
-    try {
-      res.status(200).send({ code: 200, medias });
-    } catch (err) {
-      res.status(404).send({ code: 404, msg: "File not found" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ code: 500, msg: "Internal Server Error" });
-  }
-});
 
 app.get("/cucop/api/medias/:category/:id", auth, async (req, res) => {
   const id = req.params.id;

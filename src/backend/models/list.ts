@@ -76,9 +76,9 @@ const getAll = async ({
 
     const data = rows as IList[];
     await Promise.all(
-      data.map(async (listas) => {
-        const listuser = await User.getPublicById(listas.userId);
-        listas.user = listuser;
+      data.map(async (list) => {
+        const listUser = await User.getPublicById(list.userId);
+        list.user = listUser;
       }),
     );
 
@@ -103,10 +103,10 @@ const getById = async (listId: number | string): Promise<IList | undefined> => {
 
     const data = rows as RowDataPacket[];
     if (data.length == 0) throw new OperationError(400, "Not found");
-    const lista = data[0] as IList;
-    const listuser = await User.getPublicById(lista.userId);
-    lista.user = listuser;
-    return lista;
+    const list = data[0] as IList;
+    const listUser = await User.getPublicById(list.userId);
+    list.user = listUser;
+    return list;
   } catch (ex) {
     console.log(ex);
     return undefined;
@@ -120,9 +120,6 @@ const create = async ({
   status,
   active,
 }: ICreateList): Promise<number> => {
-  if (!description) {
-    description = "Sin descripción";
-  }
   try {
     const [rows] = await db.query(
       `
@@ -134,7 +131,7 @@ const create = async ({
         active
       ) values(?, ?, ?, ?, ?)
     `,
-      [userId, title, description, status, active],
+      [userId, title, description ?? "N/A", status, active],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -149,9 +146,6 @@ const update = async (
   listId: number | string,
   { userId, title, description, status, active }: IUpdateList,
 ): Promise<boolean> => {
-  if (!description) {
-    description = "Sin descripción";
-  }
   try {
     const [rows] = await db.query(
       `
@@ -165,7 +159,7 @@ const update = async (
         active=?
       WHERE listId=?
     `,
-      [userId, title, description, status, active, listId],
+      [userId, title, description ?? "N/A", status, active, listId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;

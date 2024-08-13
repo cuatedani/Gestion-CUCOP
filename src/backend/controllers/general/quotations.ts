@@ -28,14 +28,4 @@ app.get(
   },
 );
 
-app.get(
-  "/cucop/lists/:lid/quotation/:qid/file",
-  auth,
-  async function (req, res) {
-    res.render("quotations_file", {
-      user: req.session.user,
-    });
-  },
-);
-
 export default app;

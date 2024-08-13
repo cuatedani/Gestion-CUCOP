@@ -176,7 +176,7 @@ createApp({
         ].join("\n");
 
         formData.append(
-          "file",
+          "media",
           new Blob([csvContent], { type: "text/csv" }),
           "QuotProducts-Data.csv",
         );
@@ -186,7 +186,7 @@ createApp({
         this.processButtonText = "Cargando...";
 
         const result = await axios.post(
-          `/cucop/api/quot-products/load/${this.quotationId}`,
+          `/cucop/api/medias/quotationProducts/${this.quotationId}`,
           formData,
           {
             headers: {
@@ -203,9 +203,10 @@ createApp({
         this.processButtonText = "Cargar";
 
         this.code = result.status;
-        console.log(result.data.logs);
-        this.logs.push(...result.data.logs);
         if (this.code == 200) {
+          if (result.data.logs) {
+            this.logs.push(...result.data.logs);
+          }
           this.successMessage = `Archivo Procesado Correctamente.\n`;
           this.logs.push({
             time: new Date().toISOString(),
@@ -215,8 +216,8 @@ createApp({
         } else {
           this.logs.push({
             time: new Date().toISOString(),
-            type: "error",
-            message: "Error al Procesar el Archivo",
+            type: result.data.type,
+            message: result.data.message,
           });
         }
       } catch (ex) {

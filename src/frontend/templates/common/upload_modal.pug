@@ -1,0 +1,19 @@
+mixin upload_modal()
+  div(tabindex="-1" role="dialog" id="modalUpload" ).modal.fade
+    div(role="document").modal-dialog.modal-dialog-centered
+        .modal-content
+          .modal-header
+            h5.modal-title Cargar Archivos
+            button(type="button" data-bs-dismiss="modal").btn-close
+          div(id="modalUploadBody").modal-body
+            .row
+              input(type="file" @change="handleFileUpload" accept=".*" multiple).form-control
+            .row.mt-3
+              div(role="alert" v-if="code==200").alert.alert-success.mt-3 Archivo cargado exitosamente
+              div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error {{ errorMessage }}
+          .modal-footer
+              button(type="submit" @click="processFile" :disabled="isLoading").btn.btn-primary.me-3
+                span(v-if="isLoading")
+                  .spinner-border.text-info(role="status" v-if="isLoading")
+                  span.sr-only Cargando...
+                span(v-if="!isLoading") {{ processButtonText }}

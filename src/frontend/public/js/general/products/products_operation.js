@@ -58,8 +58,8 @@ createApp({
     }
 
     try {
-      const request = await axios.get("/cucop/api/cucop/capitulos");
-      this.capitulos = request.data.cucop;
+      const request = await axios.get("/cucop/api/cucop/chapters");
+      this.capitulos = request.data.categorias;
     } catch (ex) {
       console.log(ex);
       this.capitulos = [];
@@ -236,14 +236,20 @@ createApp({
         this.cucopdata = [];
 
         try {
-          const request = await axios.get(
-            `/cucop/api/cucop/conceptos/${this.capitulo}`,
+          const requestcat = await axios.get(
+            `/cucop/api/cucop/concepts/${this.capitulo}`,
           );
-          this.conceptos = request.data.cucop;
-          this.cucopdata = request.data.cucopdata;
+          const requestdata = await axios.get(`/cucop/api/cucop`, {
+            params: {
+              capitulo: this.capitulo,
+            },
+          });
+          this.conceptos = requestcat.data.categorias;
+          this.cucopdata = requestdata.data.cucop;
         } catch (ex) {
           console.log(ex);
           this.conceptos = [];
+          this.cucopdata = [];
         }
       }
     },
@@ -264,14 +270,18 @@ createApp({
         this.cucopdata = [];
 
         try {
-          const request = await axios.get(
-            `/cucop/api/cucop/genericas/${this.concepto}`,
+          const requestcat = await axios.get(
+            `/cucop/api/cucop/generics/${this.concepto}`,
           );
-          this.genericas = request.data.cucop;
-          this.cucopdata = request.data.cucopdata;
+          const requestdata = await axios.get(`/cucop/api/cucop`, {
+            params: { concepto: this.concepto },
+          });
+          this.genericas = requestcat.data.categorias;
+          this.cucopdata = requestdata.data.cucop;
         } catch (ex) {
           console.log(ex);
           this.genericas = [];
+          this.cucopdata = [];
         }
       }
     },
@@ -288,14 +298,18 @@ createApp({
         this.cucopdata = [];
 
         try {
-          const request = await axios.get(
-            `/cucop/api/cucop/especificas/${this.generica}`,
+          const requestcat = await axios.get(
+            `/cucop/api/cucop/specifics/${this.generica}`,
           );
-          this.especificas = request.data.cucop;
-          this.cucopdata = request.data.cucopdata;
+          const requestdata = await axios.get(`/cucop/api/cucop`, {
+            params: { partidagenerica: this.generica },
+          });
+          this.especificas = requestcat.data.categorias;
+          this.cucopdata = requestdata.data.cucop;
         } catch (ex) {
           console.log(ex);
           this.especificas = [];
+          this.cucopdata = [];
         }
       }
     },
@@ -308,9 +322,9 @@ createApp({
         this.cucopdata = [];
 
         try {
-          const request = await axios.get(
-            `/cucop/api/cucop/registros/${this.especifica}`,
-          );
+          const request = await axios.get(`/cucop/api/cucop`, {
+            params: { partidaespecifica: this.especifica },
+          });
           this.cucopdata = request.data.cucop;
         } catch (ex) {
           console.log(ex);

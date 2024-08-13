@@ -22,14 +22,14 @@ import cucopController from "./src/backend/controllers/general/cucop";
 import listsController from "./src/backend/controllers/general/lists";
 import quotationsController from "./src/backend/controllers/general/quotations";
 import productsController from "./src/backend/controllers/general/products";
-import quotproductsController from "./src/backend/controllers/general/quot_products";
+import quotationProductsController from "./src/backend/controllers/general/quotation_products";
 
 //Apis
 import usersApiController from "./src/backend/controllers/api/users";
 import listsApiController from "./src/backend/controllers/api/lists";
 import cucopApiController from "./src/backend/controllers/api/cucop";
 import productsApiController from "./src/backend/controllers/api/products";
-import quotproductsApiController from "./src/backend/controllers/api/quot_products";
+import quotationProductsApiController from "./src/backend/controllers/api/quotation_products";
 import suppliersApiController from "./src/backend/controllers/api/suppliers";
 import quotationsApiController from "./src/backend/controllers/api/quotations";
 import mediasApiController from "./src/backend/controllers/api/media";
@@ -67,7 +67,7 @@ app.use(cucopController);
 app.use(listsController);
 app.use(quotationsController);
 app.use(productsController);
-app.use(quotproductsController);
+app.use(quotationProductsController);
 app.use(sessionController);
 
 app.use(usersApiController);
@@ -76,7 +76,7 @@ app.use(cucopApiController);
 app.use(listsApiController);
 app.use(quotationsApiController);
 app.use(productsApiController);
-app.use(quotproductsApiController);
+app.use(quotationProductsApiController);
 app.use(mediasApiController);
 
 app.use(commonController);
