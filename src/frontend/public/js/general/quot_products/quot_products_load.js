@@ -37,7 +37,7 @@ createApp({
       return this.quotProducts;
     },
     loadLogs() {
-      return this.logs;
+      return this.logs.reverse();
     },
   },
 
@@ -51,6 +51,7 @@ createApp({
         this.verified = false;
         this.logs.push({
           time: new Date().toISOString(),
+          type: "info",
           message: "Archivo cargado",
         });
         const reader = new FileReader();
@@ -61,12 +62,14 @@ createApp({
           if (extension === "csv") {
             this.logs.push({
               time: new Date().toISOString(),
+              type: "info",
               message: "Archivo CSV detectado",
             });
             this.verifyFileContent(content);
           } else if (extension === "xlsx" || extension === "xls") {
             this.logs.push({
               time: new Date().toISOString(),
+              type: "info",
               message: "Transformando archivo a CSV",
             });
             const workbook = XLSX.read(content, { type: "binary" });
@@ -80,6 +83,7 @@ createApp({
               "Formato de archivo no soportado. Por favor sube un archivo CSV, XLSX o XLS.";
             this.logs.push({
               time: new Date().toISOString(),
+              type: "error",
               message: "Formato de archivo no soportado",
             });
           }
@@ -113,6 +117,7 @@ createApp({
     verifyFileContent(content) {
       this.logs.push({
         time: new Date().toISOString(),
+        type: "info",
         message: "Analizando campos del archivo",
       });
       const requiredFields = ["Producto", "Cantidad", "Precio", "Detalles"];
@@ -130,6 +135,7 @@ createApp({
         this.successMessage = "";
         this.logs.push({
           time: new Date().toISOString(),
+          type: "error",
           message: `Faltan los siguientes campos requeridos: ${missingFields.join(
             ", ",
           )}.`,
@@ -139,6 +145,7 @@ createApp({
         this.errorMessage = "";
         this.logs.push({
           time: new Date().toISOString(),
+          type: "success",
           message: "El archivo contiene todos los campos requeridos",
         });
         this.quotProducts = lines
@@ -202,11 +209,13 @@ createApp({
           this.successMessage = `Archivo Procesado Correctamente.\n`;
           this.logs.push({
             time: new Date().toISOString(),
+            type: "success",
             message: "Archivo Procesado Correctamente",
           });
         } else {
           this.logs.push({
             time: new Date().toISOString(),
+            type: "error",
             message: "Error al Procesar el Archivo",
           });
         }
@@ -214,6 +223,7 @@ createApp({
         console.log(ex);
         this.logs.push({
           time: new Date().toISOString(),
+          type: "error",
           message: "Error al Procesar el Archivo",
         });
       }

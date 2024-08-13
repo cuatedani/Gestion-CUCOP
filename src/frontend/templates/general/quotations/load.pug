@@ -1,14 +1,7 @@
 mixin load()
   .white-container.mb-4
     .white-header-container
-      h4.white-title Archivo Cargado
-      a(:href="`/cucop/lists/${listId}/quotation/${quotationId}`").btn.btn-secondary.me-3 Regresar
-    hr.white-hr
-    .white-body-container
-        iframe(v-if="pdfUrl != null" :src="pdfUrl" width="100%" height="500px")
-  .white-container.mb-4
-    .white-header-container
-      h4.white-title Cargar Nuevo Archivo
+      h4.white-title Cargar Archivos
       button(type="submit" @click="processFile" :disabled="isLoading").btn.btn-primary.me-3
         span(v-if="isLoading")
           .spinner-border.text-info(role="status" v-if="isLoading")
@@ -18,10 +11,7 @@ mixin load()
     .white-body-container
       .row
         .col-8
-          input(type="file" @change="handleFileUpload" accept=".pdf").form-control
+          input(type="file" @change="handleFileUpload" accept=".*" multiple).form-control
       .row.mt-3
         div(role="alert" v-if="code==200").alert.alert-success.mt-3 Archivo cargado exitosamente
         div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error {{ errorMessage }}
-      .row.mt-3
-        .col-12
-          iframe(v-if="fileUrl" :src="fileUrl" width="100%" height="800px")

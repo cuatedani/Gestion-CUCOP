@@ -13,10 +13,16 @@ mixin table()
               thead
                 tr
                   th Hora
+                  th Tipo
                   th Mensaje
               tbody
                 tr(v-for="log in loadLogs") 
                   td(v-html="log.time")
+                  td
+                    h6
+                      span(v-if="log.type === 'info'").badge.text-bg-primary Info
+                      span(v-if="log.type === 'success'").badge.text-bg-success Exito
+                      span(v-if="log.type === 'error'").badge.text-bg-danger Error
                   td(v-html="log.message")
     .tab-pane.fade.show.active(id="data-pane")
       .white-container-tab

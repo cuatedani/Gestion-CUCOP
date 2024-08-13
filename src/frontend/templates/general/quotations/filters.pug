@@ -7,7 +7,7 @@ mixin filters()
         button.btn.btn-link.p-0(data-bs-toggle="collapse", data-bs-target="#tableInfo" @click="toggleTableInfo") {{ tableInfoButtonText }}
     hr.white-hr
     .white-body-container
-      #tableInfo.row.collapse
+      #tableInfo.row.collapse.show
         .row
           .col
             label.form-label Titulo

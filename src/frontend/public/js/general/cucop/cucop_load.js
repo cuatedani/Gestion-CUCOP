@@ -30,7 +30,7 @@ createApp({
     paginatedLogs() {
       const start = (this.currentPageLogs - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      const paginatedResult = this.logs.slice(start, end);
+      const paginatedResult = this.logs.reverse().slice(start, end);
       return paginatedResult;
     },
     totalPages() {
@@ -52,6 +52,7 @@ createApp({
         this.verified = false;
         this.logs.push({
           time: new Date().toISOString(),
+          type: "info",
           message: "Archivo cargado",
         });
         const reader = new FileReader();
@@ -62,12 +63,14 @@ createApp({
           if (extension === "csv") {
             this.logs.push({
               time: new Date().toISOString(),
+              type: "info",
               message: "Archivo CSV detectado",
             });
             this.verifyFileContent(content);
           } else if (extension === "xlsx" || extension === "xls") {
             this.logs.push({
               time: new Date().toISOString(),
+              type: "info",
               message: "Transformando archivo a CSV",
             });
             const workbook = XLSX.read(content, { type: "binary" });
@@ -81,6 +84,7 @@ createApp({
               "Formato de archivo no soportado. Por favor sube un archivo CSV, XLSX o XLS.";
             this.logs.push({
               time: new Date().toISOString(),
+              type: "error",
               message: "Formato de archivo no soportado",
             });
           }
@@ -97,7 +101,7 @@ createApp({
         const char = line[i];
 
         if (char === '"') {
-          inQuotes = !inQuotes; // Toggle inQuotes flag
+          inQuotes = !inQuotes; // indica que esta en comillas
         } else if (char === "," && !inQuotes) {
           fields.push(field);
           field = "";
@@ -106,15 +110,16 @@ createApp({
         }
       }
 
-      fields.push(field); // Push the last field
-
+      fields.push(field);
       return fields;
     },
     verifyFileContent(content) {
       this.logs.push({
         time: new Date().toISOString(),
+        type: "info",
         message: "Analizando campos del archivo",
       });
+
       const requiredFields = [
         "Clave CUCoP",
         "Descripción",
@@ -129,11 +134,60 @@ createApp({
         "Capitulo",
         "Desc Capitulo",
       ];
+
+      const alternativeFields = [
+        "CLAVE CUCoP",
+        "DESCRIPCIÓN",
+        "UNIDAD DE MEDIDA (sugerida)",
+        "TIPO DE CONTRATACIÓN",
+        "PARTIDA ESPECÍFICA",
+        "DESC. PARTIDA ESPECÍFICA",
+        "PARTIDA GENÉRICA",
+        "DESC. PARTIDA GENÉRICA",
+        "CONCEPTO",
+        "DESC. CONCEPTO",
+        "CAPÍTULO",
+        "DESC. CAPÍTULO",
+      ];
+
       const lines = content.split("\n");
-      const headers = lines[0].split(",");
+      let headers = this.parseCSVLine(lines[0]);
+
+      // Revisa si es el formato CUCoP
+      const isAlternativeFormat = headers.includes("CLAVE CUCoP +");
+
+      let headerMap = {};
+      let columnsToRemove = [];
+      let columnsToKeep = [];
+
+      if (isAlternativeFormat) {
+        // Columnas a eliminar
+        columnsToRemove = [
+          "CLAVE CUCoP +",
+          "FECHA ALTA CUCOP",
+          "FECHA MODIFICACIÓN CUCOP",
+        ];
+
+        // Crea el mapa de renombrado
+        alternativeFields.forEach((alt, index) => {
+          headerMap[alt] = requiredFields[index];
+        });
+
+        // Determina qué columnas mantener
+        columnsToKeep = headers.map((header, index) => {
+          return !columnsToRemove.includes(header);
+        });
+
+        // Aplica la eliminación y renombrado a los headers
+        headers = headers
+          .filter((_, index) => columnsToKeep[index])
+          .map((header) => headerMap[header] || header);
+      }
+
       const missingFields = requiredFields.filter(
         (field) => !headers.includes(field),
       );
+
       if (missingFields.length > 0) {
         this.code = 111;
         this.errorMessage = `Faltan los siguientes campos requeridos: ${missingFields.join(
@@ -142,6 +196,7 @@ createApp({
         this.successMessage = "";
         this.logs.push({
           time: new Date().toISOString(),
+          type: "error",
           message: `Faltan los siguientes campos requeridos: ${missingFields.join(
             ", ",
           )}.`,
@@ -151,38 +206,39 @@ createApp({
         this.errorMessage = "";
         this.logs.push({
           time: new Date().toISOString(),
+          type: "success",
           message: "El archivo contiene todos los campos requeridos",
         });
+
+        // Process the data
         this.cucopdata = lines
           .slice(1)
           .map((line) => {
-            const [
-              clavecucop,
-              descripcion,
-              unidaddemedida,
-              tipodecontratacion,
-              partidaespecifica,
-              descpartidaespecifica,
-              partidagenerica,
-              descpartidagenerica,
-              concepto,
-              descconcepto,
-              capitulo,
-              desccapitulo,
-            ] = this.parseCSVLine(line);
+            let values = this.parseCSVLine(line);
+
+            if (isAlternativeFormat) {
+              // Elimina las columnas no deseadas de los valores
+              values = values.filter((_, index) => columnsToKeep[index]);
+            }
+
+            const entry = {};
+            headers.forEach((header, index) => {
+              entry[header] = values[index];
+            });
+
             return {
-              clavecucop,
-              descripcion,
-              unidaddemedida,
-              tipodecontratacion,
-              partidaespecifica,
-              descpartidaespecifica,
-              partidagenerica,
-              descpartidagenerica,
-              concepto,
-              descconcepto,
-              capitulo,
-              desccapitulo,
+              clavecucop: entry["Clave CUCoP"],
+              descripcion: entry["Descripción"],
+              unidaddemedida: entry["Unidad de Medida"],
+              tipodecontratacion: entry["Tipo de Contratación"],
+              partidaespecifica: entry["Partida Especifica"],
+              descpartidaespecifica: entry["Desc Partida Especifica"],
+              partidagenerica: entry["Partida Generica"],
+              descpartidagenerica: entry["Desc Partida Generica"],
+              concepto: entry["Concepto"],
+              descconcepto: entry["Desc Concepto"],
+              capitulo: entry["Capitulo"],
+              desccapitulo: entry["Desc Capitulo"],
             };
           })
           .filter(
@@ -204,6 +260,7 @@ createApp({
         this.errorMessage = "Por favor, sube un archivo antes de procesarlo.";
         this.logs.push({
           time: new Date().toISOString(),
+          type: "error",
           message: "Archivo no encontrado",
         });
         return;
@@ -214,6 +271,7 @@ createApp({
           "El archivo no ha sido verificado o no es válido. Por favor, verifica el archivo antes de procesarlo.";
         this.logs.push({
           time: new Date().toISOString(),
+          type: "error",
           message: "Archivo no verificado o no válido",
         });
         return;
@@ -269,11 +327,13 @@ createApp({
           this.successMessage = `Archivo Procesado Correctamente.\n`;
           this.logs.push({
             time: new Date().toISOString(),
+            type: "success",
             message: "Archivo Procesado Correctamente",
           });
         } else {
           this.logs.push({
             time: new Date().toISOString(),
+            type: "error",
             message: "Error al editar producto cotizado",
           });
         }
@@ -281,6 +341,7 @@ createApp({
         console.log(ex);
         this.logs.push({
           time: new Date().toISOString(),
+          type: "error",
           message: "Error al procesar el archivo",
         });
       }

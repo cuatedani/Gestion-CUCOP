@@ -17,7 +17,11 @@ mixin table()
             td(v-html="`${list.user.firstNames} ${list.user.lastNames}`") 
             td(v-html="list.title")
             td(v-html="list.description")
-            td(v-html="list.status")
+            td
+              h6
+                span(v-if="list.status != 'Aprobada' && list.status != 'Rechazada'").badge.text-bg-primary {{list.status}}
+                span(v-if="list.status === 'Aprobada'").badge.text-bg-success {{list.status}}
+                span(v-if="list.status === 'Rechazada'").badge.text-bg-danger {{list.status}}
             td(v-html="list.active ? 'Sí' : 'No'")
             td(v-html="new Date(list.createdAt).parseDate()")
             td.center

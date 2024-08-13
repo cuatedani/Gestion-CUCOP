@@ -214,9 +214,11 @@ const parseCSVLine = (line: string): string[] => {
 
 const load = async (fileBuffer: Buffer, qid: number | string) => {
   const logs = [];
+  let ecount = 0;
   try {
     logs.push({
       time: new Date().toISOString(),
+      type: "info",
       message: "Archivo recibido correctamente",
     });
 
@@ -227,6 +229,7 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
     for (const line of lines.slice(1)) {
       logs.push({
         time: new Date().toISOString(),
+        type: "info",
         message: `Procesado fila #${c}`,
       });
       const [Producto, Cantidad, Precio, Detalles] = parseCSVLine(line);
@@ -242,8 +245,10 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
         if (cgen == 0) {
           logs.push({
             time: new Date().toISOString(),
+            type: "error",
             message: `Fila #${c}: Error al registrar nuevo producto `,
           });
+          ecount++;
           c++;
           continue; // Saltar al siguiente elemento del bucle
         }
@@ -253,14 +258,21 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
           description: "N/A",
           active: true,
         });
-        if (!pid || cgen == 0) {
+        if (!pid) {
           logs.push({
             time: new Date().toISOString(),
+            type: "error",
             message: `Fila #${c}: Error al registrar nuevo producto`,
           });
+          ecount++;
           c++;
           continue; // Saltar al siguiente elemento del bucle
         }
+        logs.push({
+          time: new Date().toISOString(),
+          type: "succes",
+          message: `Fila #${c}: Producto registrado correctamente`,
+        });
       }
 
       const iqp = await create({
@@ -274,21 +286,37 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
       if (iqp) {
         logs.push({
           time: new Date().toISOString(),
+          type: "success",
+          message: `Fila #${c}: Producto añadido a la cotización correctamente`,
+        });
+        logs.push({
+          time: new Date().toISOString(),
+          type: "success",
           message: `Fila #${c}: Procesada correctamente`,
         });
       } else {
         logs.push({
           time: new Date().toISOString(),
+          type: "error",
           message: `Fila #${c}: Error al añadir producto a la cotización`,
         });
+        ecount++;
         c++;
-        continue; // Saltar al siguiente elemento del bucle
+        continue;
       }
       c++;
     }
   } catch (ex) {
     console.log(ex);
+    ecount++;
     return `Error al procesar el Archivo: ${ex}`;
+  }
+  if (ecount > 0) {
+    logs.push({
+      time: new Date().toISOString(),
+      type: "error",
+      message: `Se encontraron ${ecount} errores `,
+    });
   }
   return logs;
 };

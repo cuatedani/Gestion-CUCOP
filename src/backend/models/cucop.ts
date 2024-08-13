@@ -367,10 +367,12 @@ const parseCSVLine = (line: string): string[] => {
 };
 
 const load = async (fileBuffer: Buffer) => {
-  const logs: { time: string; message: string }[] = [];
+  const logs = [];
+  let ecount = 0;
   try {
     logs.push({
       time: new Date().toISOString(),
+      type: "info",
       message: "Archivo recibido correctamente",
     });
 
@@ -381,6 +383,7 @@ const load = async (fileBuffer: Buffer) => {
     for (const line of lines.slice(1)) {
       logs.push({
         time: new Date().toISOString(),
+        type: "info",
         message: `Procesado fila #${c}`,
       });
 
@@ -424,13 +427,16 @@ const load = async (fileBuffer: Buffer) => {
         if (upd) {
           logs.push({
             time: new Date().toISOString(),
+            type: "success",
             message: `Fila #${c}: Registro actualizado correctamente`,
           });
         } else {
           logs.push({
             time: new Date().toISOString(),
+            type: "error",
             message: `Fila #${c}: Error al actualizar registro`,
           });
+          ecount++;
           c++;
           continue;
         }
@@ -452,24 +458,34 @@ const load = async (fileBuffer: Buffer) => {
         if (cid) {
           logs.push({
             time: new Date().toISOString(),
+            type: "success",
             message: `Fila #${c}: Registro agregado correctamente `,
           });
         } else {
           logs.push({
             time: new Date().toISOString(),
+            type: "error",
             message: `Fila #${c}: Error al agregar registro`,
           });
           c++;
+          ecount++;
           continue;
         }
       }
-
       c++;
     }
     logs.push({
       time: new Date().toISOString(),
+      type: "info",
       message: `Procesado Finalizado`,
     });
+    if (ecount > 0) {
+      logs.push({
+        time: new Date().toISOString(),
+        type: "error",
+        message: `Se encontraron ${ecount} errores `,
+      });
+    }
   } catch (ex) {
     console.log(ex);
     return `Error al procesar el Archivo: ${ex}`;

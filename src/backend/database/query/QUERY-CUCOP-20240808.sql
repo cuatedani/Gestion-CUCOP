@@ -109,7 +109,7 @@ CREATE TABLE `quotations_products` (
   CONSTRAINT `list_products_ibfk_2` FOREIGN KEY (`productId`) REFERENCES `products` (`productId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-create table medias (
+create table `medias` (
   mediaId	 int not null primary key AUTO_INCREMENT,
   objectId int,
   name varchar(64),
@@ -160,6 +160,7 @@ INSERT INTO SUPPLIERS (name, description, tin, phone, address, active)
 
 -- 		D E L E T E S
 -- DELETE FROM LISTS WHERE listId != 1
+-- DELETE FROM MEDIAS WHERE mediaId = 1;
 
 -- 		A L T E R S
 -- 

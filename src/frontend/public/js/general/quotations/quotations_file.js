@@ -12,8 +12,6 @@ createApp({
       errorMessage: "",
       successMessage: "",
       file: null,
-      fileUrl: "",
-      pdfUrl: "",
     };
   },
   mounted() {
@@ -31,44 +29,23 @@ createApp({
     } catch (ex) {
       this.quotationId = 0;
     }
-
-    this.loadPdf();
   },
   methods: {
-    async loadPdf() {
-      try {
-        const result = await axios.get(
-          `/cucop/api/medias/quotations/${this.quotationId}`,
-        );
-
-        if (result.status === 200) {
-          const mediaId = result.data.media.mediaId;
-
-          const response = await axios.get(`/cucop/api/medias/${mediaId}`, {
-            responseType: "blob",
-          });
-
-          this.pdfUrl = URL.createObjectURL(response.data);
-        } else {
-          this.pdfUrl = null;
-        }
-      } catch (ex) {
-        console.log(ex);
-        this.pdfUrl = null;
-      }
-    },
     handleFileUpload(event) {
       this.code = 0;
-      const file = event.target.files[0];
-      if (file) {
-        this.file = file;
-        this.fileUrl = URL.createObjectURL(file);
+      const files = event.target.files;
+      if (files.length > 0) {
+        this.file = files;
+        this.fileUrl = Array.from(files).map((file) =>
+          URL.createObjectURL(file),
+        );
       }
     },
     processFile() {
-      if (!this.file) {
+      if (!this.file || this.file.length === 0) {
         this.code = 404;
-        this.errorMessage = "Por favor, sube un archivo antes de cargarlo.";
+        this.errorMessage =
+          "Por favor, sube al menos un archivo antes de cargarlo.";
         return;
       }
       this.sendFile();
@@ -77,7 +54,10 @@ createApp({
       try {
         this.isLoading = true;
         const formData = new FormData();
-        formData.append("media", this.file);
+
+        Array.from(this.file).forEach((file) => {
+          formData.append("media", file);
+        });
 
         const result = await fetch(
           `/cucop/api/medias/quotations/${this.quotationId}/`,
@@ -90,10 +70,14 @@ createApp({
         this.code = result.status;
         if (this.code === 200) {
           this.isLoading = false;
-          this.successMessage = "Archivo cargado exitosamente";
-          this.loadPdf();
+          this.successMessage = "Archivos cargados exitosamente";
+          setTimeout(() => {
+            window.location.replace(
+              `/cucop/lists/${this.listId}/quotation/${this.quotationId}`,
+            );
+          }, 1500);
         } else {
-          throw new Error("Error en la carga del archivo");
+          throw new Error("Error en la carga de archivos");
         }
       } catch (ex) {
         this.isLoading = false;

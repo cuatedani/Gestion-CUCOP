@@ -152,8 +152,10 @@ createApp({
     },
     handleSearchSelection: async function (item, type) {
       if (type == "supplierName") {
-        this.supplierName = item.name;
-        this.quotation.supplierId = item.supplierId;
+        if (item) {
+          this.supplierName = item.name;
+          this.quotation.supplierId = item.supplierId;
+        }
       }
     },
     searchFieldShowList: function (type) {

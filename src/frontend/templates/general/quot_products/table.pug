@@ -1,6 +1,6 @@
 include ../../common/table
 mixin table()
-  .white-container
+  .white-container.mb-4
     .white-body-container
       table.table
         thead
@@ -26,3 +26,26 @@ mixin table()
               a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotProduct.quotationId+"/product/"+quotProduct.quotProductId+"/edit"`).btn.btn-primary Editar
             td.center
               button(@click="showDialog(quotProduct.quotProductId)").btn.btn-danger Eliminar
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Archivos Adjuntos
+      .white-header-container-links
+          a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/file"`).btn.btn-link.p-0 Agregar Archivos Adjuntos
+    hr.white-hr
+    .white-body-container
+      table.table
+        thead
+          tr
+            th Archivo
+            th Tipo de Archivo
+            th Fecha de Subida
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="attach in AttachedFiles") 
+            td(v-html="attach.name")
+            td(v-html="attach.extension")
+            td(v-html="new Date(attach.createdAt).parseDate()")
+            td.center
+              a(target="_blank" :href=`"/cucop/"+attach.url`).btn.btn-link.p-0 Ver
+            td.center
+              button(@click="showDialogFile(attach.mediaId)").btn.btn-danger Eliminar

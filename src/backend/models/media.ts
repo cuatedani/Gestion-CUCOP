@@ -90,7 +90,7 @@ const getByObjectId = async (
   objectId: number,
   category: string,
   rol = "main",
-): Promise<IMedia | undefined> => {
+): Promise<IMedia[] | undefined> => {
   try {
     const [rows] = await db.query(
       `
@@ -113,10 +113,11 @@ const getByObjectId = async (
     );
 
     const data = rows as RowDataPacket[];
-    return data[0] as IMedia;
+    if (data.length == 0) throw new OperationError(400, "Not found");
+    return data as IMedia[];
   } catch (ex) {
     console.log(ex);
-    return undefined;
+    return [];
   }
 };
 
@@ -209,7 +210,7 @@ const update = async (
   return affectedRows > 0;
 };
 
-const remove = async (mediaId: number): Promise<boolean> => {
+const remove = async (mediaId: number | string): Promise<boolean> => {
   const [rows] = await db.query(
     `
       delete from medias where mediaId=?

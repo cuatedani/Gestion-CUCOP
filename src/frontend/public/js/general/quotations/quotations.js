@@ -29,7 +29,7 @@ const app = createApp({
       supplied: "",
       quotations: [],
       data: [],
-      showTableInfo: false,
+      showTableInfo: true,
       showExtraFilters: false,
     };
   },

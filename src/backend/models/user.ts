@@ -107,7 +107,9 @@ const getPublicById = async (
     const [rows] = await db.query(
       `
       SELECT 
-        *
+        userId,
+        firstNames,
+        lastNames
       from users
       where userId=?
     `,
@@ -116,7 +118,6 @@ const getPublicById = async (
 
     const data = rows as RowDataPacket[];
     if (data.length == 0) throw new OperationError(400, "Not found");
-    data[0][4] = "encriptado";
     return data[0] as IUser;
   } catch (ex) {
     console.log(ex);

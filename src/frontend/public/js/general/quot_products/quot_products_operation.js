@@ -229,7 +229,6 @@ createApp({
     },
     sendForm: async function () {
       await this.sendFormProduct();
-      setTimeout(1500);
       this.prodcode = 0;
       this.code = 0;
       if (this.validateEmpty()) {

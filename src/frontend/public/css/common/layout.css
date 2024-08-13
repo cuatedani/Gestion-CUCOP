@@ -90,7 +90,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 30%;
+  width: 50%;
 }
 
 .top-left-img-container{
@@ -108,7 +108,8 @@
 }
 
 .top-right-text{
-  width: 93%;
+  padding-left: 1%;
+  width: 100%;
 }
 
 .top-right-title{
@@ -117,7 +118,7 @@
 }
 
 .top-right-container{
-  width: 30%;
+  width: 40%;
   display: flex;
   justify-content: end;
 }

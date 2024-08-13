@@ -10,15 +10,25 @@ mixin operation()
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Piezas Computadora" v-model="list.title").form-control
         .col
-          label.form-label Propietario
+          label.form-label Propietario 
           <span class="text-red">*</span>
-          select.form-control(v-model="list.userId")
-            option(value="") Selecciona un usuario
-            option(v-for="user in users" :key="user.userId" :value="user.userId") {{ user.firstNames }} {{user.lastNames}}
+          +search_field("userName", "filteredUsers", "item.userName", "Especifique un Propietario", "")
       .row.mt-3
         .col
           label.form-label Descripción
           textarea(placeholder="Ej. Piezas para Armar Pc Gamer" v-model="list.description" rows="4" cols="50").form-control
+      if operation == "edit"
+      .row.mt-3
+        .col-4
+          label.form-label Estado
+          select(name="rol" v-model="list.status").form-select
+            option(value="") Todos
+            option(value="Creada") Creada
+            option(value="Pendiente") Pendiente
+            option(value="Revisada") Revisada
+            option(value="Revisando") Revisando
+            option(value="Aprobada") Aprobada
+            option(value="Rechazada") Rechazada
       .row.mt-3
         .col
           .form-check

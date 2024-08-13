@@ -3,36 +3,32 @@ mixin filters()
     .white-header-container
       h4.white-title Información de la Cotización
       .white-header-container-links
+        button.btn.btn-link.p-0(@click="downloadQuotation") Descargar Información            
         a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/edit"`).btn.btn-link.p-0 Editar cotización
         button.btn.btn-link.p-0(data-bs-toggle="collapse", data-bs-target="#tableInfo" @click="toggleTableInfo") {{ tableInfoButtonText }}
     hr.white-hr
     .white-body-container
-      #tableInfo.row.collapse
+      #tableInfo.row.collapse.show
         .row
-          .col-3
+          .col
             label.form-label Proveedor
             h6.white-title {{quotation.supplier.name}}
-          .col-3
+          .col
             label.form-label Numero de Cotización
             h6.white-title {{quotation.quotNumber}}
           .col
             label.form-label Descripción
             h6.white-title {{quotation.description}}
         .row.mt-3
-          .col-3
+          .col
             label.form-label Fecha de Cotización
             h6.white-title {{new Date(quotation.date).parseDate()}}
-          .col-3
+          .col
             label.form-label Fecha de Creación
             h6.white-title {{new Date(quotation.createdAt).parseDate()}}
-          .col-2
+          .col
             label.form-label.center Activo
             h6.white-title {{quotation.active ? "Activa" : "Inactiva"}}
-          .col
-            .row
-              button.btn.btn-link.p-0(@click="downloadQuotation") Descargar Información            
-            .row
-              a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotationId+"/file"`).btn.btn-link.p-0 Archivo Adjunto
           
   .white-container.mb-4
     .white-header-container
