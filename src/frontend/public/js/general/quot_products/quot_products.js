@@ -11,8 +11,13 @@ const app = createApp({
       productId: "",
       quantity: "",
       price: "",
+      discount: "",
+      IVA: "",
+      ISR: "",
+      subtotal: "",
+      amountIVA: "",
+      amountISR: "",
       totalPrice: "",
-      details: "",
       active: "1",
       quotation: {
         quotationId: "",
@@ -32,10 +37,19 @@ const app = createApp({
       },
       product: {
         name: "",
+        brand: "",
+        model: "",
+        denomination: "",
+        description: "",
+        cucop: { clavecucop: "", descripcion: "" },
       },
       wherever: "",
       isproduct: "",
-      quotProducts: [],
+      isbrand: "",
+      ismodel: "",
+      isdenomination: "",
+      isdescription: "",
+      iscucop: "",
       mediadata: [],
       data: [],
       showTableInfo: true,
@@ -48,7 +62,7 @@ const app = createApp({
       file: null,
     };
   },
-  mounted() {
+  async mounted() {
     const href = window.location.href;
     const qid = href.split("/")[7];
     try {
@@ -56,9 +70,9 @@ const app = createApp({
     } catch (ex) {
       this.quotationId = 0;
     }
-    this.loadQuotation();
-    this.loadQuotProducts();
-    this.loadMedias();
+    await this.loadQuotation();
+    await this.loadQuotProducts();
+    await this.loadMedias();
   },
   computed: {
     AttachedFiles() {
@@ -72,17 +86,65 @@ const app = createApp({
           this.quantity || this.wherever,
         ),
         price: this.highlight(quotpro.price, this.price || this.wherever),
+        discount: this.highlight(
+          quotpro.discount,
+          this.discount || this.wherever,
+        ),
+        IVA: this.highlight(quotpro.IVA, this.IVA || this.wherever),
+        ISR: this.highlight(quotpro.ISR, this.ISR || this.wherever),
+        subtotal: this.highlight(
+          quotpro.subtotal,
+          this.subtotal || this.wherever,
+        ),
+        amountIVA: this.highlight(
+          quotpro.amountIVA,
+          this.amountIVA || this.wherever,
+        ),
+        amountISR: this.highlight(
+          quotpro.amountISR,
+          this.amountISR || this.wherever,
+        ),
         totalPrice: this.highlight(
           quotpro.totalPrice,
           this.totalPrice || this.wherever,
         ),
-        details: this.highlight(quotpro.details, this.details || this.wherever),
         product: {
           ...quotpro.product,
           name: this.highlight(
             quotpro.product.name,
             this.isproduct || this.wherever,
           ),
+          brand: this.highlight(
+            quotpro.product.brand,
+            this.isbrand || this.wherever,
+          ),
+          model: this.highlight(
+            quotpro.product.model,
+            this.ismodel || this.wherever,
+          ),
+          denomination: this.highlight(
+            quotpro.product.denomination,
+            this.isdenomination || this.wherever,
+          ),
+          description: this.highlight(
+            quotpro.product.description,
+            this.isdescription || this.wherever,
+          ),
+          cucop: {
+            ...quotpro.product.cucop,
+            clavecucop: this.highlight(
+              quotpro.product.cucop.clavecucop +
+                " - " +
+                quotpro.product.cucop.descripcion,
+              this.iscucop || this.wherever,
+            ),
+            descripcion: this.highlight(
+              quotpro.product.cucop.clavecucop +
+                " - " +
+                quotpro.product.cucop.descripcion,
+              this.iscucop || this.wherever,
+            ),
+          },
         },
       }));
     },
@@ -98,7 +160,7 @@ const app = createApp({
       try {
         const request = await axios.get("/cucop/api/quotationProducts/", {
           params: {
-            quotationId: this.quotationId,
+            quotationId: this.quotation.quotationId,
           },
         });
         this.data = request.data.quotproducts;
@@ -137,7 +199,6 @@ const app = createApp({
       `);
       $("#modalDelete").modal("toggle");
       this.id = id;
-      this.ismedia = false;
     },
     delete: async function () {
       try {
@@ -148,23 +209,19 @@ const app = createApp({
         console.log(ex);
       }
     },
-    getIsmedia() {
-      return this.ismedia;
-    },
     showDialogFile: function (id) {
       const data = this.mediadata.find((tmp) => tmp.mediaId == id);
-      $("#modalDeleteBody").html(`
+      $("#modalDeleteFileBody").html(`
       <p>¿Estás seguro de eliminar este archivo?</p>
       <p><b>${data.name}</b></p>
       `);
-      $("#modalDelete").modal("toggle");
+      $("#modalDeleteFile").modal("toggle");
       this.mid = id;
-      this.ismedia = true;
     },
     deleteFile: async function () {
       try {
         await axios.delete(`/cucop/api/medias/${this.mid}`);
-        $("#modalDelete").modal("toggle");
+        $("#modalDeleteFile").modal("toggle");
         this.loadMedias();
       } catch (ex) {
         console.log(ex);
@@ -193,11 +250,21 @@ const app = createApp({
       const modifiedData = this.data
         .filter((item) => item.active)
         .map((item) => ({
+          CUCoP: item.product.cucop.clavecucop,
           Producto: item.product.name,
-          Cantidad: item.quantity,
+          Marca: item.product.brand,
+          Modelo: item.product.model,
+          Unidad: item.product.denomination,
+          Descripción: item.product.description,
           PrecioUnitario: item.price,
-          PrecioTotal: item.price,
-          Detalles: item.details,
+          Cantidad: item.quantity,
+          Descuento: item.discount,
+          SubTotal: item.subtotal,
+          IVA: item.IVA,
+          MontoIVA: item.amountIVA,
+          ISR: item.ISR,
+          MontoISR: item.amountISR,
+          PrecioTotal: item.totalPrice,
         }));
 
       // Convierte los datos modificados a una hoja de cálculo
@@ -211,7 +278,11 @@ const app = createApp({
     },
     downloadQuotation() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
       // Formateador para precios en moneda local (MXN en este ejemplo)
       const currencyFormatter = new Intl.NumberFormat("es-MX", {
@@ -379,37 +450,72 @@ const app = createApp({
         doc.setFontSize(12);
         doc.setFont("helvetica", "bolditalic");
         doc.text(`Artículos`, 90, i);
+
+        doc.addPage("a4", "landscape");
+
         // Configuración de la tabla
         const headers = [
+          "CUCoP",
           "Producto",
+          "Marca",
+          "Modelo",
+          "Unidad",
+          "Descripción",
           "Cantidad",
           "Precio Unitario",
+          "Descuento",
+          "SubTotal",
+          "IVA",
+          "MontoIVA",
+          "ISR",
+          "MontoISR",
           "Precio Total",
-          "Detalles",
         ];
 
         const modifiedData = this.data
           .filter((item) => item.active)
           .map((item) => ({
+            CUCoP:
+              item.product.cucop.clavecucop +
+              " - " +
+              item.product.cucop.descripcion,
             Producto: item.product.name,
+            Marca: item.product.brand,
+            Modelo: item.product.model,
+            Unidad: item.product.denomination,
+            Descripción: item.product.description,
+            PrecioUnitario: currencyFormatter.format(item.price),
             Cantidad: item.quantity,
-            PrecioUnitario: currencyFormatter.format(item.price), // Formato de moneda
-            PrecioTotal: currencyFormatter.format(item.price * item.quantity), // Formato de moneda y multiplicación por cantidad
-            Detalles: item.details,
+            Descuento: item.discount,
+            SubTotal: currencyFormatter.format(item.subtotal),
+            IVA: item.IVA,
+            MontoIVA: currencyFormatter.format(item.amountIVA),
+            ISR: item.ISR,
+            MontoISR: currencyFormatter.format(item.amountISR),
+            PrecioTotal: currencyFormatter.format(item.totalPrice),
           }));
 
         const rows = modifiedData.map((item) => [
+          item.CUCoP,
           item.Producto,
+          item.Marca,
+          item.Modelo,
+          item.Unidad,
+          item.Descripción,
           item.Cantidad,
           item.PrecioUnitario,
+          item.Descuento,
+          item.SubTotal,
+          item.IVA,
+          item.MontoIVA,
+          item.ISR,
+          item.MontoISR,
           item.PrecioTotal,
-          item.Detalles,
         ]);
 
         // Añade la tabla al documento
-        i += 5;
         doc.autoTable({
-          startY: i,
+          startY: 25,
           head: [headers],
           body: rows,
           theme: "grid",
@@ -433,6 +539,15 @@ const app = createApp({
             fillColor: [235, 235, 235], // Fondo gris claro con opacidad para las filas pares
             lineWidth: 0.3, // Grosor de las líneas
             lineColor: [180, 180, 180], // Color gris oscuro para las líneas verticales
+          },
+          columnStyles: {
+            0: { cellWidth: 25 }, // CUCoP
+            1: { cellWidth: 25 }, // Producto
+            2: { cellWidth: 20 }, // Marca
+            3: { cellWidth: 20 }, // Modelo
+            4: { cellWidth: 15 }, // Unidad
+            5: { cellWidth: 35 }, // Descripción
+            // Ajustar ancho de otras columnas según sea necesario
           },
           margin: {
             right: 10,
@@ -506,9 +621,9 @@ const app = createApp({
 }).mount("#app");
 
 $("#btnDelete").click(() => {
-  if (app.getIsmedia()) {
-    app.deleteFile();
-  } else {
-    app.delete();
-  }
+  app.delete();
+});
+
+$("#btnDeleteFile").click(() => {
+  app.deleteFile();
 });

@@ -149,9 +149,6 @@ const create = async ({
   quotNumber,
   active,
 }: ICreateQuotation): Promise<number> => {
-  if (!quotNumber) {
-    quotNumber = "Sin numero";
-  }
   try {
     const [rows] = await db.query(
       `
@@ -164,7 +161,7 @@ const create = async ({
         active
       ) values(?, ?, ?, ?, ?, ?)
     `,
-      [listId, supplierId, description, quotNumber, date, active],
+      [listId, supplierId, description, quotNumber ?? "S/N", date, active],
     );
 
     const { insertId } = rows as ResultSetHeader;

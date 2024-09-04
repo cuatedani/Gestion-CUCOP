@@ -6,21 +6,35 @@ mixin operation()
     .white-body-container
       .row
         .col
-          label.form-label Registro Cucop
-          <span class="text-red">*</span>
+          label.form-label Registro Cucop <span class="text-red">*</span>
           .row
             .col
-              input(type="text" placeholder="Sin Seleccionar" v-model="cucopelement.clavecucop" disabled).form-control
+              input(type="number" placeholder="Sin Seleccionar" v-model="cucopelement.clavecucop" disabled).form-control
             .col
               button(@click="selectCUCOP()").btn.btn-secondary Seleccionar
-        .col
-          label.form-label Nombre del producto
-          <span class="text-red">*</span>
+        .col-8
+          label.form-label Nombre del producto <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Lapiz" v-model="product.name").form-control
       .row.mt-3 
         .col
-          label.form-label Descripción
-          textarea(placeholder="Ej. Mirador No.2" v-model="product.description" rows="2" cols="50").form-control
+          label.form-label Marca <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Bic" v-model="product.brand").form-control
+        .col
+          label.form-label Modelo <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Mirador" v-model="product.model").form-control
+        .col
+          label.form-label Unidad <span class="text-red">*</span>
+          input(type="text" placeholder="10 Pzs" v-model="product.denomination").form-control
+        .col
+            label.form-label Numero de Serie
+            input(type="text" placeholder="Ej. NS00001" v-model="product.serialNumber").form-control
+        .col
+          label.form-label Numero de Item
+          input(type="text" placeholder="Ej. NI00001" v-model="product.itemNumber").form-control
+      .row.mt-3
+        .col
+          label.form-label Descripción  <span class="text-red">*</span>
+          textarea(placeholder="Ej. Lapiz de grafito con borrador del No.2" v-model="product.description" rows="2" cols="50").form-control
       .row.mt-3
         .col
           .form-check

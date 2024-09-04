@@ -10,8 +10,7 @@ mixin operation()
           <span class="text-red">*</span>
           input(type="text" placeholder="Ej. Piezas Computadora" v-model="list.title").form-control
         .col
-          label.form-label Propietario 
-          <span class="text-red">*</span>
+          label.form-label Propietario <span class="text-red">*</span>
           +search_field("userName", "filteredUsers", "item.userName", "Especifique un Propietario", "")
       .row.mt-3
         .col

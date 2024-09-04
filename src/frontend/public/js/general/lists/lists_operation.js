@@ -17,8 +17,8 @@ createApp({
       },
       userName: "",
       users: [],
-      usersData: [],
       code: 0,
+      showSearchUserFieldData: false,
     };
   },
   async mounted() {
@@ -32,24 +32,24 @@ createApp({
 
     try {
       const request = await axios.get("/cucop/api/users");
-      this.users = request.data.users.filter((user) => user.active);
-      this.usersData = this.users;
+      this.users = request.data.users
+        .filter((user) => user.active)
+        .map((user) => {
+          return {
+            ...user,
+            userName: `${user.firstNames} ${user.lastNames}`,
+          };
+        });
     } catch (ex) {
       this.users = [];
-      this.usersData = [];
     }
     if (!isNaN(this.id)) this.loadList();
   },
   computed: {
     filteredUsers() {
-      const usersData = this.filteringUsers().map((user) => {
-        return {
-          ...user,
-          userName: `${user.firstNames} ${user.lastNames}`,
-        };
-      });
-      console.log(usersData);
-      return [...usersData].slice(0, 3);
+      const data = this.filteringUsers();
+      console.log(data);
+      return [...data].slice(0, 3);
     },
   },
   methods: {
@@ -62,7 +62,7 @@ createApp({
         this.list.active = this.list.active == 1;
       } catch (ex) {
         console.log(ex);
-        this.data = [];
+        this.list = null;
       }
     },
     validateEmpty: function () {
@@ -96,8 +96,10 @@ createApp({
       if (this.userName) {
         const seachtext = this.userName.toLowerCase();
         newUserData = this.users.filter((user) => {
-          const name = user.firstNames + " " + user.lastNames;
-          return name.toLowerCase().includes(seachtext);
+          console.log(user);
+          return (
+            user.userName && user.userName.toLowerCase().includes(seachtext)
+          );
         });
       } else {
         newUserData = this.users;
@@ -118,26 +120,27 @@ createApp({
     searchFieldKeyUp: function (evt, type) {
       if (!this.searchFieldIsShowed(type)) this.searchFieldShowList(type);
     },
-    handleSearchSelection: function (item, type) {
-      if (type === "userName" && item) {
-        this.userName = item.userName;
-        this.list.userId = item.userId; // Asegúrate de asociar correctamente el ID del usuario seleccionado
+    handleSearchSelection: async function (item, type) {
+      if (type == "userName") {
+        if (item) {
+          this.userName = item.userName;
+          this.list.userId = item.userId;
+        }
+      }
+    },
+    searchFieldShowList: function (type) {
+      if (type == "userName") {
+        this.showSearchUserFieldData = true;
       }
     },
     searchFieldIsShowed: function (type) {
-      if (type === "userName") {
-        return this.usersData.length > 0;
-      }
-      return false;
-    },
-    searchFieldShowList: function (type) {
-      if (type == "supplierName") {
-        this.showSearchSupplierFieldData = true;
+      if (type == "userName") {
+        return this.showSearchUserFieldData;
       }
     },
     searchFieldHideList: function (type) {
-      if (type == "supplierName") {
-        this.showSearchSupplierFieldData = false;
+      if (type == "userName") {
+        this.showSearchUserFieldData = false;
       }
     },
   },

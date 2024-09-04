@@ -16,8 +16,13 @@ export interface IQuotationProduct {
   productId: number;
   quantity: number;
   price: number;
+  discount: number;
+  subtotal: number;
+  IVA: number;
+  amountIVA: number;
+  ISR: number;
+  amountISR: number;
   totalPrice: number;
-  details: string;
   active: boolean;
   updatedAt: string;
   createdAt: string;
@@ -28,6 +33,9 @@ export interface IQuotationProduct {
 export type ICreateQuotProduct = Omit<
   IQuotationProduct,
   | "quotProductId"
+  | "subtotal"
+  | "amountIVA"
+  | "amountISR"
   | "totalPrice"
   | "createdAt"
   | "updatedAt"
@@ -47,7 +55,7 @@ const exists = async (quotProductId: number | boolean): Promise<boolean> => {
       `
       SELECT 
         quotProductId
-      FROM quotations_products
+      FROM quotation_products
       WHERE quotProductId=?
     `,
       [quotProductId],
@@ -63,17 +71,18 @@ const exists = async (quotProductId: number | boolean): Promise<boolean> => {
 };
 
 const getAll = async ({
-  quotaionId,
+  quotationId,
 }: {
-  quotaionId?: number;
+  quotationId?: number;
 }): Promise<IQuotationProduct[]> => {
   try {
-    let query = "SELECT * FROM quotations_products WHERE 1=1";
+    let query = "SELECT * FROM quotation_products WHERE 1=1";
     const queryParams: number[] = [];
 
-    if (quotaionId) {
-      query += " AND partidaespecifica = ?";
-      queryParams.push(Number(quotaionId));
+    if (quotationId) {
+      console.log("Llego este QID: ", quotationId);
+      query += " AND quotationId = ?";
+      queryParams.push(Number(quotationId));
     }
     const [rows] = await db.query(query, queryParams);
     const data = rows as IQuotationProduct[];
@@ -100,7 +109,7 @@ const getById = async (
       `
       SELECT 
         *
-      FROM quotations_products
+      FROM quotation_products
       WHERE quotProductId=?
     `,
       [quotProductId],
@@ -125,22 +134,35 @@ const create = async ({
   quotationId,
   quantity,
   price,
-  details,
+  discount,
+  IVA,
+  ISR,
   active,
 }: ICreateQuotProduct): Promise<number> => {
   try {
     const [rows] = await db.query(
       `
-      INSERT INTO quotations_products (
+      INSERT INTO quotation_products (
         productId,
         quotationId,
         quantity,
         price,
-        details,
+        discount,
+        IVA,
+        ISR,
         active
-      ) VALUES (?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `,
-      [productId, quotationId, quantity, price, details ?? "N/A", active],
+      [
+        Number(productId),
+        Number(quotationId),
+        Number(quantity),
+        Number(price),
+        discount ? Number(discount) : 0.0,
+        IVA ? Number(IVA) : 0.0,
+        ISR ? Number(ISR) : 0.0,
+        active,
+      ],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -186,17 +208,26 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
     const cgen = await Cucop.getDefalt();
     for (const line of lines.slice(1)) {
       logs.push(Log.createLog("info", `Procesado fila #${c}`));
-      const [Producto, Cantidad, Precio, Detalles] = parseCSVLine(line);
-      let pid = 0;
+      const [
+        clavecucop,
+        Producto,
+        Marca,
+        Modelo,
+        Denominacion,
+        Descripcion,
+        Cantidad,
+        Precio,
+        Descuento,
+        IVA,
+        ISR,
+      ] = parseCSVLine(line);
 
       // Buscar si existe el producto
-      const prod = await Product.existsName(Producto);
-
+      let prod = await Product.existsName(Producto);
+      const exclave = await Cucop.existsClave(clavecucop);
       // Si existe tomar su id y si no crearlo
-      if (prod != 0) {
-        pid = prod;
-      } else {
-        if (cgen == 0) {
+      if (prod <= 0) {
+        if (cgen == 0 && !exclave) {
           logs.push(
             Log.createLog(
               "error",
@@ -207,13 +238,18 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
           c++;
           continue; // Saltar al siguiente elemento del bucle
         }
-        pid = await Product.create({
-          cucopId: cgen,
+        prod = await Product.create({
+          cucopId: exclave ? exclave : cgen,
           name: Producto,
-          description: "N/A",
+          description: Descripcion,
+          brand: Marca,
+          model: Modelo,
+          denomination: Denominacion,
+          serialNumber: "",
+          itemNumber: "",
           active: true,
         });
-        if (!pid) {
+        if (prod <= 0) {
           logs.push(
             Log.createLog(
               "error",
@@ -222,7 +258,7 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
           );
           ecount++;
           c++;
-          continue; // Saltar al siguiente elemento del bucle
+          continue;
         }
         logs.push(
           Log.createLog(
@@ -231,17 +267,55 @@ const load = async (fileBuffer: Buffer, qid: number | string) => {
           ),
         );
       }
+
       let iqp = null;
-      if (!isNaN(Number(Cantidad)) && !isNaN(Number(Precio))) {
-        iqp = await create({
-          productId: pid,
-          quotationId: Number(qid),
-          quantity: Number(Cantidad),
-          price: Number(Precio),
-          details: Detalles,
-          active: true,
-        });
+      const validIVA = [0.0, 0.16, 0.08];
+      const validISR = [0.0, 0.0125];
+
+      // Validación de los campos y acumulación de errores
+      const errorMessages = [];
+
+      if (isNaN(Number(Cantidad))) {
+        errorMessages.push(`Cantidad no válida: ${Cantidad}`);
       }
+      if (isNaN(Number(Precio))) {
+        errorMessages.push(`Precio no válido: ${Precio}`);
+      }
+      if (
+        isNaN(Number(Descuento)) &&
+        Number(Descuento) >= 0 &&
+        Number(Descuento) < 1
+      ) {
+        errorMessages.push(`Descuento no válido: ${Descuento}`);
+      }
+      if (isNaN(Number(IVA)) || !validIVA.includes(Number(IVA))) {
+        errorMessages.push(`IVA no válido: ${IVA}`);
+      }
+      if (isNaN(Number(ISR)) || !validISR.includes(Number(ISR))) {
+        errorMessages.push(`ISR no válido: ${ISR}`);
+      }
+
+      if (errorMessages.length > 0) {
+        logs.push(
+          Log.createLog("error", `Fila #${c}: ${errorMessages.join(", ")}`),
+        );
+        ecount++;
+        c++;
+        continue; // Saltar al siguiente elemento del bucle
+      }
+
+      // Crear QuotProduct si los datos son válidos
+      iqp = await create({
+        productId: prod,
+        quotationId: Number(qid),
+        quantity: Number(Cantidad),
+        price: Number(Precio),
+        discount: Number(Descuento),
+        IVA: Number(IVA),
+        ISR: Number(ISR),
+        active: true,
+      });
+
       if (iqp) {
         logs.push(
           Log.createLog(
@@ -284,7 +358,9 @@ const update = async (
     quotationId,
     quantity,
     price,
-    details,
+    discount,
+    IVA,
+    ISR,
     active,
   }: IUpdateQuotProduct,
 ): Promise<boolean> => {
@@ -292,22 +368,26 @@ const update = async (
     const [rows] = await db.query(
       `
       UPDATE  
-        quotations_products 
+        quotation_products 
       SET 
         productId=?,
         quotationId=?,
         quantity=?,
         price=?,
-        details=?,
+        discount=?,
+        IVA=?,
+        ISR=?,
         active=?
       WHERE quotProductId=?
     `,
       [
-        productId,
-        quotationId,
-        quantity,
-        price,
-        details ?? "N/A",
+        Number(productId),
+        Number(quotationId),
+        Number(quantity),
+        Number(price),
+        discount ? Number(discount) : 0.0,
+        IVA ? Number(IVA) : 0.0,
+        ISR ? Number(ISR) : 0.0,
         active,
         quotProductId,
       ],
@@ -326,7 +406,7 @@ const remove = async (quotProductId: number | string): Promise<boolean> => {
     const [rows] = await db.query(
       `
       UPDATE
-        quotations_products 
+        quotation_products 
       SET
         active=? 
       WHERE

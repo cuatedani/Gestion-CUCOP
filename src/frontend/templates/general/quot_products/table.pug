@@ -5,21 +5,41 @@ mixin table()
       table.table
         thead
           tr
+            th CUCoP
             th Producto
+            th Marca
+            th Modelo
+            th Descripción
+            th Unidad
             th Cantidad
             th Precio Unitario
+            th Descuento
+            th SubTotal
+            th IVA
+            th MontoIVA
+            th ISR
+            th MontoISR
             th Precio Total
-            th Detalles
             th Activo
             th Fecha de creación
             th.center(colspan="2") Acciones
         tbody
           tr(v-for="quotProduct in filteredQuotProducts") 
+            td(v-html="quotProduct.product.cucop.clavecucop")
             td(v-html="quotProduct.product.name")
+            td(v-html="quotProduct.product.brand")
+            td(v-html="quotProduct.product.model")
+            td(v-html="quotProduct.product.description")
+            td(v-html="quotProduct.product.denomination")
             td(v-html="quotProduct.quantity")
-            td(v-html="quotProduct.price")
-            td(v-html="quotProduct.totalPrice")
-            td(v-html="quotProduct.details")
+            td(v-html="`${quotProduct.price}`")
+            td(v-html="quotProduct.discount")
+            td(v-html="`${quotProduct.subtotal}`")
+            td(v-html="quotProduct.IVA")
+            td(v-html="`${quotProduct.amountIVA}`")
+            td(v-html="quotProduct.ISR")
+            td(v-html="`${quotProduct.amountISR}`")
+            td(v-html="`${quotProduct.totalPrice}`")
             td(v-html="quotProduct.active ? 'Sí' : 'No'")
             td(v-html="new Date(quotProduct.createdAt).parseDate()")
             td.center
@@ -49,3 +69,12 @@ mixin table()
               a(target="_blank" :href=`"/cucop/"+attach.url`).btn.btn-link.p-0 Ver
             td.center
               button(@click="showDialogFile(attach.mediaId)").btn.btn-danger Eliminar
+style.
+  .white-body-container {
+    display: block;
+    overflow-x: auto;
+  }
+  .table {
+    width: 100%;
+    table-layout: auto;
+  }

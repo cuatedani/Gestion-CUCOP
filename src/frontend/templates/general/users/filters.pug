@@ -24,7 +24,7 @@ mixin filters()
             input(type="text" placeholder="Ej. email@example.com" v-model="email").form-control
         .row.mt-3
           .col
-            label.form-label Rol
+            label(for="rol").form-label Rol
             select(name="rol" v-model="rol").form-select
               option(value="") Todos
               option(value="normal") Normal

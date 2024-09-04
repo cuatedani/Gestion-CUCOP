@@ -17,7 +17,6 @@ createApp({
       },
       supplierName: "",
       suppliers: [],
-      data: [],
       code: 0,
       showSearchSupplierFieldData: false,
     };
@@ -30,7 +29,6 @@ createApp({
     } catch (ex) {
       this.id = 0;
     }
-    console.log("QuotationId: ", this.id);
 
     const lid = href.split("/")[5];
     try {
@@ -38,18 +36,15 @@ createApp({
     } catch (ex) {
       this.quotation.listId = 0;
     }
-    console.log("listId: ", this.quotation.listId);
 
     try {
       const request = await axios.get("/cucop/api/suppliers");
       this.suppliers = request.data.suppliers.filter(
         (supplier) => supplier.active,
       );
-      this.data = this.suppliers;
     } catch (ex) {
       console.log(ex);
       this.suppliers = [];
-      this.data = [];
     }
 
     if (!isNaN(this.id)) this.loadQuotation();
@@ -163,14 +158,14 @@ createApp({
         this.showSearchSupplierFieldData = true;
       }
     },
-    searchFieldHideList: function (type) {
-      if (type == "supplierName") {
-        this.showSearchSupplierFieldData = false;
-      }
-    },
     searchFieldIsShowed: function (type) {
       if (type == "supplierName") {
         return this.showSearchSupplierFieldData;
+      }
+    },
+    searchFieldHideList: function (type) {
+      if (type == "supplierName") {
+        this.showSearchSupplierFieldData = false;
       }
     },
   },

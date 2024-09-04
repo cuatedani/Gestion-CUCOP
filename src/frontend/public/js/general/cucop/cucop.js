@@ -108,7 +108,7 @@ const app = createApp({
       const data = this.data.find((tmp) => tmp.cucopId == id);
       $("#modalDeleteBody").html(`
       <p>¿Estás seguro de eliminar este registro cucop?</p>
-      <p><b>${data.clavecucopid}</b></p>
+      <p><b>${data.clavecucop} - ${data.descripcion}</b></p>
       `);
       $("#modalDelete").modal("toggle");
       this.id = id;

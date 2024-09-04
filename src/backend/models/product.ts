@@ -13,6 +13,11 @@ export interface IProduct {
   cucopId: number;
   name: string;
   description: string;
+  brand: string;
+  model: string;
+  denomination: string;
+  serialNumber: string;
+  itemNumber: string;
   active: boolean;
   updatedAt: string;
   createdAt: string;
@@ -25,12 +30,6 @@ export type ICreateProduct = Omit<
 >;
 
 export type IUpdateProduct = ICreateProduct;
-
-interface IGetAllFilters {
-  limit?: number;
-  sort?: "asc" | "desc";
-  status?: "all" | "active" | "inactive";
-}
 
 /**
  * Methods
@@ -57,20 +56,13 @@ const exists = async (productId: number | boolean): Promise<boolean> => {
   }
 };
 
-const getAll = async ({
-  limit,
-  sort = "desc",
-  status = "all",
-}: IGetAllFilters): Promise<IProduct[]> => {
+const getAll = async (): Promise<IProduct[]> => {
   try {
-    const amount = limit ? `limit ${limit}` : "";
-    const active = status != "all" ? `where active=${status == "active"}` : "";
-
     const [rows] = await db.query(`
       select 
         *
-      from products ${active}
-      order by createdAt ${sort} ${amount}
+      from products
+      order by createdAt
     `);
 
     const data = rows as IProduct[];
@@ -119,7 +111,7 @@ const existsName = async (name: string): Promise<number> => {
       select 
         *
       from products
-      where name=?
+      where name=? && active=1
     `,
       [name],
     );
@@ -129,7 +121,7 @@ const existsName = async (name: string): Promise<number> => {
       return 0;
     }
 
-    return data[0].cucopId as number;
+    return data[0].productId as number;
   } catch (ex) {
     console.log(ex);
     return 0;
@@ -140,6 +132,11 @@ const create = async ({
   cucopId,
   name,
   description,
+  brand,
+  model,
+  denomination,
+  serialNumber,
+  itemNumber,
   active,
 }: ICreateProduct): Promise<number> => {
   try {
@@ -149,10 +146,25 @@ const create = async ({
         cucopId,
         name,
         description,
+        brand,
+        model,
+        denomination,
+        serialNumber,
+        itemNumber,
         active
-      ) values(?, ?, ?, ?)
+      ) values(?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
-      [cucopId, name, description, active],
+      [
+        cucopId,
+        name,
+        description,
+        brand,
+        model,
+        denomination,
+        serialNumber ? serialNumber : "S/N",
+        itemNumber ? itemNumber : "S/N",
+        active,
+      ],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -165,7 +177,17 @@ const create = async ({
 
 const update = async (
   productId: number | string,
-  { cucopId, name, description, active }: IUpdateProduct,
+  {
+    cucopId,
+    name,
+    description,
+    brand,
+    model,
+    denomination,
+    serialNumber,
+    itemNumber,
+    active,
+  }: IUpdateProduct,
 ): Promise<boolean> => {
   try {
     const [rows] = await db.query(
@@ -176,10 +198,26 @@ const update = async (
         cucopId=?,
         name=?,
         description=?,
+        brand=?,
+        model=?,
+        denomination=?,
+        serialNumber=?,
+        itemNumber=?,
         active=?
       WHERE productId=?
     `,
-      [cucopId, name, description, active, productId],
+      [
+        cucopId,
+        name,
+        description,
+        brand,
+        model,
+        denomination,
+        serialNumber ?? "S/N",
+        itemNumber ?? "S/N",
+        active,
+        productId,
+      ],
     );
 
     const { affectedRows } = rows as ResultSetHeader;

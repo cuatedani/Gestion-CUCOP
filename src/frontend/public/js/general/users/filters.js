@@ -26,7 +26,6 @@ export const filteringUsers = ({
       (x) =>
         x.firstNames.toLowerCase().includes(wherever.toLowerCase()) ||
         (x.lastNames || "").toLowerCase().includes(wherever.toLowerCase()) ||
-        (x.rol || "").toLowerCase().includes(wherever.toLowerCase()) ||
         (x.email || "").toLowerCase().includes(wherever.toLowerCase()),
     );
   if (active) data = data.filter((x) => x.active == active);

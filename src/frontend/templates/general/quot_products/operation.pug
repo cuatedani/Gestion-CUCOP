@@ -5,7 +5,7 @@ mixin operation()
     hr.white-hr
     .white-body-container
       .row
-        .col-5
+        .col-3
           label.form-label Producto <span class="text-danger">*</span>
           +search_field("productName", "filteredProducts", "item.name", "Especifique un Producto", "")
         .col-3
@@ -16,22 +16,51 @@ mixin operation()
               input(type="text" placeholder="Sin Seleccionar" v-model="cucopelement.clavecucop" disabled).form-control       
             .col
               button(@click="selectCUCOP()").btn.btn-secondary Seleccionar
-        .col-2
-          label.form-label Cantidad
+        .col
+          label.form-label Marca
           span.text-red *
-          input(type="text" placeholder="Ej. 10" v-model="quotProduct.quantity").form-control
-        .col-2
-          label.form-label Precio Unitario
+          input(type="text" placeholder="Ej. BIC" v-model="product.brand").form-control
+        .col
+          label.form-label Modelo
           span.text-red *
-          input(type="text" placeholder="Ej. 10.00" v-model="quotProduct.price").form-control
+          input(type="text" placeholder="Ej. Mirador" v-model="product.model").form-control
+        .col
+          label.form-label Unidad
+          span.text-red *
+          input(type="text" placeholder="Ej. 10 pzs" v-model="product.denomination").form-control
       .row.mt-3
         .col
           label.form-label Descripción del Producto
+          span.text-red *
           textarea(placeholder="Ej. Mirador No.2" v-model="product.description" rows="2" cols="50").form-control
       .row.mt-3
         .col
-          label.form-label Detalles
-          textarea(placeholder="Ej. Para uso en oficina" v-model="quotProduct.details" rows="2" cols="50").form-control
+          label.form-label Cantidad
+          span.text-red *
+          input(type="number" placeholder="Ej. 10" v-model.number="quotProduct.quantity" @input="validateQuantity").form-control
+        .col
+          label.form-label Precio Unitario
+          span.text-red *
+          input(type="number" placeholder="Ej. 100.00" v-model.number="quotProduct.price" @input="validatePrice").form-control
+        .col
+          label.form-label Descuento
+          span.text-red *
+          input(type="number" placeholder="Ej. 0.0" step="0.01" v-model.number="quotProduct.discount" @input="validateDiscount").form-control
+        .col
+            label(for="IVA").form-label IVA
+            span.text-red *
+            select(id="IVA" v-model="quotProduct.IVA").form-select
+              option(value="") Sin Seleccionar
+              option(value="0.08") 8%
+              option(value="0.16") 16%
+              option(value="0") No Aplica
+        .col
+          label(for="ISR").form-label ISR
+          span.text-red *
+          select(id="ISR" v-model="quotProduct.ISR").form-select
+            option(value="") Sin Seleccionar
+            option(value="0") 0%
+            option(value="0.0125") 1.25%
       .row.mt-3
         .col
           .form-check

@@ -10,13 +10,17 @@ createApp({
         quotationId: "",
         quantity: "",
         price: "",
-        total: "",
-        details: "",
+        discount: "",
+        IVA: "",
+        ISR: "",
         active: true,
       },
       product: {
         cucopId: "",
         name: "",
+        brand: "",
+        model: "",
+        denomination: "",
         description: "",
         active: true,
       },
@@ -35,9 +39,9 @@ createApp({
       },
       productName: "",
       supplierName: "",
+      clavecucop: "",
       cucopDesc: "",
       products: [],
-      cucop: [],
       productsData: [],
       cucopdata: [],
       capitulo: "0",
@@ -114,6 +118,7 @@ createApp({
     filteredCucop() {
       return this.filteringCucop(this).map((cucop) => ({
         ...cucop,
+        clavecucop: this.highlight(cucop.clavecucop, this.clavecucop),
         descripcion: this.highlight(cucop.descripcion, this.cucopDesc),
         unidaddemedida: this.highlight(cucop.unidaddemedida, this.cucopDesc),
         tipodecontratacion: this.highlight(
@@ -145,15 +150,19 @@ createApp({
       const paginatedResult = this.filteredCucop.slice(start, end);
       return paginatedResult;
     },
+    totalPages() {
+      const totalPages = Math.ceil(
+        this.filteredCucop.length / this.itemsPerPage,
+      );
+      return totalPages;
+    },
   },
   methods: {
     loadQuotProduct: async function () {
       try {
-        const request = await axios.get(`/cucop/api/quotationProducts`, {
-          params: {
-            quotationId: this.quotationId,
-          },
-        });
+        const request = await axios.get(
+          `/cucop/api/quotationProducts/${this.id}`,
+        );
         this.quotProduct = request.data.quotproduct;
         this.quotProduct.active = this.quotProduct.active == 1;
         await this.loadProduct();
@@ -168,7 +177,6 @@ createApp({
         );
         this.product = request.data.product;
         this.productName = this.product.name;
-        this.product.active = this.product.active == 1;
         await this.loadCucop();
       } catch (ex) {
         console.log(ex);
@@ -188,8 +196,7 @@ createApp({
         await this.selectPartidaGenerica();
         this.especifica = this.cucopelement.partidaespecifica;
         await this.selectPartidaEspecifica();
-        this.cucopDesc = this.cucopelement.descripcion;
-        cucop = [];
+        this.clavecucop = this.cucopelement.clavecucop;
         try {
           const request = await axios.get(`/cucop/api/cucop`);
           this.cucopdata = request.data.cucop;
@@ -225,11 +232,24 @@ createApp({
       return (
         !this.quotProduct.productId ||
         !this.quotProduct.quantity ||
-        !this.quotProduct.price
+        !this.quotProduct.price ||
+        this.quotProduct.discount === null ||
+        this.quotProduct.discount === undefined ||
+        this.quotProduct.IVA === null ||
+        this.quotProduct.IVA === undefined ||
+        this.quotProduct.ISR === null ||
+        this.quotProduct.ISR === undefined
       );
     },
     validateEmptyProduct: function () {
-      return !this.product.cucopId || !this.productName;
+      return (
+        !this.product.cucopId ||
+        !this.productName ||
+        !this.product.brand ||
+        !this.product.model ||
+        !this.product.denomination ||
+        !this.product.description
+      );
     },
     sendForm: async function () {
       await this.sendFormProduct();
@@ -270,16 +290,12 @@ createApp({
     },
     sendFormProduct: async function () {
       this.prodcodecode = 0;
-      console.log("QuotProductID: " + this.quotProduct.productId);
-      console.log("ProdProductID: " + this.product.productId);
       if (this.validateEmptyProduct()) {
-        console.log("No valido Product" + this.product);
         this.prodcodecode = -1;
         return;
       }
       if (isNaN(this.quotProduct.productId || this.product.productId)) {
         try {
-          console.log("Añadiendo Product");
           console.log(this.product);
           let result;
           this.product.name = this.productName;
@@ -294,7 +310,6 @@ createApp({
         }
       } else {
         try {
-          console.log("Actualizando Product");
           console.log(this.product);
           let result;
           this.product.name = this.productName;
@@ -348,9 +363,12 @@ createApp({
           this.productName = "";
           this.product.name = "";
           this.product.cucopId = "";
-          this.cucop.clavecucop = "";
-          this.cucopelement.clavecucop = "";
+          this.product.brand = "";
+          this.product.model = "";
+          this.product.denomination = "";
           this.product.description = "";
+          this.clavecucop = "";
+          this.cucopelement.clavecucop = "";
           return;
         }
         this.quotProduct.productId = item.productId;
@@ -375,39 +393,65 @@ createApp({
     },
     //Metodos Para el modal
     filteringCucop: function () {
-      if (!this.cucopDesc || this.cucopDesc.trim() === "") {
-        this.totalPages = Math.ceil(this.cucopdata.length / this.itemsPerPage);
-        return this.cucopdata;
-      }
-
-      let newdata = this.cucopdata.filter((x) => {
+      let newdata = [];
+      if (this.cucopDesc) {
         const searchText = this.cucopDesc.toLowerCase();
-        return (
-          x.descripcion.toLowerCase().includes(searchText) ||
-          x.unidaddemedida.toLowerCase().includes(searchText) ||
-          x.tipodecontratacion.toLowerCase().includes(searchText) ||
-          x.descpartidaespecifica.toLowerCase().includes(searchText) ||
-          x.descpartidagenerica.toLowerCase().includes(searchText) ||
-          x.descconcepto.toLowerCase().includes(searchText) ||
-          x.desccapitulo.toLowerCase().includes(searchText)
-        );
-      });
-
-      if (newdata.length == 0) {
-        this.totalPages = 0;
+        newdata = this.cucopdata.filter((x) => {
+          return (
+            (x.descripcion &&
+              x.descripcion.toLowerCase().includes(searchText)) ||
+            (x.unidaddemedida &&
+              x.unidaddemedida.toLowerCase().includes(searchText)) ||
+            (x.tipodecontratacion &&
+              x.tipodecontratacion.toLowerCase().includes(searchText)) ||
+            (x.partidaespecifica &&
+              x.partidaespecifica
+                .toString()
+                .toLowerCase()
+                .includes(searchText)) ||
+            (x.descpartidaespecifica &&
+              x.descpartidaespecifica.toLowerCase().includes(searchText)) ||
+            (x.partidagenerica &&
+              x.partidagenerica
+                .toString()
+                .toLowerCase()
+                .includes(searchText)) ||
+            (x.descpartidagenerica &&
+              x.descpartidagenerica.toLowerCase().includes(searchText)) ||
+            (x.cconcepto &&
+              x.cconcepto.toString().toLowerCase().includes(searchText)) ||
+            (x.descconcepto &&
+              x.descconcepto.toLowerCase().includes(searchText)) ||
+            (x.capitulo &&
+              x.capitulo.toString().toLowerCase().includes(searchText)) ||
+            (x.desccapitulo &&
+              x.desccapitulo.toLowerCase().includes(searchText))
+          );
+        });
       } else {
-        this.totalPages = Math.ceil(newdata.length / this.itemsPerPage);
-        this.currentPage = 1;
+        newdata = this.cucopdata;
       }
-      return newdata;
+
+      if (this.clavecucop) {
+        const cucopclave = this.clavecucop.toString().toLowerCase();
+        newdata = newdata.filter((x) => {
+          return (
+            x.clavecucop &&
+            x.clavecucop.toString().toLowerCase().includes(cucopclave)
+          );
+        });
+      }
+
+      return [...newdata];
     },
-    selectCUCOP: function () {
+    selectCUCOP: async function () {
       $("#modalSelect").modal("toggle");
+      if (isNaN(this.product.cucopId)) await this.loadCucop();
     },
     selectRow: async function (clavecucop) {
       this.product.cucopId = clavecucop;
-      await this.loadCucop();
       $("#modalSelect").removeClass("show").modal("hide");
+      await this.loadCucop();
     },
     selectCapitulo: async function () {
       this.currentPage = 1;
@@ -555,6 +599,23 @@ createApp({
       return text
         .toString()
         .replace(new RegExp(search, "gi"), (match) => `<mark>${match}</mark>`);
+    },
+    validateQuantity() {
+      if (this.quotProduct.quantity < 0) {
+        this.quotProduct.quantity = 0;
+      }
+    },
+    validatePrice() {
+      if (this.quotProduct.price < 0) {
+        this.quotProduct.price = 0.0;
+      }
+    },
+    validateDiscount() {
+      if (this.quotProduct.discount < 0) {
+        this.quotProduct.discount = 0.0;
+      } else if (this.quotProduct.discount >= 1) {
+        this.quotProduct.discount = 0.99; // Puedes ajustar este valor según tus necesidades
+      }
     },
   },
 }).mount("#app");

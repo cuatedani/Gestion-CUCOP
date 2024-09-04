@@ -5,12 +5,7 @@ import auth from "../../middlewares/auth";
 const app = express();
 
 app.get("/cucop/api/products", auth, async (req, res) => {
-  const { sort = "desc", status } = req.query;
-
-  const products = await Product.getAll({
-    sort: sort as "desc" | "asc",
-    status: status as "all" | "active" | "inactive",
-  });
+  const products = await Product.getAll();
   res.status(200).send({ code: 200, products });
 });
 

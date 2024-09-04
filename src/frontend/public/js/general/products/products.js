@@ -9,10 +9,15 @@ const app = createApp({
       cucopId: "",
       name: "",
       description: "",
+      brand: "",
+      model: "",
+      denomination: "",
+      serialNumber: "",
+      itemNumber: "",
       active: "1",
       cucop: {
+        clavecucop: "",
         descripcion: "",
-        descpartidaespecifica: "",
       },
       wherever: "",
       iscucop: "",
@@ -35,14 +40,28 @@ const app = createApp({
           product.description,
           this.description || this.wherever,
         ),
+        brand: this.highlight(product.brand, this.brand || this.wherever),
+        model: this.highlight(product.model, this.model || this.wherever),
+        denomination: this.highlight(
+          product.denomination,
+          this.denomination || this.wherever,
+        ),
+        serialNumber: this.highlight(
+          product.serialNumber,
+          this.serialNumber || this.wherever,
+        ),
+        itemNumber: this.highlight(
+          product.itemNumber,
+          this.itemNumber || this.wherever,
+        ),
         cucop: {
           ...product.cucop,
           descripcion: this.highlight(
             product.cucop.descripcion,
             this.iscucop || this.wherever,
           ),
-          descpartidaespecifica: this.highlight(
-            product.cucop.descpartidaespecifica,
+          clavecucop: this.highlight(
+            product.cucop.clavecucop,
             this.iscucop || this.wherever,
           ),
         },

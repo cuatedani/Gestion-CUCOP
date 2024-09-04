@@ -120,7 +120,19 @@ createApp({
         type: "info",
         message: "Analizando campos del archivo",
       });
-      const requiredFields = ["Producto", "Cantidad", "Precio", "Detalles"];
+      const requiredFields = [
+        "CUCoP",
+        "Producto",
+        "Marca",
+        "Modelo",
+        "Unidad",
+        "Descripción",
+        "Cantidad",
+        "Precio",
+        "Descuento",
+        "IVA",
+        "ISR",
+      ];
       const lines = content.split("\n");
       const headers = lines[0].split(",");
 
@@ -151,12 +163,39 @@ createApp({
         this.quotProducts = lines
           .slice(1)
           .map((line) => {
-            const [Producto, Cantidad, Precio, Detalles] =
-              this.parseCSVLine(line);
-            return { Producto, Cantidad, Precio, Detalles };
+            const [
+              CUCoP,
+              Producto,
+              Marca,
+              Modelo,
+              Unidad,
+              Descripción,
+              Cantidad,
+              Precio,
+              Descuento,
+              IVA,
+              ISR,
+            ] = this.parseCSVLine(line);
+            return {
+              CUCoP,
+              Producto,
+              Marca,
+              Modelo,
+              Unidad,
+              Descripción,
+              Cantidad,
+              Precio,
+              Descuento,
+              IVA,
+              ISR,
+            };
           })
           .filter(
-            (product) => product.Producto && product.Cantidad && product.Precio,
+            (product) =>
+              product.Producto &&
+              product.Cantidad &&
+              product.Precio &&
+              product.Descripción,
           );
         this.verified = true;
       }
@@ -168,10 +207,10 @@ createApp({
           (product) => product.Producto && product.Cantidad && product.Precio,
         );
         const csvContent = [
-          "Producto,Cantidad,Precio,Detalles",
+          "CUCoP, Producto, Marca, Modelo, Unidad, Descripción, Cantidad, Precio, Descuento, IVA, ISR",
           ...filteredProducts.map(
             (product) =>
-              `"${product.Producto}",${product.Cantidad},${product.Precio},"${product.Detalles}"`,
+              `${product.CUCoP},"${product.Producto}","${product.Marca}","${product.Modelo}","${product.Unidad}","${product.Descripción}",${product.Cantidad},${product.Precio},${product.Descuento},${product.IVA},${product.ISR}`,
           ),
         ].join("\n");
 

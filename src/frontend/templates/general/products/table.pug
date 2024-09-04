@@ -6,7 +6,11 @@ mixin table()
         thead
           tr
             th Nombre
+            th Marca y Modelo
+            th Unidad
             th Descripción
+            th #Serie
+            th #Item
             th Registro CUCOP
             th Activo
             th Fecha de creación
@@ -14,8 +18,12 @@ mixin table()
         tbody
           tr(v-for="product in paginatedProducts") 
             td(v-html="product.name")
+            td(v-html="`${product.brand} - ${product.model}`")
+            td(v-html="product.denomination")
             td(v-html="product.description")
-            td(v-html="`${product.cucop.descpartidaespecifica}: ${product.cucop.descripcion}`")
+            td(v-html="product.serialNumber")
+            td(v-html="product.itemNumber")
+            td(v-html="`${product.cucop.clavecucop} - ${product.cucop.descripcion}`")
             td(v-html="product.active ? 'Sí' : 'No'")
             td(v-html="new Date(product.createdAt).parseDate()")
             td.center

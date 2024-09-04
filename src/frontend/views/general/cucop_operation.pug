@@ -10,10 +10,8 @@ html(lang="es")
   head
     if operation == 'create'
       +header("Agregar registro CUCoP")
-    if operation == 'edit'
-      +header("Editar registro CUCoP")
     else
-      +header("Cargar registros CUCoP")
+      +header("Editar registro CUCoP")
   body
     .main-container
       +nav-bar(2)
@@ -22,12 +20,7 @@ html(lang="es")
           +nav-top("Agregar registro CUCoP")
         if operation == 'edit'
           +nav-top("Editar registro CUCoP")
-        if operation == 'load'
-          +nav-top("Cargar registros CUCoP")
         .content-container#app
-          if operation == 'load'
-            +load()
-          else
             +operation()
     +scripts()
     script(src="/cucop/public/js/general/cucop/cucop_operation.js")

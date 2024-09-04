@@ -5,6 +5,7 @@ import auth from "../../middlewares/auth";
 const app = express();
 app.get("/cucop/api/quotationProducts", auth, async (req, res) => {
   const quotproducts = await QuotProduct.getAll(req.query);
+  console.log(req.query);
   res.status(200).send({ code: 200, quotproducts });
 });
 

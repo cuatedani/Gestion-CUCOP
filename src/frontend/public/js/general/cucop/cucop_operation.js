@@ -58,7 +58,7 @@ createApp({
         !this.cucop.desccapitulo
       );
     },
-    sendForm: async function () {
+    async sendForm() {
       this.code = 0;
       if (this.validateEmpty()) {
         this.code = -1;
@@ -72,8 +72,12 @@ createApp({
           result = await axios.put(`/cucop/api/cucop/${this.id}`, this.cucop);
         }
         this.code = result.status;
+
         if (this.code == 200) {
-          window.location.replace(`/cucop/cucop`);
+          setTimeout(() => {
+            this.loadMedias();
+            window.location.replace(`/cucop/cucop`);
+          }, 1500);
         }
       } catch (ex) {
         this.code = ex.response.status;

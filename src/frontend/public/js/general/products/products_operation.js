@@ -8,9 +8,13 @@ createApp({
         cucopId: "",
         name: "",
         description: "",
+        brand: "",
+        model: "",
+        denomination: "",
+        serialNumber: "",
+        itemNumber: "",
         active: true,
       },
-      cucop: [],
       cucopelement: {
         cucopId: "",
         clavecucop: "",
@@ -24,6 +28,7 @@ createApp({
         capitulo: "",
         desccapitulo: "",
       },
+      clavecucop: "",
       cucopDesc: "",
       capitulo: "0",
       capitulos: [],
@@ -33,7 +38,6 @@ createApp({
       genericas: [],
       especifica: "0",
       especificas: [],
-      data: [],
       cucopdata: [],
       currentPage: 1,
       itemsPerPage: 10,
@@ -71,6 +75,7 @@ createApp({
     filteredCucop() {
       return this.filteringCucop(this).map((cucop) => ({
         ...cucop,
+        clavecucop: this.highlight(cucop.clavecucop, this.clavecucop),
         descripcion: this.highlight(cucop.descripcion, this.cucopDesc),
         unidaddemedida: this.highlight(cucop.unidaddemedida, this.cucopDesc),
         tipodecontratacion: this.highlight(
@@ -102,6 +107,12 @@ createApp({
       const paginatedResult = this.filteredCucop.slice(start, end);
       return paginatedResult;
     },
+    totalPages() {
+      const totalPages = Math.ceil(
+        this.filteredCucop.length / this.itemsPerPage,
+      );
+      return totalPages;
+    },
   },
   methods: {
     loadProduct: async function () {
@@ -112,7 +123,6 @@ createApp({
         await this.loadCucop();
       } catch (ex) {
         console.log(ex);
-        this.data = [];
       }
     },
     loadCucops: async function () {
@@ -125,6 +135,7 @@ createApp({
       }
     },
     loadCucop: async function () {
+      console.log("Se ejecuto");
       try {
         const request = await axios.get(
           `/cucop/api/cucop/${this.product.cucopId}`,
@@ -138,7 +149,7 @@ createApp({
         await this.selectPartidaGenerica();
         this.especifica = this.cucopelement.partidaespecifica;
         await this.selectPartidaEspecifica();
-        this.cucopDesc = this.cucopelement.descripcion;
+        this.clavecucop = this.cucopelement.clavecucop;
         try {
           const request = await axios.get(`/cucop/api/cucop`);
           this.cucopdata = request.data.cucop;
@@ -151,14 +162,23 @@ createApp({
       }
     },
     validateEmpty: function () {
-      return !this.product.cucopId || !this.product.name;
+      return (
+        !this.product.cucopId ||
+        !this.product.name ||
+        !this.product.description ||
+        !this.product.brand ||
+        !this.product.model ||
+        !this.product.denomination
+      );
     },
     sendForm: async function () {
       this.code = 0;
       if (this.validateEmpty()) {
         this.code = -1;
+        console.log("No validado");
         return;
       }
+      console.log("Datos", this.product);
       try {
         let result;
         if (isNaN(this.id)) {
@@ -171,9 +191,9 @@ createApp({
         }
         this.code = result.status;
         if (this.code == 200) {
-          setTimeout(() => {
+          await setTimeout(() => {
             window.location.replace(`/cucop/products`);
-          }, 1500);
+          }, 2000);
         }
       } catch (ex) {
         this.code = ex.response.status;
@@ -181,39 +201,65 @@ createApp({
     },
     //Metodos Para el modal
     filteringCucop: function () {
-      if (!this.cucopDesc || this.cucopDesc.trim() === "") {
-        this.totalPages = Math.ceil(this.cucopdata.length / this.itemsPerPage);
-        return this.cucopdata;
-      }
-
-      let newdata = this.cucopdata.filter((x) => {
+      let newdata = [];
+      if (this.cucopDesc) {
         const searchText = this.cucopDesc.toLowerCase();
-        return (
-          x.descripcion.toLowerCase().includes(searchText) ||
-          x.unidaddemedida.toLowerCase().includes(searchText) ||
-          x.tipodecontratacion.toLowerCase().includes(searchText) ||
-          x.descpartidaespecifica.toLowerCase().includes(searchText) ||
-          x.descpartidagenerica.toLowerCase().includes(searchText) ||
-          x.descconcepto.toLowerCase().includes(searchText) ||
-          x.desccapitulo.toLowerCase().includes(searchText)
-        );
-      });
-
-      if (newdata.length == 0) {
-        this.totalPages = 0;
+        newdata = this.cucopdata.filter((x) => {
+          return (
+            (x.descripcion &&
+              x.descripcion.toLowerCase().includes(searchText)) ||
+            (x.unidaddemedida &&
+              x.unidaddemedida.toLowerCase().includes(searchText)) ||
+            (x.tipodecontratacion &&
+              x.tipodecontratacion.toLowerCase().includes(searchText)) ||
+            (x.partidaespecifica &&
+              x.partidaespecifica
+                .toString()
+                .toLowerCase()
+                .includes(searchText)) ||
+            (x.descpartidaespecifica &&
+              x.descpartidaespecifica.toLowerCase().includes(searchText)) ||
+            (x.partidagenerica &&
+              x.partidagenerica
+                .toString()
+                .toLowerCase()
+                .includes(searchText)) ||
+            (x.descpartidagenerica &&
+              x.descpartidagenerica.toLowerCase().includes(searchText)) ||
+            (x.cconcepto &&
+              x.cconcepto.toString().toLowerCase().includes(searchText)) ||
+            (x.descconcepto &&
+              x.descconcepto.toLowerCase().includes(searchText)) ||
+            (x.capitulo &&
+              x.capitulo.toString().toLowerCase().includes(searchText)) ||
+            (x.desccapitulo &&
+              x.desccapitulo.toLowerCase().includes(searchText))
+          );
+        });
       } else {
-        this.totalPages = Math.ceil(newdata.length / this.itemsPerPage);
-        this.currentPage = 1;
+        newdata = this.cucopdata;
       }
-      return newdata;
+
+      if (this.clavecucop) {
+        const cucopclave = this.clavecucop.toString().toLowerCase();
+        newdata = newdata.filter((x) => {
+          return (
+            x.clavecucop &&
+            x.clavecucop.toString().toLowerCase().includes(cucopclave)
+          );
+        });
+      }
+
+      return [...newdata];
     },
-    selectCUCOP: function () {
+    selectCUCOP: async function () {
       $("#modalSelect").modal("toggle");
+      if (isNaN(this.product.cucopId)) await this.loadCucop();
     },
     selectRow: async function (clavecucop) {
       this.product.cucopId = clavecucop;
-      await this.loadCucop();
       $("#modalSelect").removeClass("show").modal("hide");
+      await this.loadCucop();
     },
     selectCapitulo: async function () {
       this.currentPage = 1;

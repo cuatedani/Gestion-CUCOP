@@ -18,7 +18,23 @@ mixin filters()
             input(type="text" placeholder="Ej. Lapiz" v-model="name").form-control
           .col-5
             label.form-label Registro CUCOP
-            input(type="text" placeholder="Ej. Producto de Oficina" v-model="iscucop").form-control
+            input(type="text" placeholder="Ej. 20100001" v-model="iscucop").form-control
+        .row.mt-3
+          .col
+            label.form-label Marca
+            input(type="text" placeholder="Ej. Bic" v-model="brand").form-control
+          .col
+            label.form-label Modelo
+            input(type="text" placeholder="Ej. Mirador" v-model="model").form-control
+          .col
+            label.form-label Unidad
+            input(type="text" placeholder="Ej. 10 pzs" v-model="denomination").form-control
+          .col
+            label.form-label #Serie
+            input(type="text" placeholder="Ej. NS00001" v-model="serialNumber").form-control
+          .col
+            label.form-label #Item
+            input(type="text" placeholder="Ej. NI00001" v-model="itemNumber").form-control
         .row.mt-3
           .col
             label.form-label Descripción

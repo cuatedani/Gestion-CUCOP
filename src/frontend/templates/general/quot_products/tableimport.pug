@@ -30,16 +30,30 @@ mixin table()
           table.table
             thead
               tr
+                th CUCoP
                 th Producto
+                th Marca
+                th Modelo
+                th Unidad
+                th Descripción
                 th Cantidad
                 th Precio
-                th Detalles
+                th Descuento
+                th IVA
+                th ISR
             tbody
-              tr(v-for="quotProduct in loadQuotProducts") 
+              tr(v-for="quotProduct in loadQuotProducts")
+                td(v-html="quotProduct.CUCoP")
                 td(v-html="quotProduct.Producto")
+                td(v-html="quotProduct.Marca")
+                td(v-html="quotProduct.Modelo")
+                td(v-html="quotProduct.Unidad")
+                td(v-html="quotProduct.Descripción")
                 td(v-html="quotProduct.Cantidad")
                 td(v-html="quotProduct.Precio")
-                td(v-html="quotProduct.Detalles")
+                td(v-html="quotProduct.Descuento")
+                td(v-html="quotProduct.IVA")
+                td(v-html="quotProduct.ISR")
 style.
   .white-container-tab {
     background-color: white;

@@ -107,11 +107,11 @@ const getById = async (
 
 const create = async ({
   name,
-  description = "N/A",
+  description,
   tin,
-  phone = "N/A",
-  address = "N/A",
-  email = "N/A",
+  phone,
+  address,
+  email,
   active,
 }: ICreateSupplier): Promise<number> => {
   try {
@@ -127,7 +127,15 @@ const create = async ({
         active
       ) values(?, ?, ?, ?, ?, ?, ?)
     `,
-      [name, description, tin, phone, address, email, active],
+      [
+        name,
+        description ? description : "N/A",
+        tin,
+        phone ? phone : "N/A",
+        address ? address : "N/A",
+        email ? email : "N/A",
+        active,
+      ],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -140,15 +148,7 @@ const create = async ({
 
 const update = async (
   supplierId: number | string,
-  {
-    name,
-    description = "N/A",
-    tin,
-    phone = "N/A",
-    address = "N/A",
-    email = "N/A",
-    active,
-  }: IUpdateSupplier,
+  { name, description, tin, phone, address, email, active }: IUpdateSupplier,
 ): Promise<boolean> => {
   try {
     const [rows] = await db.query(
@@ -165,7 +165,16 @@ const update = async (
         active=?
       WHERE supplierId=?
     `,
-      [name, description, tin, phone, address, email, active, supplierId],
+      [
+        name,
+        description ? description : "N/A",
+        tin,
+        phone ? phone : "N/A",
+        address ? address : "N/A",
+        email ? email : "N/A",
+        active,
+        supplierId,
+      ],
     );
 
     const { affectedRows } = rows as ResultSetHeader;
