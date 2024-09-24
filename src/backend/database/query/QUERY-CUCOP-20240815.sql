@@ -48,6 +48,12 @@ CREATE TABLE `cucop` (
   KEY `idx_cucopId` (`cucopId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `permits` (
+  `permitId` INT AUTO_INCREMENT,
+  `partidagenerica` INT NOT NULL,
+  PRIMARY KEY (`permitId`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `products` (
   `productId` INT AUTO_INCREMENT,
   `cucopId` INT NOT NULL,
@@ -144,11 +150,29 @@ INSERT INTO SUPPLIERS (name, description, tin, phone, address, email, active)
  VALUES
  ("Proveedor Generico", "Proveedor generico", "ABCDEFG", "0000000000", "Calle #0", "ProvGen@mail.com", true);
  
+ 
+/*
+INSERT INTO `permits` (partidagenerica) 
+VALUES
+(2110), (2120), (2130), (2140), (2150), (2160), (2170),
+(2210), (2220), (2230), (2350), (2460), (2470), (2480),
+(2490), (2520), (2530), (2550), (2590), (2610), (2710),
+(2720), (2730), (2910), (2920), (2940), (2950), (2960),
+(2980), (3110), (3130), (3140), (3150), (3170), (3180),
+(3190), (3220), (3250), (3260), (3270), (3310), (3330),
+(3340), (3350), (3360), (3380), (3390), (3410), (3450),
+(3460), (3470), (3510), (3520), (3530), (3550), (3570),
+(3580), (3710), (3720), (3750), (3760), (3790), (3830),
+(3850), (3920), (4390), (5110), (5150), (5190), (5210),
+(5310), (5620), (5650), (5670), (6220);
+*/
+ 
 -- 		S E L E C T S
  
 -- SELECT * FROM USERS;
 -- SELECT * FROM SUPPLIERS;
 -- SELECT * FROM CUCOP ;
+-- SELECT * FROM PERMITS;
 -- SELECT * FROM MEDIAS ;
 -- SELECT * FROM PRODUCTS;
 -- SELECT * FROM QUOTATIONS;
@@ -157,8 +181,19 @@ INSERT INTO SUPPLIERS (name, description, tin, phone, address, email, active)
 --
 -- SELECT DISTINCT desccapitulo, capitulo FROM CUCOP;
 -- SELECT DISTINCT descconcepto, concepto FROM CUCOP;
--- SELECT DISTINCT descpartidagenerica, partidagenerica FROM CUCOP;
+-- SELECT DISTINCT partidagenerica FROM CUCOP;
 -- SELECT DISTINCT descpartidaespecifica, partidaespecifica FROM CUCOP;
+
+/*
+SELECT 
+    MIN(descpartidagenerica) AS descpartidagenerica,
+    partidagenerica,
+    MIN(concepto) AS concepto,
+    MIN(capitulo) AS capitulo
+FROM CUCOP
+GROUP BY partidagenerica;
+*/
+
 
 --  	D R O P S
 -- DROP TABLE QUOTATIONS_PRODUCTS;
@@ -169,6 +204,14 @@ INSERT INTO SUPPLIERS (name, description, tin, phone, address, email, active)
 -- 		D E L E T E S
 -- DELETE FROM LISTS WHERE listId != 1
 -- DELETE FROM MEDIAS WHERE mediaId = 1;
+/*
+DELETE FROM `cucop`
+WHERE `partidagenerica` NOT IN (
+    SELECT `partidagenerica` FROM `permits`
+);
+SET SQL_SAFE_UPDATES = 1;
+*/
+
 
 -- 		A L T E R S
 -- ALTER TABLE quotation_products DROP COLUMN details;

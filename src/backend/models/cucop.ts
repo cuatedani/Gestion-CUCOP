@@ -3,6 +3,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../database";
 import OperationError from "../utils/error";
 import Log, { ILog } from "./log";
+import Permit, { IPermit } from "./permit";
 
 /**
  * Interfaces
@@ -253,6 +254,14 @@ const create = async ({
   desccapitulo,
 }: ICreateCucop): Promise<number> => {
   try {
+    const permitidos: IPermit[] = await Permit.getAll();
+
+    if (
+      !permitidos.some((permit) => permit.partidagenerica === partidagenerica)
+    ) {
+      return -1;
+    }
+
     const [rows] = await db.query(
       `
       insert into cucop (
@@ -444,6 +453,14 @@ const update = async (
   }: IUpdateCucop,
 ): Promise<boolean> => {
   try {
+    const permitidos: IPermit[] = await Permit.getAll();
+
+    if (
+      !permitidos.some((permit) => permit.partidagenerica === partidagenerica)
+    ) {
+      return false;
+    }
+
     const [rows] = await db.query(
       `
       UPDATE  

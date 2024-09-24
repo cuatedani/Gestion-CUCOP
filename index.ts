@@ -28,6 +28,7 @@ import quotationProductsController from "./src/backend/controllers/general/quota
 import usersApiController from "./src/backend/controllers/api/users";
 import listsApiController from "./src/backend/controllers/api/lists";
 import cucopApiController from "./src/backend/controllers/api/cucop";
+import permitsApiController from "./src/backend/controllers/api/permits";
 import productsApiController from "./src/backend/controllers/api/products";
 import quotationProductsApiController from "./src/backend/controllers/api/quotation_products";
 import suppliersApiController from "./src/backend/controllers/api/suppliers";
@@ -73,6 +74,7 @@ app.use(sessionController);
 app.use(usersApiController);
 app.use(suppliersApiController);
 app.use(cucopApiController);
+app.use(permitsApiController);
 app.use(listsApiController);
 app.use(quotationsApiController);
 app.use(productsApiController);
