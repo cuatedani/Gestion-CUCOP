@@ -52,7 +52,7 @@ createApp({
   computed: {
     filteredSuppliers() {
       const data = this.filteringSuppliers();
-      return [...data].slice(0, 3);
+      return [...data];
     },
   },
   methods: {

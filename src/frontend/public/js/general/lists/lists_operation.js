@@ -49,7 +49,7 @@ createApp({
     filteredUsers() {
       const data = this.filteringUsers();
       console.log(data);
-      return [...data].slice(0, 3);
+      return [...data];
     },
   },
   methods: {

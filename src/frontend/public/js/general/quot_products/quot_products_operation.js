@@ -113,7 +113,7 @@ createApp({
   computed: {
     filteredProducts() {
       const productsData = this.filteringProducts();
-      return [...productsData].slice(0, 3);
+      return [...productsData];
     },
     filteredCucop() {
       return this.filteringCucop(this).map((cucop) => ({
