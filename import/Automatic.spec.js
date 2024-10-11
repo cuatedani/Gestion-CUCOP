@@ -8,24 +8,15 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 
-const SitioWeb = "https://episa.cicese.mx:8443/episaMain/solicitudesAbastecimientoRM";
-const apiURL = 'https://requiem.cicese.mx/cucop';
+const SitioWeb = "https://;
+const apiURL = 'https://';
 
 // Reemplaza con el ID de la cotización que quieras usar
 const quotationId = '1';
 let quotation ={};
 let quotationProducts = [];
-const RFC = "PSA150303H27";
+const RFC = "56576";
 const fecha = addDaysToCurrentDate(3);
-
-//zmunoz
-//Zulemamunoz99
-
-//Comando para guardar sesion
-//npx playwright open --save-storage auth/ePISA.json
-
-//Comando para guardar sesion
-//npx playwright test
 
 function addDaysToCurrentDate(daysToAdd) {
   // Obtener la fecha actual
