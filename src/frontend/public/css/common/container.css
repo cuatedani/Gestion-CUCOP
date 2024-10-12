@@ -15,6 +15,11 @@
   align-items: center;
 }
 
+.white-header-container-links{
+  display: flex;
+  gap: 20px;
+}
+
 .white-title{
   margin:0;
 }

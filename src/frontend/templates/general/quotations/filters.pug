@@ -1,0 +1,65 @@
+mixin filters()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Información de la Lista
+      .white-header-container-links
+        a(:href=`"/cucop/lists/"+listId+"/edit"`).btn.btn-link.p-0 Editar lista
+        button.btn.btn-link.p-0(data-bs-toggle="collapse", data-bs-target="#tableInfo" @click="toggleTableInfo") {{ tableInfoButtonText }}
+    hr.white-hr
+    .white-body-container
+      #tableInfo.row.collapse.show
+        .row
+          .col
+            label.form-label Titulo
+            h6.white-title {{list.title}}
+          .col
+            label.form-label Propietario
+            h6.white-title {{list.user.firstNames}} {{list.user.lastNames}}
+        .row.mt-3
+          .col
+            label.form-label Justificación
+            h6.white-title {{list.description}}
+        .row.mt-3
+          .col
+            label.form-label Estado
+            h6.white-title {{list.status}}
+          .col
+            label.form-label Activo
+            h6.white-title {{list.active ? "Activa" : "Inactiva"}}
+          .col
+            label.form-label Fecha de Creación
+            h6.white-title {{new Date(list.createdAt).parseDate()}}
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Filtros
+      .white-header-container-links
+          a(:href=`"/cucop/lists/"+listId+"/quotation/create"`).btn.btn-link.p-0 Agregar cotización a lista
+    hr.white-hr
+    .white-body-container
+      .row
+        .col-10
+          label.form-label Todos los campos
+          input.form-control(type="text", placeholder="Ej. La Mariposa, hojas, 10/07/2024", v-model="wherever")
+        .col-2.btn-toggle-more-filters
+          button.btn.btn-primary(data-bs-toggle="collapse", data-bs-target="#extraFilters" @click="toggleExtraFilters") {{ extraFiltersButtonText }}
+      #extraFilters.row.collapse
+        .row.mt-3
+          .col-5
+            label.form-label Proveedor
+            input(type="text" placeholder="Ej. la Mariposa" v-model="supplied").form-control
+          .col-3
+            label.form-label Número de Cotización
+            input(type="text" placeholder="Ej. COT0001" v-model="quotNumber").form-control
+          .col-2
+            label.form-label Fecha de Cotización
+            input(type="date" v-model="date").form-control
+        .row.mt-3
+          .col-6
+            label.form-label Descripción
+            input(type="text" placeholder="Ej. Hojas al por mayor" v-model="description").form-control
+          .col-2
+            label(for="active").form-label Activo
+            select(id="active" v-model="active").form-select
+              option(value="") Todos
+              option(value="1") Activo
+              option(value="0") Inactivo

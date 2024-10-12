@@ -1,0 +1,26 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/common/search_field.pug
+include ../../templates/general/lists/operation.pug
+
+doctype html
+html(lang="es")
+  head
+    if operation == 'create'
+      +header("Agregar lista de pedidos")
+    else
+      +header("Editar lista de pedidos")
+  body
+    .main-container
+      +nav-bar(0)
+      .right-container
+        if operation == 'create'
+          +nav-top("Agregar lista de pedidos")
+        else
+          +nav-top("Editar lista de pedidos")
+        .content-container#app
+          +operation()
+    +scripts()
+    script(src="/cucop/public/js/general/lists/lists_operation.js")

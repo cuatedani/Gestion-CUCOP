@@ -2,7 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 import db from "../database";
 import OperationError from "../utils/error";
-import { IUser } from "./user";
+import User, { IUser } from "./user";
 
 /**
  * Interfaces
@@ -11,11 +11,13 @@ import { IUser } from "./user";
 export interface IList {
   listId: number;
   userId: number;
+  title: string;
+  description: string;
   status: string;
   active: boolean;
   updatedAt: string;
   createdAt: string;
-  user: IUser;
+  user?: IUser;
 }
 
 export type ICreateList = Omit<
@@ -73,6 +75,13 @@ const getAll = async ({
     `);
 
     const data = rows as IList[];
+    await Promise.all(
+      data.map(async (list) => {
+        const listUser = await User.getPublicById(list.userId);
+        list.user = listUser;
+      }),
+    );
+
     return data;
   } catch (ex) {
     console.log(ex);
@@ -94,7 +103,10 @@ const getById = async (listId: number | string): Promise<IList | undefined> => {
 
     const data = rows as RowDataPacket[];
     if (data.length == 0) throw new OperationError(400, "Not found");
-    return data[0] as IList;
+    const list = data[0] as IList;
+    const listUser = await User.getPublicById(list.userId);
+    list.user = listUser;
+    return list;
   } catch (ex) {
     console.log(ex);
     return undefined;
@@ -103,6 +115,8 @@ const getById = async (listId: number | string): Promise<IList | undefined> => {
 
 const create = async ({
   userId,
+  title,
+  description,
   status,
   active,
 }: ICreateList): Promise<number> => {
@@ -111,11 +125,13 @@ const create = async ({
       `
       insert into lists (
         userId,
+        title,
+        description,
         status,
         active
-      ) values(?, ?, ?)
+      ) values(?, ?, ?, ?, ?)
     `,
-      [userId, status, active],
+      [userId, title, description ?? "N/A", status, active],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -128,7 +144,7 @@ const create = async ({
 
 const update = async (
   listId: number | string,
-  { userId, status, active }: IUpdateList,
+  { userId, title, description, status, active }: IUpdateList,
 ): Promise<boolean> => {
   try {
     const [rows] = await db.query(
@@ -137,11 +153,13 @@ const update = async (
         lists 
       SET 
         userId=?,
+        title=?,
+        description=?,
         status=?,
         active=?
       WHERE listId=?
     `,
-      [userId, status, active, listId],
+      [userId, title, description ?? "N/A", status, active, listId],
     );
 
     const { affectedRows } = rows as ResultSetHeader;

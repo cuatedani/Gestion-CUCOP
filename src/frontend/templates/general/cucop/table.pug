@@ -1,0 +1,67 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th Clave CUCoP
+            th Descripción
+            th Unidad de Medida
+            th Tipo de Contratación
+            th Partida Especifica
+            th Partida Generica
+            th Concepto
+            th Capitulo
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="cucop in paginatedCucop")
+            td(v-html="cucop.clavecucop")
+            td(v-html="cucop.descripcion")
+            td(v-html="cucop.unidaddemedida")
+            td(v-html="cucop.tipodecontratacion")
+            td(v-html="`${cucop.partidaespecifica} - ${cucop.descpartidaespecifica}`")
+            td(v-html="`${cucop.partidagenerica} - ${cucop.descpartidagenerica}`")
+            td(v-html="`${cucop.concepto} - ${cucop.descconcepto}`")
+            td(v-html="`${cucop.capitulo} - ${cucop.desccapitulo}`") 
+            td.center
+              a(:href=`"/cucop/cucop/"+cucop.cucopId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(cucop.cucopId)").btn.btn-danger Eliminar
+      .pagination
+        button(@click="prevPage" :disabled="currentPage === 1").btn.btn-secondary Anterior
+        .row
+          .col
+            span Página
+          .col-6
+            input(type="number" v-model.number="currentPage" @input="handlePageInput" @blur="validatePage").form-control.form-control-sm.pagination-input
+          .col
+            span de {{ totalPages }}
+        button(@click="nextPage" :disabled="currentPage === totalPages").btn.btn-secondary Siguiente
+style.
+  .white-body-container {
+    display: block;
+    overflow-x: auto;
+  }
+  .table {
+    width: 100%;
+    table-layout: auto;
+  }
+  .pagination {
+  width: 40%
+  display: flex;
+  justify-content: flex-end; 
+  margin-top: 10px;
+  text-align: left;
+  }
+  .pagination button {
+    margin: 0 5px;
+  }
+  .pagination span  {
+    text-align: center;
+  }
+  .pagination-input {
+    width: 50px;
+    display: inline-block;
+    text-align: center;
+  }

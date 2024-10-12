@@ -10,11 +10,11 @@ app.get("/holass", async (req, res) => {
 
 app.get("/cucop/api/suppliers", auth, async (req, res) => {
   const { sort = "desc", status } = req.query;
-  const supplier = await Supplier.getAll({
+  const suppliers = await Supplier.getAll({
     sort: sort as "desc" | "asc",
     status: status as "all" | "active" | "inactive",
   });
-  res.status(200).send({ code: 200, supplier });
+  res.status(200).send({ code: 200, suppliers });
 });
 
 app.get("/cucop/api/suppliers/:id", auth, async (req, res) => {

@@ -1,0 +1,28 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th Proveedor
+            th Justificación
+            th Número de cotización
+            th Fecha de cotización
+            th Activo
+            th Fecha de creación
+            th.center(colspan="3") Acciones
+        tbody
+          tr(v-for="quotation in filteredQuotations") 
+            td(v-html="quotation.supplier.name")
+            td(v-html="quotation.description")
+            td(v-html="quotation.quotNumber")
+            td(v-html="quotation.date")
+            td(v-html="quotation.active ? 'Sí' : 'No'")
+            td(v-html="new Date(quotation.createdAt).parseDate()")
+            td.center
+              a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotation.quotationId`).btn.btn-link.p-0 Ver
+            td.center
+              a(:href=`"/cucop/lists/"+quotation.listId+"/quotation/"+quotation.quotationId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(quotation.quotationId)").btn.btn-danger Eliminar 

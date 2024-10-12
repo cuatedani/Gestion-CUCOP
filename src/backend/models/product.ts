@@ -2,7 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 import db from "../database";
 import OperationError from "../utils/error";
-import { ICucop } from "./cucop";
+import Cucop, { ICucop } from "./cucop";
 
 /**
  * Interfaces
@@ -13,10 +13,15 @@ export interface IProduct {
   cucopId: number;
   name: string;
   description: string;
+  brand: string;
+  model: string;
+  denomination: string;
+  serialNumber: string;
+  itemNumber: string;
   active: boolean;
   updatedAt: string;
   createdAt: string;
-  cucop: ICucop;
+  cucop?: ICucop;
 }
 
 export type ICreateProduct = Omit<
@@ -25,12 +30,6 @@ export type ICreateProduct = Omit<
 >;
 
 export type IUpdateProduct = ICreateProduct;
-
-interface IGetAllFilters {
-  limit?: number;
-  sort?: "asc" | "desc";
-  status?: "all" | "active" | "inactive";
-}
 
 /**
  * Methods
@@ -57,23 +56,22 @@ const exists = async (productId: number | boolean): Promise<boolean> => {
   }
 };
 
-const getAll = async ({
-  limit,
-  sort = "desc",
-  status = "all",
-}: IGetAllFilters): Promise<IProduct[]> => {
+const getAll = async (): Promise<IProduct[]> => {
   try {
-    const amount = limit ? `limit ${limit}` : "";
-    const active = status != "all" ? `where active=${status == "active"}` : "";
-
     const [rows] = await db.query(`
       select 
         *
-      from products ${active}
-      order by createdAt ${sort} ${amount}
+      from products
+      order by createdAt
     `);
 
     const data = rows as IProduct[];
+    await Promise.all(
+      data.map(async (prod) => {
+        const procuc = await Cucop.getById(prod.cucopId);
+        prod.cucop = procuc;
+      }),
+    );
     return data;
   } catch (ex) {
     console.log(ex);
@@ -97,10 +95,36 @@ const getById = async (
 
     const data = rows as RowDataPacket[];
     if (data.length == 0) throw new OperationError(400, "Not found");
-    return data[0] as IProduct;
+    const prod = data[0] as IProduct;
+    prod.cucop = await Cucop.getById(prod.cucopId);
+    return prod;
   } catch (ex) {
     console.log(ex);
     return undefined;
+  }
+};
+
+const existsName = async (name: string): Promise<number> => {
+  try {
+    const [rows] = await db.query(
+      `
+      select 
+        *
+      from products
+      where name=? && active=1
+    `,
+      [name],
+    );
+
+    const data = rows as RowDataPacket[];
+    if (data.length === 0) {
+      return 0;
+    }
+
+    return data[0].productId as number;
+  } catch (ex) {
+    console.log(ex);
+    return 0;
   }
 };
 
@@ -108,6 +132,11 @@ const create = async ({
   cucopId,
   name,
   description,
+  brand,
+  model,
+  denomination,
+  serialNumber,
+  itemNumber,
   active,
 }: ICreateProduct): Promise<number> => {
   try {
@@ -117,10 +146,25 @@ const create = async ({
         cucopId,
         name,
         description,
+        brand,
+        model,
+        denomination,
+        serialNumber,
+        itemNumber,
         active
-      ) values(?, ?, ?, ?)
+      ) values(?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
-      [cucopId, name, description, active],
+      [
+        cucopId,
+        name,
+        description,
+        brand,
+        model,
+        denomination,
+        serialNumber ? serialNumber : "S/N",
+        itemNumber ? itemNumber : "S/N",
+        active,
+      ],
     );
 
     const { insertId } = rows as ResultSetHeader;
@@ -133,7 +177,17 @@ const create = async ({
 
 const update = async (
   productId: number | string,
-  { cucopId, name, description, active }: IUpdateProduct,
+  {
+    cucopId,
+    name,
+    description,
+    brand,
+    model,
+    denomination,
+    serialNumber,
+    itemNumber,
+    active,
+  }: IUpdateProduct,
 ): Promise<boolean> => {
   try {
     const [rows] = await db.query(
@@ -144,10 +198,26 @@ const update = async (
         cucopId=?,
         name=?,
         description=?,
+        brand=?,
+        model=?,
+        denomination=?,
+        serialNumber=?,
+        itemNumber=?,
         active=?
       WHERE productId=?
     `,
-      [cucopId, name, description, active, productId],
+      [
+        cucopId,
+        name,
+        description,
+        brand,
+        model,
+        denomination,
+        serialNumber ?? "S/N",
+        itemNumber ?? "S/N",
+        active,
+        productId,
+      ],
     );
 
     const { affectedRows } = rows as ResultSetHeader;
@@ -182,6 +252,7 @@ const remove = async (productId: number | string): Promise<boolean> => {
 
 export default {
   exists,
+  existsName,
   getAll,
   getById,
   create,

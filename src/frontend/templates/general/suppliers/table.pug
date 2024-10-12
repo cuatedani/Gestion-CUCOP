@@ -1,0 +1,26 @@
+include ../../common/table
+mixin table()
+  .white-container
+    .white-body-container
+      table.table
+        thead
+          tr
+            th RFC
+            th Nombre
+            th Descripción
+            th Contacto
+            th Activo
+            th Fecha de creación
+            th.center(colspan="2") Acciones
+        tbody
+          tr(v-for="supplier in filteredSuppliers" :key="supplier.supplierId")
+            td(v-html="supplier.tin")
+            td(v-html="supplier.name")
+            td(v-html="supplier.description")
+            td(v-html="`${supplier.phone} <br> ${supplier.address} <br> ${supplier.email}`")
+            td(v-html="supplier.active ? 'Sí' : 'No'")
+            td(v-html="new Date(supplier.createdAt).parseDate()")
+            td.center
+              a(:href=`"/cucop/suppliers/"+supplier.supplierId+"/edit"`).btn.btn-primary Editar
+            td.center
+              button(@click="showDialog(supplier.supplierId)").btn.btn-danger Eliminar

@@ -1,0 +1,52 @@
+mixin operation()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Datos del producto
+    hr.white-hr
+    .white-body-container
+      .row
+        .col
+          label.form-label Registro Cucop <span class="text-red">*</span>
+          .row
+            .col
+              input(type="number" placeholder="Sin Seleccionar" v-model="cucopelement.clavecucop" disabled).form-control
+            .col
+              button(@click="selectCUCOP()").btn.btn-secondary Seleccionar
+        .col-8
+          label.form-label Nombre del producto <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Lapiz" v-model="product.name").form-control
+      .row.mt-3 
+        .col
+          label.form-label Marca <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Bic" v-model="product.brand").form-control
+        .col
+          label.form-label Modelo <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Mirador" v-model="product.model").form-control
+        .col
+          label.form-label Unidad <span class="text-red">*</span>
+          input(type="text" placeholder="10 Pzs" v-model="product.denomination").form-control
+        .col
+            label.form-label Numero de Serie
+            input(type="text" placeholder="Ej. NS00001" v-model="product.serialNumber").form-control
+        .col
+          label.form-label Numero de Item
+          input(type="text" placeholder="Ej. NI00001" v-model="product.itemNumber").form-control
+      .row.mt-3
+        .col
+          label.form-label Descripción  <span class="text-red">*</span>
+          textarea(placeholder="Ej. Lapiz de grafito con borrador del No.2" v-model="product.description" rows="2" cols="50").form-control
+      .row.mt-3
+        .col
+          .form-check
+            label.form-check-label Activo
+              input(type="checkbox" name="active" v-model="product.active").form-check-input
+      .row.mt-3 
+        .col-12.text-end
+          a(href="/cucop/products").btn.btn-secondary.me-3 Cancelar
+          button(type="sumbit" @click="sendForm").btn.btn-primary #{operation == "create" ? "Agregar" : "Actualizar"}
+      .row.mt-3
+        if operation == "create"
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Producto creado exitosamente
+        else
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Producto actualizado exitosamente
+        div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error al realizar la operación revisa los campos

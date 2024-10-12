@@ -1,0 +1,99 @@
+include ./table
+
+mixin search_modal()
+  div(tabindex="-1" role="dialog" id="modalSelect" ).modal.fade
+    div(role="document").modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            h5.modal-title Selecciona un Registro CUCOP
+            button(type="button" data-bs-dismiss="modal").btn-close
+          div(id="modalSelectBody").modal-body
+              .row
+                .col-4
+                  label.form-label Clave CUCOP
+                  input(type="text" placeholder="Ej. 12201001" v-model="clavecucop").form-control
+                .col-8
+                  label.form-label Filtrar
+                  input(type="text" placeholder="Texto a Buscar" v-model="cucopDesc").form-control
+              .row.mt-3
+                .col
+                  label.form-label Capítulo
+                  select.form-control.form-select(v-model="capitulo" @change="selectCapitulo")
+                    option(value="0") Selecciona un Capítulo
+                    option(v-for="cap in capitulos" :key="cap.capitulo" :value="cap.capitulo") {{ cap.desccapitulo }}
+                .col
+                  label.form-label Concepto
+                  select.form-control.form-select(v-model="concepto" @change="selectConcepto")
+                    option(value="0") Selecciona un Concepto
+                    option(v-for="con in conceptos" :key="con.concepto" :value="con.concepto") {{ con.descconcepto }}
+              .row.mt-3
+                .col
+                  label.form-label Partida Generica
+                  select.form-control.form-select(v-model="generica" @change="selectPartidaGenerica")
+                    option(value="0") Selecciona una Partida Generica
+                    option(v-for="gen in genericas" :key="gen.partidagenerica" :value="gen.partidagenerica") {{ gen.descpartidagenerica }}
+                .col
+                  label.form-label Partida Especifica
+                  select.form-control.form-select(v-model="especifica" @change="selectPartidaEspecifica")
+                    option(value="0") Selecciona una Partida Especifica
+                    option(v-for="esp in especificas" :key="esp.partidaespecifica" :value="esp.partidaespecifica") {{ esp.descpartidaespecifica }}
+              .white-body-container
+                table.table
+                  thead
+                    tr
+                      th.center(colspan="1") Acción
+                      th Clave CUCOP
+                      th Descripción
+                      th Unidad de Medida
+                      th Tipo de Contratación
+                      th Partida Especifica
+                      th Partida Generica
+                      th Concepto
+                      th Capitulo
+                  tbody
+                    tr(v-for="onecucop in paginatedCucop")
+                      td.center
+                        button(@click="selectRow(onecucop.cucopId)").btn.btn-secondary Seleccionar 
+                      td(v-html="onecucop.clavecucop")
+                      td(v-html="onecucop.descripcion")
+                      td(v-html="onecucop.unidaddemedida")
+                      td(v-html="onecucop.tipodecontratacion")
+                      td(v-html="`${onecucop.partidaespecifica} - ${onecucop.descpartidaespecifica}`") 
+                      td(v-html="`${onecucop.partidagenerica} - ${onecucop.descpartidagenerica}`") 
+                      td(v-html="`${onecucop.concepto} - ${onecucop.descconcepto}`") 
+                      td(v-html="`${onecucop.capitulo} - ${onecucop.desccapitulo}`") 
+                .pagination
+                  button(@click="prevPage" :disabled="currentPage === 1").btn.btn-secondary Anterior
+                  .row
+                    .col
+                      span Página
+                    .col-6
+                      input(type="number" v-model.number="currentPage" @input="handlePageInput" @blur="validatePage").form-control.form-control-sm.pagination-input
+                    .col
+                      span de {{ totalPages }}
+                  button(@click="nextPage" :disabled="currentPage === totalPages").btn.btn-secondary Siguiente
+
+style.
+  .modal-lg, .modal-xl {
+    --bs-modal-width: 80% !important;
+  }
+  .white-body-container {
+    display: block;
+    overflow-x: auto;
+  }
+  .pagination {
+  width: 60%
+  display: flex;
+  justify-content: flex-end; 
+  margin-top: 10px;
+  text-align: left;
+  }
+  .pagination button {
+    margin: 0 5px;
+  }
+  .pagination-input {
+    width: 50px;
+    display: inline-block;
+    margin: 0 5px;
+    text-align: center;
+  }

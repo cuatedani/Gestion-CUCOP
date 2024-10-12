@@ -6,5 +6,12 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": ["javascript", "typescript", "ruby", "python", "pug", "html"]
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "ruby",
+    "python",
+    "pug",
+    "html"
+  ],
 }

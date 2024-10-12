@@ -1,0 +1,21 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/general/cucop/load.pug
+include ../../templates/general/cucop/tableimport.pug
+
+doctype html
+html(lang="es")
+  head
+    +header("Importar registros CUCoP")
+  body
+    .main-container
+      +nav-bar(2)
+      .right-container
+        +nav-top("Importar registros CUCoP")
+        .content-container#app
+          +load()
+          +table()
+    +scripts()
+    script(src="/cucop/public/js/general/cucop/cucop_load.js")

@@ -17,10 +17,10 @@ const app = createApp({
       };
       this.code = 0;
       try {
-        const result = await axios.post("/time/api/login", data);
+        const result = await axios.post("/cucop/api/login", data);
         this.code = result.code;
         window.location.replace(
-          `/time/login/verify?token=${result.data.token}`,
+          `/cucop/login/verify?token=${result.data.token}`,
         );
       } catch (ex) {
         console.log(ex);

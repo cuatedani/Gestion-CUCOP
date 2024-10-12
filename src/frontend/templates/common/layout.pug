@@ -2,50 +2,46 @@
   const options = [
     {
       "id":0,
-      "img":"icons8-reloj-30.png",
-      "text":"Checar entrada/salida",
-      "url":"/time/checks/create",
+      "img":"icons8-lista-32.png",
+      "text":"Listas de Pedidos",
+      "url":"/cucop/lists",
       "items":[]
     },
     {
       "id":1,
-      "img":"icons8-agregar-propiedad-30.png",
-      "text":"Historial",
-      "url":"/time/checks",
+      "img":"icons8-tienda-50.png",
+      "text":"Proveedores",
+      "url":"/cucop/suppliers",
+      "items":[]
+    },
+    {
+      "id":4,
+      "img":"icons8-producto-nuevo-30.png",
+      "text":"Productos",
+      "url":"/cucop/products",
+      "items":[]
+    },
+    {
+      "id":2,
+      "img":"icons8-editor-de-registro-50.png",
+      "text":"CUCoP",
+      "url":"/cucop/cucop",
+      "items":[]
+    },
+    {
+      "id":3,
+      "img":"icons8-usuario-30.png",
+      "text":"Usuarios",
+      "url":"/cucop/users",
       "items":[]
     },
   ]
-  if (user?.rol == "admin") {
-    options.push(
-      {
-        "id":2,
-        "img":"icons8-proveedor-30.png",
-        "text":"Cliente interno",
-        "url":"/time/customers",
-        "items":[]
-      },
-      {
-        "id":3,
-        "img":"icons8-usuario-30.png",
-        "text":"Usuarios",
-        "url":"/time/users",
-        "items":[]
-      },
-      {
-        "id":4,
-        "img":"icons8-gráfico-combinado-30.png",
-        "text":"Reportes",
-        "url":"/time/reports",
-        "items":[]
-      },
-    )
-  }
-
+  
 mixin nav-bar(index)
   nav.left-container
     .logo-container
-      img(src="/time/public/images/cicese.png").logo-img
-    +nav-bar-ul(index, options, 7)
+      img(src="/cucop/public/images/cicese.png").logo-img
+    +nav-bar-ul(index, options, 5)
 
 mixin nav-bar-ul(index, items, padding)
   ul.list-container
@@ -54,7 +50,7 @@ mixin nav-bar-ul(index, items, padding)
         a(href=item.url class=(index == item.id ? "active":"") style=`padding-left: ${padding}%`).list-item
           .list-item-img-container
             if item.img
-              img(src=`/time/public/images/nav-bar/${item.img}`).list-item-img
+              img(src=`/cucop/public/images/nav-bar/${item.img}`).list-item-img
           .list-item-text
             .list-link #{item.text}
         if item.items
@@ -64,15 +60,13 @@ mixin nav-top(title)
   .top-container
     .top-left-container
       #btn-collapse.top-left-img-container
-        img(src=`/time/public/images/nav-bar/icons8-menú-50.png`).top-left-img
+        img(src=`/cucop/public/images/nav-bar/icons8-menú-50.png`).top-left-img
       .top-right-text 
         h4.top-right-title #{title}
-    .top-center-container
-      h4#nav-bar-date
     .top-right-container
       - if (user)
         h4.white-title #{user.firstNames} #{user.lastNames}
-        a(href="/time/logout")
-          img(src="/time/public/images/nav-bar/Logout.png", alt="Logout").logout-button
+        a(href="/cucop/logout")
+          img(src="/cucop/public/images/nav-bar/Logout.png", alt="Logout").logout-button
       - else  
-        a(href="/time/login").btn.btn-primary  Iniciar sesión
+        a(href="/cucop/login").btn.btn-primary  Iniciar sesión

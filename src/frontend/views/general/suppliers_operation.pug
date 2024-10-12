@@ -1,0 +1,25 @@
+include ../../templates/common/constants.pug
+include ../../templates/common/header.pug
+include ../../templates/common/scripts.pug
+include ../../templates/common/layout.pug
+include ../../templates/general/suppliers/operation.pug
+
+doctype html
+html(lang="es")
+  head
+    if operation == 'create'
+      +header("Agregar proveedor")
+    else
+      +header("Editar proveedor")
+  body
+    .main-container
+      +nav-bar(1)
+      .right-container
+        if operation == 'create'
+          +nav-top("Agregar proveedor")
+        else
+          +nav-top("Editar proveedor")
+        .content-container#app
+          +operation()
+    +scripts()
+    script(src="/cucop/public/js/general/suppliers/suppliers_operation.js")

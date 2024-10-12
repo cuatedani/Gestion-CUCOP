@@ -1,0 +1,45 @@
+mixin filters()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Filtros
+      .white-header-container-links
+        a(href="/cucop/cucop/create").btn.btn-link.p-0 Agregar registro CUCoP
+        a(href="/cucop/cucop/load").btn.btn-link.p-0 Importar
+        button.btn.btn-link.p-0(@click="exportData") Exportar
+    hr.white-hr
+    .white-body-container
+      .row
+        .col-10
+          label.form-label Todos los campos
+          input.form-control(type="text", placeholder="Ej. Remuneraciones al personal", v-model="wherever")
+        .col-2.btn-toggle-more-filters
+          button.btn.btn-primary(data-bs-toggle="collapse", data-bs-target="#extraFilters" @click="toggleExtraFilters") {{ extraFiltersButtonText }}
+      #extraFilters.row.collapse
+        .row.mt-3
+          .col
+            label.form-label Clave CUCoP
+            input(type="text" placeholder="Ej. 12201001" v-model="clavecucop").form-control
+          .col
+            label.form-label Descripción
+            input(type="text" placeholder="Ej. Remuneraciones" v-model="descripcion").form-control
+        .row.mt-3
+          .col
+            label.form-label Unidad de Medida
+            input(type="text" placeholder="Ej. Servicio" v-model="unidaddemedida").form-control
+          .col
+            label.form-label Tipo de Contratación
+            input(type="text" placeholder="Ej. Servicios" v-model="tipodecontratacion").form-control
+        .row.mt-3
+          .col
+            label.form-label Partida Especifica
+            input(type="text" placeholder="Ej. 12201 - Remuneraciones al personal eventual" v-model="partidaespecifica").form-control
+          .col
+            label.form-label Partida Generica
+            input(type="text" placeholder="Ej. 1212 - Sueldo base al personal eventual" v-model="partidagenerica").form-control
+        .row.mt-3
+          .col
+            label.form-label Concepto
+            input(type="text" placeholder="Ej. 1200 - Remuneraciones al personal de caracter transitorio" v-model="concepto").form-control
+          .col
+            label.form-label Capítulo
+            input(type="text" placeholder="Ej. 1000 - Servicios Personales" v-model="capitulo").form-control

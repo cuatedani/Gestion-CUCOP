@@ -8,7 +8,7 @@ createApp({
         lastNames: "",
         password: "",
         email: "",
-        rol: "",
+        rol: "normal",
         active: true,
       },
       initialPassword: "",
@@ -30,7 +30,7 @@ createApp({
   methods: {
     loadUser: async function () {
       try {
-        const request = await axios.get(`/time/api/users/${this.id}`);
+        const request = await axios.get(`/cucop/api/users/${this.id}`);
         this.user = request.data.user;
         this.user.active = this.user.active == 1;
         this.initialPassword = this.user.password;
@@ -57,14 +57,18 @@ createApp({
       try {
         let result;
         if (isNaN(this.id)) {
-          result = await axios.post("/time/api/users", this.user);
-          window.location.replace(`/time/users`);
+          result = await axios.post("/cucop/api/users", this.user);
         } else {
           if (this.initialPassword == this.user.password)
             delete this.user.password;
-          result = await axios.put(`/time/api/users/${this.id}`, this.user);
+          result = await axios.put(`/cucop/api/users/${this.id}`, this.user);
         }
         this.code = result.status;
+        if (this.code == 200) {
+          setTimeout(() => {
+            window.location.replace(`/cucop/users`);
+          }, 1500);
+        }
       } catch (ex) {
         this.code = ex.response.status;
       }

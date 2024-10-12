@@ -6,42 +6,38 @@ mixin operation()
     .white-body-container
       .row
         .col
-          label.form-label Nombres del usuario
-          <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. Carlos" v-model="user.firstNames").form-control
+          label.form-label Nombre
+          span.text-red * 
+          input.form-control(type="text" placeholder="Juan Daniel" v-model="user.firstNames")
         .col
-          label.form-label Apellidos del usuario
-          <span class="text-red">*</span>
-          input(type="text" placeholder="Ej. Ramirez" v-model="user.lastNames").form-control
-      .row.mt-3 
+          label.form-label Apellidos
+          input.form-control(type="text" placeholder="Ej. Gomez Gonzalez" v-model="user.lastNames")
+      .row.mt-3
         .col
-          label.form-label Correo electrónico
-          <span class="text-red">*</span>
-          input(type="email" placeholder="Ej. email@example.com" v-model="user.email").form-control
+          label.form-label Correo Electronico
+          span.text-red * 
+          input.form-control(type="email" placeholder="Ej. correo@cicese.com.mx" v-model="user.email")
         .col
           label.form-label Contraseña
-          <span class="text-red">*</span>
-          input(type="password" placeholder="Ej. **************" v-model="user.password").form-control
-      .row.mt-3 
+          span.text-red * 
+          input.form-control(type="password" placeholder="********" v-model="user.password")
         .col
           label.form-label Rol
-          <span class="text-red">*</span>
           select(name="rol" v-model="user.rol").form-select
-            option(value="") Selecciona un rol
             option(value="normal") Normal
             option(value="admin") Administrador
       .row.mt-3
         .col
           .form-check
             label.form-check-label Activo
-              input(type="checkbox" name="active" v-model="user.active").form-check-input
+              input.form-check-input(type="checkbox" name="active" v-model="user.active")
       .row.mt-3 
         .col-12.text-end
-          a(href="/time/users").btn.btn-secondary.me-3 Cancelar
-          button(type="sumbit" @click="sendForm").btn.btn-primary #{operation == "create" ? "Agregar" : "Actualizar"}
+          a.btn.btn-secondary.me-3(href="/cucop/users") Cancelar
+          button.btn.btn-primary(type="button" @click="sendForm") #{operation == "create" ? "Agregar" : "Actualizar"}
       .row.mt-3
         if operation == "create"
-          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Usuario creado exitosamente
+          div.alert.alert-success.mt-3(v-if="code==200" role="alert") Usuario creado exitosamente
         else
-          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Usuario actualizado exitosamente
-        div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error al realizar la operación revisa los campos
+          div.alert.alert-success.mt-3(v-if="code==200" role="alert") Usuario actualizado exitosamente
+        div.alert.alert-danger.mt-3(v-if="code!=0 && code!=200" role="alert") Error al realizar la operación, revisa los campos

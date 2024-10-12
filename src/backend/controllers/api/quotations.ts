@@ -7,11 +7,16 @@ const app = express();
 app.get("/cucop/api/quotations", auth, async (req, res) => {
   const { sort = "desc", status } = req.query;
 
-  const quotation = await Quotation.getAll({
+  const quotations = await Quotation.getAll({
     sort: sort as "desc" | "asc",
     status: status as "all" | "active" | "inactive",
   });
-  res.status(200).send({ code: 200, quotation });
+  res.status(200).send({ code: 200, quotations });
+});
+
+app.get("/cucop/api/list/quotations/:id", auth, async (req, res) => {
+  const quotations = await Quotation.getByList(req.params.id);
+  res.status(200).send({ code: 200, quotations });
 });
 
 app.get("/cucop/api/quotations/:id", auth, async (req, res) => {

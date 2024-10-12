@@ -1,0 +1,45 @@
+mixin operation()
+  .white-container.mb-4
+    .white-header-container
+      h4.white-title Datos del Proveedor
+    hr.white-hr
+    .white-body-container
+      .row
+        .col
+          label.form-label Nombre
+          <span class="text-red">*</span>
+          input(type="text" placeholder="Ej. Papeleria" v-model="supplier.name").form-control
+        .col
+          label.form-label RFC
+          <span class="text-red">*</span>
+          input(type="email" placeholder="Ej. EJM951103H34" v-model="supplier.tin").form-control
+      .row.mt-3 
+        .col
+          label.form-label Descripción
+          textarea(placeholder="Ej. Extenso Surtido" v-model="supplier.description" rows="3" cols="50").form-control
+      .row.mt-3
+        .col
+          label.form-label Teléfono
+          input(type="text" placeholder="Ej. 311-100-1111" v-model="supplier.phone").form-control
+        .col
+          label.form-label Correo Electrónico
+          input(type="text" placeholder="Ej. proveedor@mail.com" v-model="supplier.email").form-control
+      .row.mt-3
+        .col
+          label.form-label Dirección
+          input(type="text" placeholder="Ej. Av.Mexico #122" v-model="supplier.address").form-control
+      .row.mt-3
+        .col
+          .form-check
+            label.form-check-label Activo
+              input(type="checkbox" name="active" v-model="supplier.active").form-check-input
+      .row.mt-3 
+        .col-12.text-end
+          a(href="/cucop/suppliers").btn.btn-secondary.me-3 Cancelar
+          button(type="sumbit" @click="sendForm").btn.btn-primary #{operation == "create" ? "Agregar" : "Actualizar"}
+      .row.mt-3
+        if operation == "create"
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Proveedor creado exitosamente
+        else
+          div(role="alert" v-if="code==200").alert.alert-success.mt-3 Proveedor actualizado exitosamente
+        div(role="alert" v-if="code!=0 && code!=200").alert.alert-danger.mt-3 Error al realizar la operación revisa los campos

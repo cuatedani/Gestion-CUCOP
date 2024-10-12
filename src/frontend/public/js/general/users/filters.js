@@ -5,6 +5,7 @@ export const filteringUsers = ({
   rol,
   email,
   active,
+  wherever,
 }) => {
   if (firstNames)
     data = data.filter((x) =>
@@ -19,6 +20,13 @@ export const filteringUsers = ({
   if (email)
     data = data.filter((x) =>
       x.email.toLowerCase().includes(email.toLowerCase()),
+    );
+  if (wherever)
+    data = data.filter(
+      (x) =>
+        x.firstNames.toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.lastNames || "").toLowerCase().includes(wherever.toLowerCase()) ||
+        (x.email || "").toLowerCase().includes(wherever.toLowerCase()),
     );
   if (active) data = data.filter((x) => x.active == active);
   return data;
